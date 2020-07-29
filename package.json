@@ -1,5 +1,5 @@
 {
-  "name": "AwesomeProject",
+  "name": "TheDarkRoom",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -39,6 +39,7 @@
     "eslint": "^6.5.1",
     "jest": "^25.1.0",
     "metro-react-native-babel-preset": "^0.59.0",
+    "react-native-rename": "^2.4.1",
     "react-test-renderer": "16.13.1",
     "redux-logger": "^3.0.6"
   },

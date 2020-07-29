@@ -131,7 +131,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.awesomeproject"
+        applicationId "com.thedarkroom"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -146,13 +146,19 @@ android {
         }
     }
     signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            debug {
+                storeFile file('debug.keystore')
+                storePassword 'darkmoon-password-debug'
+                keyAlias 'darkmoonDebugAlias'
+                keyPassword 'darkmoon-password-debug'
+            }
+            release {
+                storeFile file('release.keystore')
+                storePassword 'darkmoon-password-release'
+                keyAlias 'darkmoonReleaseAlias'
+                keyPassword 'darkmoon-password-release'
+           }
         }
-    }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
