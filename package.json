@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@react-native-community/blur": "^3.6.0",
+    "@react-native-community/cameraroll": "^4.0.0",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.7.2",
     "@react-navigation/stack": "^5.8.0",
@@ -29,11 +30,13 @@
     "react-native-reanimated": "^1.10.1",
     "react-native-safe-area-context": "^3.1.1",
     "react-native-screens": "^2.9.0",
+    "react-native-share": "^3.7.0",
     "react-native-splash-screen": "^3.2.0",
     "react-redux": "^7.2.1",
     "redux": "^4.0.5",
     "redux-act": "^1.8.0",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",

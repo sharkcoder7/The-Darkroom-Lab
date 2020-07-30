@@ -5,6 +5,7 @@ import {useTheme} from '../theme-manager';
 import {AlbumInfo} from '../components/AlbumInfo';
 import {Roll} from '../components/Roll';
 import HeaderButton from '../components/HeaderButton';
+import {customBackButtonHeaderProps} from '../components/BackButton';
 
 export default function AlbumRolls ({route, navigation})
 {
@@ -16,17 +17,10 @@ export default function AlbumRolls ({route, navigation})
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerBackImage: () => (
-                <TouchableOpacity style={styles.backButton}>
-                    <Image style={styles.backButtonIcon} source={require('../assets/back_arrow_icon.png')}/>
-                </TouchableOpacity>
-            ),
             headerRight: () => (
                 <HeaderButton text="Edit Album" onPress={toEditAlbum}/>
             ),
-            headerLeftStyle : styles.backButton,
-            headerBackTitleStyle : {color: '#fff', marginTop: -10},
-            headerBackTitle : 'Orders'
+            ...customBackButtonHeaderProps('Orders')
         });
     }, [navigation]);
 
@@ -55,13 +49,14 @@ export default function AlbumRolls ({route, navigation})
 
     function selectRoll (roll)
     {
-        navigation.navigate('Roll', {album, roll});
+        //navigation.navigate('RollImages', {album, roll});
+        navigation.navigate('ImageDetail', {album, roll, image : roll.images[0]});
     }
 
     return (
         <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
             <AlbumInfo album={album} isInsideAlbumBlock={false}/>
-            <FlatList style={styles.listWrapper} data={rolls} renderItem={({item}) => <Roll key={item.id} roll={item} onPress={() => selectRoll(rolls)}/>}/>
+            <FlatList style={styles.listWrapper} data={rolls} renderItem={({item}) => <Roll key={item.id} roll={item} onPress={() => selectRoll(item)}/>}/>
         </View>
     )
 }
@@ -77,15 +72,5 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingHorizontal: 10,
         marginTop: 15
-    },
-    backButton : {
-        marginRight: 5,
-        marginTop: -10,
-        marginLeft: 10
-    },
-    backButtonIcon : {
-        width : 17,
-        height: 23,
-        marginRight: 5
     }
 });

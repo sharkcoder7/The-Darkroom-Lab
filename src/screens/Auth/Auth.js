@@ -15,6 +15,7 @@ import LinearGradient from "react-native-linear-gradient";
 import {Button} from '../../components/Button';
 import {useRequest} from '../../helper';
 import {setToken} from '../../ducks/main';
+import {customBackButtonHeaderProps} from '../../components/BackButton';
 
 export default function Auth ({route, navigation})
 {
@@ -26,14 +27,7 @@ export default function Auth ({route, navigation})
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerBackImage: () => (
-                <TouchableOpacity style={styles.backButton}>
-                    <Image style={styles.backButtonIcon} source={require('../../assets/back_arrow_icon.png')}/>
-                </TouchableOpacity>
-            ),
-            headerLeftStyle : styles.backButton,
-            headerBackTitleStyle : {color: '#fff', marginTop: -10},
-            headerBackTitle : 'Back'
+            ...customBackButtonHeaderProps('Back')
         });
     }, [navigation]);
 
@@ -133,15 +127,5 @@ const styles = StyleSheet.create({
     },
     button : {
         marginTop: 25
-    },
-    backButton : {
-        marginRight: 5,
-        marginTop: -10,
-        marginLeft: 10
-    },
-    backButtonIcon : {
-        width : 17,
-        height: 23,
-        marginRight: 5
     }
 });

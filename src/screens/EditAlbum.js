@@ -4,6 +4,7 @@ import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import {AlbumInfo} from '../components/AlbumInfo';
 import HeaderButton from '../components/HeaderButton';
+import {customBackButtonHeaderProps} from '../components/BackButton';
 
 export default function EditAlbum ({route, navigation})
 {
@@ -14,17 +15,10 @@ export default function EditAlbum ({route, navigation})
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerBackImage: () => (
-                <TouchableOpacity style={styles.backButton}>
-                    <Image style={styles.backButtonIcon} source={require('../assets/back_arrow_icon.png')}/>
-                </TouchableOpacity>
-            ),
             headerRight: () => (
                 <HeaderButton text="Done" onPress={submit}/>
             ),
-            headerLeftStyle : styles.backButton,
-            headerBackTitleStyle : {color: '#fff', marginTop: -10},
-            headerBackTitle : 'Rolls'
+            ...customBackButtonHeaderProps('Album')
         });
     }, [navigation]);
 
@@ -54,15 +48,5 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         paddingTop: 15
-    },
-    backButton : {
-        marginRight: 5,
-        marginTop: -10,
-        marginLeft: 10
-    },
-    backButtonIcon : {
-        width : 17,
-        height: 23,
-        marginRight: 5
     }
 });

@@ -23,7 +23,7 @@ export const SharedUtils =
     {
         if (!this.lazyLoadedModules["Share"])
         {
-            this.lazyLoadedModules["Share"] = require('react-native').Share;
+            this.lazyLoadedModules["Share"] = require('react-native-share').default;
         }
 
         return this.lazyLoadedModules["Share"];

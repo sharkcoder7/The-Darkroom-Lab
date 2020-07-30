@@ -14,6 +14,8 @@ import AlbumRolls from './screens/AlbumRolls';
 import {FosLogo} from './components/FosLogo';
 import {Image, TouchableOpacity} from 'react-native';
 import EditAlbum from './screens/EditAlbum';
+import RollImages from './screens/RollImages';
+import ImageDetail from './screens/ImageDetail';
 
 const headerStyle = {
     headerStyle : {
@@ -50,6 +52,8 @@ const MainStackScreen = () => {
                     <MainStack.Screen name="Albums" component={Albums} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
                     <MainStack.Screen name="AlbumRolls" component={AlbumRolls} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
                     <MainStack.Screen name="EditAlbum" component={EditAlbum} options={{...headerStyle, headerTitle : 'Edit'}}/>
+                    <MainStack.Screen name="RollImages" component={RollImages} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
+                    <MainStack.Screen name="ImageDetail" component={ImageDetail} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
                     <MainStack.Screen name="Main2" component={register({require : () => require('./screens/Details')})} />
                 </React.Fragment>
             }
