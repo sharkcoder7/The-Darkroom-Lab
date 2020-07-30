@@ -1,10 +1,10 @@
 import {createAction, createReducer} from "redux-act";
 
-export const setTest = createAction('gogo test');
-const initialState =  {test : '12312312'};
+export const setToken = createAction('Set user token');
+const initialState =  {token : null};
 
 const main = createReducer({
-    [setTest]: (state, payload) => ({...state, test: payload})
+    [setToken]: (state, payload) => ({...state, token: payload})
 }, initialState);
 
 export default main;

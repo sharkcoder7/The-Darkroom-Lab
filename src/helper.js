@@ -1,6 +1,6 @@
 import {useCallback, useState} from "react";
 
-export const API_ENDPOINT = 'https://your_api';
+export const API_ENDPOINT = 'https://private-0abce-dmitry100.apiary-mock.com';
 
 export function useRequest ()
 {
@@ -13,7 +13,7 @@ export function useRequest ()
 
         const headers = new Headers({'App-Version': '1.0', 'Content-Type' : 'application/json', ...additionalHeaders});
         options = {...options, timeout : options.timeout || 5000, headers};
-        let response = await timeoutPromise(options.timeout, fetch(endpoint, options));
+        let response = await timeoutPromise(options.timeout, fetch(API_ENDPOINT + endpoint, options));
 
         try
         {
@@ -41,14 +41,13 @@ export function useRequest ()
         }
         catch (e)
         {
-            console.warn(e);
             setError(e.message);
         }
         finally
         {
             setLoading(false);
         }
-    }, [])
+    }, []);
 
     return { loading, request, error }
 }
