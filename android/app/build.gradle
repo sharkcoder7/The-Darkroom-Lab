@@ -98,7 +98,7 @@ def enableSeparateBuildPerCPUArchitecture = true
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = true
+def enableProguardInReleaseBuilds = false
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -159,6 +159,9 @@ android {
                 keyPassword 'darkmoon-password-release'
            }
         }
+	dexOptions {
+			javaMaxHeapSize "5g"
+		 }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug

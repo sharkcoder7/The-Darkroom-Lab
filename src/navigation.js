@@ -1,6 +1,6 @@
 import React from "react";
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, HeaderStyleInterpolators } from '@react-navigation/stack';
 import { register } from 'react-native-bundle-splitter';
 
 import Albums from './screens/Albums';
@@ -38,7 +38,7 @@ const MainStackScreen = () => {
     const token = useSelector(state => state.main.token, shallowEqual);
 
     return (
-        <MainStack.Navigator initialRouteName="Welcome" >
+        <MainStack.Navigator initialRouteName="Welcome" headerMode="screen" >
             {
                 !token &&
                 <React.Fragment>
