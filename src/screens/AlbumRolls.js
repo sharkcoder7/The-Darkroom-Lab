@@ -20,7 +20,7 @@ export default function AlbumRolls ({route, navigation})
             headerRight: () => (
                 <HeaderButton text="Edit Album" onPress={toEditAlbum}/>
             ),
-            ...customBackButtonHeaderProps('Orders')
+            ...customBackButtonHeaderProps('Orders', navigation)
         });
     }, [navigation]);
 

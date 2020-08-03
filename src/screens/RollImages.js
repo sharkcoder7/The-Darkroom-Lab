@@ -19,7 +19,7 @@ export default function RollImages ({route, navigation})
             headerRight: () => (
                 <HeaderButton text="Select" onPress={() => setSelectionMode(true)}/>
             ),
-            ...customBackButtonHeaderProps('Album')
+            ...customBackButtonHeaderProps('Album', navigation)
         });
     }, [navigation]);
 

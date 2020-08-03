@@ -1,10 +1,10 @@
 import React from 'react';
 import {Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 
-export default function BackButton ({})
+export default function BackButton ({navigation})
 {
     return (
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Image style={styles.backButtonIcon} source={require('../assets/back_arrow_icon.png')}/>
         </TouchableOpacity>
     )
@@ -14,7 +14,7 @@ export default function BackButton ({})
 const styles = StyleSheet.create({
     backButton : {
         marginRight: 5,
-        marginTop: -10,
+        marginTop: 0,
         marginLeft: 10
     },
     backButtonIcon : {
@@ -24,12 +24,12 @@ const styles = StyleSheet.create({
     }
 });
 
-export const customBackButtonHeaderProps = (title) =>
+export const customBackButtonHeaderProps = (title, navigation) =>
 {
     return {
-        headerBackImage: BackButton,
+        headerBackImage: () => <BackButton navigation={navigation}/>,
         headerLeftStyle : styles.backButton,
-        headerBackTitleStyle : {color: '#fff', marginTop: -10},
+        headerBackTitleStyle : {color: '#fff', marginTop: 0},
         headerBackTitle : title
     };
 };

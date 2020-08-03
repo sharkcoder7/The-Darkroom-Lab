@@ -18,7 +18,7 @@ export default function EditAlbum ({route, navigation})
             headerRight: () => (
                 <HeaderButton text="Done" onPress={submit}/>
             ),
-            ...customBackButtonHeaderProps('Album')
+            ...customBackButtonHeaderProps('Album', navigation)
         });
     }, [navigation]);
 

@@ -13,6 +13,7 @@ import {customBackButtonHeaderProps} from '../components/BackButton';
 import {SharedUtils} from '../shared';
 import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
+import HeaderButton from '../components/HeaderButton';
 
 export default function ImageDetail ({route, navigation})
 {
@@ -34,7 +35,10 @@ export default function ImageDetail ({route, navigation})
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            ...customBackButtonHeaderProps('Roll')
+            headerRight: () => (
+                <View></View>
+            ),
+            ...customBackButtonHeaderProps('Roll', navigation)
         });
     }, [navigation]);
 

@@ -27,7 +27,7 @@ export default function Auth ({route, navigation})
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            ...customBackButtonHeaderProps('Back')
+            ...customBackButtonHeaderProps('Back', navigation)
         });
     }, [navigation]);
 
