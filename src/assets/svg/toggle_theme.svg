@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="73px" height="34px" viewBox="0 0 73 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Light Dark mode toggle</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-18.000000, -439.000000)" stroke="#FFFFFF">
+            <g id="Light-Dark-mode-toggle" transform="translate(19.000000, 440.000000)">
+                <rect id="Rectangle" stroke-width="1.5" x="0" y="0" width="71" height="32" rx="14.5"></rect>
+                <path d="M54.2927797,6.95424968 C55.9968222,7.31270163 57.4971232,8.13638507 58.664128,9.28386395 C60.2759456,10.8687132 61.25,13.0689376 61.25,15.5 C61.25,17.9176994 60.2872159,20.1070595 58.728921,21.6916378 C57.1751285,23.2716378 55.0288931,24.25 52.6575764,24.25 C50.4170441,24.25 48.3778187,23.3765998 46.8494201,21.9477642 C49.5824998,21.95 51.8739156,20.9080471 53.5323507,19.2216396 C55.1862835,17.5398104 56.2103035,15.2166705 56.2103035,12.65 C56.2103035,10.5034085 55.494112,8.52722469 54.2927797,6.95424968 Z" id="Path" stroke-width="1.5"></path>
+            </g>
+        </g>
+    </g>
+</svg>

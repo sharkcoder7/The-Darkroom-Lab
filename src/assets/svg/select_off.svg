@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>select icon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-173.000000, -505.000000)" stroke="#FFFFFF">
+            <g id="select-icon" transform="translate(174.000000, 506.000000)">
+                <circle id="Oval-4" fill-opacity="0.4" fill="#FFFFFF" cx="10" cy="10" r="10"></circle>
+                <polyline id="Path-12" stroke-width="2" points="4.70588235 10.5882353 9.41176471 14.1176471 14.7058824 5.88235294"></polyline>
+            </g>
+        </g>
+    </g>
+</svg>

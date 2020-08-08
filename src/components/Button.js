@@ -5,32 +5,30 @@ import {
     Text,
     TouchableOpacity,
 } from 'react-native';
+import LinearGradient from "react-native-linear-gradient";
 
 export function Button ({onPress, text, style})
 {
     return (
-        <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
-            <Text style={styles.buttonText}>{text}</Text>
-            <Image style={styles.arrowIcon} source={require('../assets/back_arrow_icon.png')}></Image>
-        </TouchableOpacity>
+        <LinearGradient colors={['#fa8e01', '#fcc801']} style={style}>
+            <TouchableOpacity onPress={onPress} style={styles.button}>
+                <Text style={styles.buttonText}>{text}</Text>
+            </TouchableOpacity>
+        </LinearGradient>
     )
 }
 
 const styles = StyleSheet.create({
     button : {
         flexDirection : 'row',
-        justifyContent: 'space-between',
-        backgroundColor: '#33333380',
-        borderWidth: 1,
-        borderColor: '#999',
-        paddingVertical: 18,
-        paddingHorizontal : 30,
-        marginBottom: 7,
-        width: '100%'
+        justifyContent: 'center',
+        paddingVertical: 10,
+        paddingHorizontal : 35,
     },
     buttonText : {
-        color: 'white',
-        fontSize: 16
+        color: '#000',
+        fontSize: 24,
+        fontWeight : "600"
     },
     arrowIcon : {
         transform: [{ rotate: '180deg'}],

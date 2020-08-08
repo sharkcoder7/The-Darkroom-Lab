@@ -18,7 +18,7 @@ export function configureStore ()
     const withStorage = true;
 
     const rootReducer = combineReducers({
-        main : withStorage ? persistReducer({key: "main", storage : FastStorage, blacklist: ['token']}, main) : main
+        main : withStorage ? persistReducer({key: "main", storage : FastStorage, blacklist: []}, main) : main
     });
     const enhancer = compose(applyMiddleware(...middlewares));
     const store = createStore(rootReducer, enhancer);

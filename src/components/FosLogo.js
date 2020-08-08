@@ -1,5 +1,6 @@
 import React from 'react';
 import {Image, Dimensions, View, Platform} from 'react-native';
+import Fos from './icons/Fos';
 
 export function FosLogo (props)
 {
@@ -10,6 +11,6 @@ export function FosLogo (props)
         imageHeight = imageWidth / imageOriginalWidth * imageOriginalHeight;
 
     return <View style={{paddingTop : Platform.OS === 'ios' ? 10 : 0}}>
-        <Image resizeMode="contain" style={{width: imageWidth, height: imageHeight}} source={require('../assets/fos_logo.png')}/>
+        <Fos/>
     </View>
 }

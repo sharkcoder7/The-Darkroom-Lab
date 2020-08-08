@@ -7,7 +7,6 @@ import Albums from './screens/Albums';
 import Welcome from './screens/Auth/Welcome';
 import {ImageHeader} from './components/ImageHeader';
 import {TdrLogo} from './components/TdrLogo';
-import Auth from './screens/Auth/Auth';
 import {shallowEqual, useSelector} from 'react-redux';
 import Notifications from './screens/Notifications';
 import AlbumRolls from './screens/AlbumRolls';
@@ -43,7 +42,6 @@ const MainStackScreen = () => {
                 !token &&
                 <React.Fragment>
                     <MainStack.Screen name="Welcome" component={Welcome} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
-                    <MainStack.Screen name="Auth" component={Auth} options={{...headerStyle, headerTitle : '', headerBackTitle : 'Back', headerBackTitleStyle : {color: '#fff'}}}/>
                 </React.Fragment>
             }
             {
@@ -54,7 +52,7 @@ const MainStackScreen = () => {
                     <MainStack.Screen name="EditAlbum" component={EditAlbum} options={{...headerStyle, headerTitle : 'Edit'}}/>
                     <MainStack.Screen name="RollImages" component={RollImages} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
                     <MainStack.Screen name="ImageDetail" component={ImageDetail} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
-                    <MainStack.Screen name="Main2" component={register({require : () => require('./screens/Details')})} />
+                    {/*<MainStack.Screen name="Main2" component={register({require : () => require('./screens/Details')})} />*/}
                 </React.Fragment>
             }
         </MainStack.Navigator>

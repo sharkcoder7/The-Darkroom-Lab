@@ -1,22 +1,32 @@
 
-/*export function openUrl (url)
+export function openUrl (url)
 {
-    utils.Linking.canOpenURL(url).then(supported =>
+    SharedUtils.Linking.canOpenURL(url).then(supported =>
     {
         if (supported)
         {
-            utils.Linking.openURL(url);
+            SharedUtils.Linking.openURL(url);
         }
         else
         {
             console.log("Don't know how to open URI: " + url);
         }
     });
-}*/
+}
 
 export const SharedUtils =
 {
     lazyLoadedModules : {
+    },
+
+    get Alert ()
+    {
+        if (!this.lazyLoadedModules["Alert"])
+        {
+            this.lazyLoadedModules["Alert"] = require('react-native').Alert;
+        }
+
+        return this.lazyLoadedModules["Alert"];
     },
 
     get Share ()
@@ -29,6 +39,15 @@ export const SharedUtils =
         return this.lazyLoadedModules["Share"];
     },
 
+    get Linking ()
+    {
+        if (!this.lazyLoadedModules["Linking"])
+        {
+            this.lazyLoadedModules["Linking"] = require('react-native').Linking;
+        }
+
+        return this.lazyLoadedModules["Linking"];
+    },
 };
 
 /*

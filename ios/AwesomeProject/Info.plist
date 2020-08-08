@@ -63,6 +63,9 @@
 	<array>
 		<string>Montserrat-SemiBold.ttf</string>
 		<string>Roboto-Regular.ttf</string>
+		<string>MontserratSemiBold.ttf</string>
+		<string>RobotoRegular.ttf</string>
+		<string>LatoBold.ttf</string>
 	</array>
 </dict>
 </plist>

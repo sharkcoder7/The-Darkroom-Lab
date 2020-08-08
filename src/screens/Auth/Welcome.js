@@ -1,18 +1,31 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     ImageBackground,
     Text,
     StyleSheet,
     Image,
     View,
-    TouchableOpacity
+    TouchableOpacity, TextInput, KeyboardAvoidingView,
 } from 'react-native';
 import SplashScreen from "react-native-splash-screen";
 import LinearGradient from 'react-native-linear-gradient';
 import {Button} from '../../components/Button';
+import {useRequest} from '../../helper';
+import {setToken} from '../../ducks/main';
+import {BestLabSeal, OrderPromo, YearsOfQuality} from '../../components/icons';
+import {openUrl, SharedUtils} from '../../shared';
+import BottomSheet from 'reanimated-bottom-sheet'
+import {SheetHeader} from '../../components/SheetHeader';
+import {SheetBody} from '../../components/SheetBody';
 
 export default function Welcome ({navigation})
 {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const passwordInput = useRef();
+    const bottomSheetEl = useRef();
+    const {request, loading, error} = useRequest();
+
     useEffect(() =>
     {
 
@@ -23,47 +36,124 @@ export default function Welcome ({navigation})
         setTimeout(() => SplashScreen.hide(), 50);
     }, []);
 
-    function toSignIn ()
+    async function submit ()
     {
-        navigation.navigate('Auth', {mode : "SignIn"});
+        if (email === '' || password === '')
+        {
+            return ;
+        }
+
+        try
+        {
+            const response = await request(`/auth/signIn`, {method : "POST", body : JSON.stringify({email, password})});
+            setToken(response);
+            navigation.navigate('Albums');
+        }
+        catch (e)
+        {
+            alert('error:' + JSON.stringify(e));
+        }
     }
 
-    function toSignUp ()
+    function openForgotPasswordPage () {
+        openUrl('https://thedarkroom.com/shop/my-account/lost-password/');
+    }
+
+    function openRegistrationSheet ()
     {
-        navigation.navigate('Auth', {mode : "SignUp"});
+        bottomSheetEl.current.snapTo(1);
+    }
+
+    function renderHeader()
+    {
+        return <SheetHeader title="Register" onPress={() => bottomSheetEl.current.snapTo(0)}/>;
+    }
+
+    function renderContent ()
+    {
+        return (
+            <SheetBody>
+                <Text style={[styles.firstLine, styles.text]}>This application is a gallery for customers that have placed and order.</Text>
+                <Text style={styles.text}>
+                    If you don't have an account, you can register at <Text onPress={() => openUrl('https://thedarkmoon.com')} style={styles.linkInText}>thedarkmoon.com</Text>
+                </Text>
+                <View style={styles.registerIconWrapper}>
+                    <OrderPromo style={styles.registerIcon}/>
+                </View>
+            </SheetBody>
+        );
     }
 
     return (
-        <LinearGradient colors={['#474042', '#000']} style={styles.gradient}>
-            <ImageBackground source={require('../../assets/textured_background.png')} style={styles.image}>
+        <React.Fragment>
+                <LinearGradient colors={['#474042', '#000']} style={styles.gradient}>
+                <ImageBackground source={require('../../assets/textured_background.png')} style={styles.image}>
 
-                <View style={styles.wrapper}>
-                    <View></View>
+                    <View style={styles.wrapper}>
+                        <View></View>
 
-                    <View style={styles.buttonsWrapper}>
-                        <Text style={styles.header}>Welcome to The DarkRoom</Text>
+                        <View style={styles.buttonsWrapper}>
+                            <Text style={styles.header}>Login</Text>
 
-                        <Button text="Login" onPress={toSignIn}/>
+                            <TextInput style={styles.input}
+                                       onSubmitEditing={() => { passwordInput.current.focus(); }}
+                                       blurOnSubmit={false}
+                                       placeholderTextColor="#fff"
+                                       textContentType="emailAddress"
+                                       keyboardType="email-address"
+                                       returnKeyType="next"
+                                       onChangeText={setEmail}
+                                       autoCapitalize='none'
+                                       textAlign={'center'}
+                                       placeholder={"Username or email address"}/>
 
-                        <Button text="Register" onPress={toSignUp}/>
+                            <TextInput style={styles.input}
+                                       onSubmitEditing={submit}
+                                       ref={passwordInput}
+                                       placeholderTextColor="#fff"
+                                       textContentType="password"
+                                       returnKeyType="done"
+                                       onChangeText={setPassword}
+                                       secureTextEntry={true}
+                                       autoCapitalize = 'none'
+                                       textAlign={'center'}
+                                       placeholder={"Password"}/>
 
-                    </View>
 
-                    <View>
-                        <View style={styles.bullet}>
-                            <Image style={[{height : 35, aspectRatio : 0.975}, styles.bulletIcon]} source={require('../../assets/40years.png')}/>
-                            <Text style={styles.bulletText}>40+ Years of Quality</Text>
-                            <Text style={styles.bulletText}>Photo Developing</Text>
+                               <Button text="Submit" onPress={submit} style={styles.button}/>
+
+                               <TouchableOpacity onPress={openForgotPasswordPage} style={styles.link}>
+                                   <Text style={styles.linkText}>Forgot Password</Text>
+                               </TouchableOpacity>
+
+                                <TouchableOpacity onPress={openRegistrationSheet} style={styles.link}>
+                                    <Text style={styles.linkText}>Don't have an account?</Text>
+                                </TouchableOpacity>
                         </View>
-                        <View style={styles.bullet}>
-                            <Image style={[{height : 35, aspectRatio : 1.21}, styles.bulletIcon]} source={require('../../assets/best.png')}/>
-                            <Text style={styles.bulletText}>Voted Best Photo Lab</Text>
-                            <Text style={styles.bulletText}>In an Independent User Poll</Text>
+
+                        <View style={styles.bulletsWrapper}>
+                            <View style={styles.bullet}>
+                                <YearsOfQuality style={styles.bulletIcon}/>
+                                <Text style={styles.bulletText}>40+ Years of Quality</Text>
+                                <Text style={styles.bulletText}>Photo Developing</Text>
+                            </View>
+                            <View style={styles.bullet}>
+                                <BestLabSeal style={styles.bulletIcon}/>
+                                <Text style={styles.bulletText}>Voted Best Photo Lab</Text>
+                                <Text style={styles.bulletText}>In an Independent User Poll</Text>
+                            </View>
                         </View>
                     </View>
-                </View>
-            </ImageBackground>
-        </LinearGradient>
+                </ImageBackground>
+            </LinearGradient>
+            <BottomSheet
+                ref={bottomSheetEl}
+                initialSnap={0}
+                snapPoints={[0, 400]}
+                renderContent={renderContent}
+                renderHeader={renderHeader}
+            />
+        </React.Fragment>
     )
 }
 
@@ -88,8 +178,13 @@ const styles = StyleSheet.create({
     },
     header : {
         color: 'white',
-        fontSize: 16,
-        marginBottom: 40
+        fontSize: 24,
+        marginBottom: 20
+    },
+    bulletsWrapper : {
+        flexDirection : 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal : 20
     },
     bullet : {
         alignItems : 'center',
@@ -97,9 +192,47 @@ const styles = StyleSheet.create({
     },
     bulletText : {
         color: '#999',
-        fontSize: 13
+        fontSize: 12
     },
     bulletIcon : {
-        marginBottom : 10
+        marginBottom : 15,
+        transform: [{ scale: 1.2 }]
+    },
+    input : {
+        width: '100%',
+        paddingHorizontal: 10,
+        paddingVertical: 20,
+        fontSize: 18,
+        backgroundColor : '#00000050',
+        borderWidth: 1,
+        borderColor: '#999',
+        marginBottom: 10,
+        color: '#fff'
+    },
+    button : {
+        marginTop: 15
+    },
+    link : {
+        marginTop: 25
+    },
+    linkText : {
+        color: '#3e9d99',
+        fontSize: 16
+    },
+    firstLine : {
+        marginBottom: 15
+    },
+    text : {
+        fontSize: 16,
+        color: '#97989a'
+    },
+    linkInText : {
+        color: '#3e9d99',
+    },
+    registerIconWrapper : {
+        alignItems : 'center',
+        marginTop: 30
+    },
+    registerIcon : {
     }
 });

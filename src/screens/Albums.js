@@ -1,3 +1,4 @@
+
 import React, {useEffect, useState} from 'react';
 import {shallowEqual, useSelector} from "react-redux";
 import {SafeAreaView, Button, Text, StyleSheet, View, Image, FlatList, TouchableOpacity} from 'react-native';
@@ -5,6 +6,12 @@ import SplashScreen from "react-native-splash-screen";
 import {Album} from '../components/Album';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
+import Fos from '../components/icons/Fos';
+import ToggleTheme from '../components/icons/ToggleTheme';
+import {Notifications} from '../components/icons';
+import DownloadFilm from '../components/icons/DownloadFilm';
+import IconBadge from 'react-native-icon-badge';
+import {ToggleThemeButton} from '../components/ToggleThemeButton';
 
 export default function Albums ({navigation})
 {
@@ -51,16 +58,21 @@ export default function Albums ({navigation})
         <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
             <View style={styles.header}>
                 <Text style={[styles.headerText, {color : theme.primaryText}]}>Your Albums</Text>
-                <Image style={styles.headerImage} source={require('../assets/fos_logo.png')}/>
+                <Fos style={styles.icon} fill={theme.primaryText}/>
             </View>
             <FlatList style={styles.listWrapper} data={albums} renderItem={({item}) => <Album key={item.id} album={item} onPress={() => selectAlbum(item)}/>}/>
-            <View style={styles.footer}>
-                <TouchableOpacity onPress={toggle}>
-                    <Image style={styles.switchIcon} source={require('../assets/night_mode_toggle.png')}/>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={toNotifications}>
-                    <Image style={styles.notificationsIcon} source={require('../assets/notification.png')}/>
-                </TouchableOpacity>
+            <View style={[styles.footer, {backgroundColor : mode === 'light' ? '#5e5e5e' : '#000000'}]}>
+                <ToggleThemeButton/>
+                <IconBadge
+                    MainElement={
+                        <TouchableOpacity onPress={toNotifications}>
+                            <Notifications style={styles.notificationsIcon}/>
+                        </TouchableOpacity>
+                    }
+                    BadgeElement={<Text style={styles.badgeText}>{3}</Text>}
+                    IconBadgeStyle={styles.badge}
+                    Hidden={false}
+                />
             </View>
         </View>
     )
@@ -77,7 +89,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 10,
         paddingVertical: 15,
-        marginTop: 10
+        marginTop: 10,
+        marginBottom : 5
     },
     headerText : {
         fontSize: 24,
@@ -102,9 +115,22 @@ const styles = StyleSheet.create({
     footer : {
         justifyContent : 'space-between',
         flexDirection: 'row',
-        paddingTop: 30,
-        paddingBottom: 30,
+        paddingTop: 20,
+        paddingBottom: 20,
         paddingLeft: 15,
         paddingRight: 30,
-    }
+    },
+    icon : {
+        marginTop: 8
+    },
+    badge : {
+        width : 10,
+        height : 20,
+        right: -5,
+        top: -5,
+        backgroundColor: '#3e9d99'
+    },
+    badgeText : {
+        color: '#fff'
+    },
 });

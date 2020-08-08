@@ -1,21 +1,26 @@
 import React from 'react';
 import {Image, View, StyleSheet, Text} from 'react-native';
+import Film from './icons/Film';
+import Picture from './icons/Picture';
+import {useTheme} from '../theme-manager';
 
 export function AlbumInfo ({album, isInsideAlbumBlock = true, showName = true})
 {
+    const { mode, theme, toggle } = useTheme();
+
     return (
         <View style={[styles.infoWrapper, isInsideAlbumBlock ? {position : 'absolute', backgroundColor: '#00000070'} : {}]}>
-            <Text style={[styles.name, isInsideAlbumBlock ? {} : {fontSize: 20}]}>{showName ? album.name : ''}</Text>
+            <Text style={[styles.name, isInsideAlbumBlock ? {} : {fontSize: 20, color: theme.primaryText}]}>{showName ? album.name : ''}</Text>
             <View style={styles.secondaryInfo}>
                 <View style={styles.infoBlock}>
-                    <Image style={[styles.icon, {aspectRatio : 38 / 32}]} source={require('../assets/film_canister.png')}></Image>
-                    <Text style={styles.text}>{album.photoCount}</Text>
+                    <Film fill={theme.primaryText} style={[styles.icon, {transform : [{scale : 1}]}]}/>
+                    <Text style={[styles.text, {color: !isInsideAlbumBlock ? theme.primaryText : '#fff'}]}>{album.photoCount}</Text>
                 </View>
                 <View style={styles.infoBlock}>
-                    <Image style={[styles.icon, {aspectRatio : 44 / 32, marginTop: 3}]} source={require('../assets/picture.png')}></Image>
-                    <Text style={styles.text}>{album.imagesCount}</Text>
+                    <Picture fill={theme.primaryText} style={[styles.icon, {transform : [{scale : 0.9}]}]}/>
+                    <Text style={[styles.text, {color: !isInsideAlbumBlock ? theme.primaryText : '#fff'}]}>{album.imagesCount}</Text>
                 </View>
-                <Text style={[styles.text, styles.date]}>{album.date}</Text>
+                <Text style={[styles.text, styles.date, {color: !isInsideAlbumBlock ? theme.primaryText : '#fff'}]}>{album.date}</Text>
             </View>
         </View>
     )
@@ -35,7 +40,6 @@ const styles = StyleSheet.create({
     name : {
         fontSize: 16,
         color: '#fff',
-        fontWeight: 'bold',
         fontFamily : 'Roboto-Regular'
     },
     secondaryInfo : {
@@ -43,15 +47,18 @@ const styles = StyleSheet.create({
     },
     infoBlock : {
         flexDirection : 'row',
-        marginRight: 10
+        marginRight: 15,
+        marginTop: 2
     },
     icon : {
-        width: 20,
         marginRight: 5,
-        marginTop: 1
+        marginTop: 2
     },
     text : {
         color: 'white',
         fontFamily : 'Roboto-Regular',
+    },
+    date : {
+        marginTop: 2
     }
 });

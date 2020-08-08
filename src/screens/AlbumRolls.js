@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import {StyleSheet, View, FlatList, Image, TouchableOpacity, Text} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -22,7 +22,7 @@ export default function AlbumRolls ({route, navigation})
             ),
             ...customBackButtonHeaderProps('Orders', navigation)
         });
-    }, [navigation]);
+    }, [navigation, rolls]);
 
     useEffect(() =>
     {
@@ -42,15 +42,14 @@ export default function AlbumRolls ({route, navigation})
         }
     }
 
-    function toEditAlbum ()
+    const toEditAlbum = useCallback(() =>
     {
         navigation.navigate('EditAlbum', {album, rolls});
-    }
+    }, [album, rolls]);
 
     function selectRoll (roll)
     {
-        //navigation.navigate('RollImages', {album, roll});
-        navigation.navigate('ImageDetail', {album, roll, image : roll.images[0]});
+        navigation.navigate('RollImages', {album, roll});
     }
 
     return (

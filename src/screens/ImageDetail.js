@@ -14,6 +14,7 @@ import {SharedUtils} from '../shared';
 import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
 import HeaderButton from '../components/HeaderButton';
+import {Delete, Download, LikeOff, LikeOffTool, Rotate, Share} from '../components/icons';
 
 export default function ImageDetail ({route, navigation})
 {
@@ -173,19 +174,19 @@ export default function ImageDetail ({route, navigation})
                 source={{uri : image.imageUrl}} />
             <View style={styles.actions}>
                 <TouchableOpacity onPress={rotate}>
-                    <Text>круг</Text>
+                    <Rotate fill={theme.primaryText}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={share}>
-                    <Text>шеринг</Text>
+                    <Share fill={theme.primaryText}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={like}>
-                    <Text>лайк</Text>
+                    <LikeOffTool fill={theme.primaryText} style={{marginTop: 5}}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={download}>
-                    <Text>скачать</Text>
+                    <Download fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={deleteImage}>
-                    <Text>удалить</Text>
+                    <Delete fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
         </View>

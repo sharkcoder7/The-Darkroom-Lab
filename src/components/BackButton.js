@@ -1,11 +1,15 @@
 import React from 'react';
-import {Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, Image, Platform} from 'react-native';
+import {Back} from './icons';
 
-export default function BackButton ({navigation})
+export default function BackButton ({navigation, title})
 {
     return (
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Image style={styles.backButtonIcon} source={require('../assets/back_arrow_icon.png')}/>
+            <Back style={styles.backButtonIcon}/>
+            {
+                Platform.OS !== 'ios' && <Text style={styles.title}>{title}</Text>
+            }
         </TouchableOpacity>
     )
 }
@@ -14,22 +18,30 @@ export default function BackButton ({navigation})
 const styles = StyleSheet.create({
     backButton : {
         marginRight: 5,
-        marginTop: 0,
-        marginLeft: 10
+        marginTop: 5,
+        marginLeft: 10,
+        flexDirection: 'row'
     },
     backButtonIcon : {
         width : 17,
         height: 23,
-        marginRight: 5
+        marginRight: 5,
+        transform : [{scale : 1}]
+    },
+    title : {
+        fontSize: 16,
+        marginTop: -4,
+        marginLeft: 3,
+        color: '#fff'
     }
 });
 
 export const customBackButtonHeaderProps = (title, navigation) =>
 {
     return {
-        headerBackImage: () => <BackButton navigation={navigation}/>,
+        headerBackImage: () => <BackButton title={title} navigation={navigation}/>,
         headerLeftStyle : styles.backButton,
-        headerBackTitleStyle : {color: '#fff', marginTop: 0},
+        headerBackTitleStyle : {color: '#fff', marginTop: 4},
         headerBackTitle : title
     };
 };
