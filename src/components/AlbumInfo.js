@@ -13,11 +13,11 @@ export function AlbumInfo ({album, isInsideAlbumBlock = true, showName = true})
             <Text style={[styles.name, isInsideAlbumBlock ? {} : {fontSize: 20, color: theme.primaryText}]}>{showName ? album.name : ''}</Text>
             <View style={styles.secondaryInfo}>
                 <View style={styles.infoBlock}>
-                    <Film fill={theme.primaryText} style={[styles.icon, {transform : [{scale : 1}]}]}/>
-                    <Text style={[styles.text, {color: !isInsideAlbumBlock ? theme.primaryText : '#fff'}]}>{album.photoCount}</Text>
+                    <Film fill={!isInsideAlbumBlock ? theme.primaryText : '#fff'} style={[styles.icon, {transform : [{scale : 1}]}]}/>
+                    <Text style={[styles.text, {color: !isInsideAlbumBlock ? theme.primaryText : '#fff'}]}>{album.filmsCount}</Text>
                 </View>
                 <View style={styles.infoBlock}>
-                    <Picture fill={theme.primaryText} style={[styles.icon, {transform : [{scale : 0.9}]}]}/>
+                    <Picture fill={!isInsideAlbumBlock ? theme.primaryText : '#fff'} style={[styles.icon, {transform : [{scale : 0.9}]}]}/>
                     <Text style={[styles.text, {color: !isInsideAlbumBlock ? theme.primaryText : '#fff'}]}>{album.imagesCount}</Text>
                 </View>
                 <Text style={[styles.text, styles.date, {color: !isInsideAlbumBlock ? theme.primaryText : '#fff'}]}>{album.date}</Text>

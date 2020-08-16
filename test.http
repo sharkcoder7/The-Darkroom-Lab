@@ -1,0 +1,91 @@
+POST https://staging.thedarkroom.com/api/api/auth/signIn
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "email" : "eddy.reynoso0618@gmail.com",
+  "password" : "Test123",
+  "device_name" : "test"
+}
+
+###
+
+POST https://staging.thedarkroom.com/api/api/auth/signIn
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "email" : "mferrara@gmail.com",
+  "password" : "eaCNUymYC@Coo1c",
+  "device_name" : "test"
+}
+
+###
+
+GET https://staging.thedarkroom.com/api/api/albums
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
+
+###
+
+GET https://staging.thedarkroom.com/api/api/albums/36374/rolls
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
+
+###
+
+PUT https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
+
+{
+  "id": "25159",
+  "name": "Updated"
+}
+###
+
+PUT https://staging.thedarkroom.com/api/api/albums/36374
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
+
+{
+  "id": "36374",
+  "name": "Updated album"
+}
+###
+
+PUT https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
+
+{
+  "id": "2057532",
+  "liked": true
+}
+
+###
+
+PUT https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532/rotate
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
+
+{
+  "id": "2057532",
+  "rotationAngle": 90
+}
+
+###

@@ -1,17 +1,24 @@
 import {useCallback, useState} from "react";
+import {shallowEqual, useSelector} from 'react-redux';
 
-export const API_ENDPOINT = 'https://private-0abce-dmitry100.apiary-mock.com';
+export const API_ENDPOINT = 'https://staging.thedarkroom.com/api/api';
 
 export function useRequest ()
 {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const token = useSelector(state => state.main.token, shallowEqual);
 
-    const request = useCallback( async (endpoint, options= {}, additionalHeaders = {}) => {
+    const request = useCallback( async (endpoint, options = {}, additionalHeaders = {}) => {
 
         setLoading(true);
 
-        const headers = new Headers({'App-Version': '1.0', 'Content-Type' : 'application/json', ...additionalHeaders});
+        if (options.withAuth !== false)
+        {
+            additionalHeaders['Authorization'] = 'Bearer ' + token;
+        }
+
+        const headers = new Headers({'Content-Type' : 'application/json', ...additionalHeaders});
         options = {...options, timeout : options.timeout || 5000, headers};
         let response = await timeoutPromise(options.timeout, fetch(API_ENDPOINT + endpoint, options));
 
@@ -42,6 +49,7 @@ export function useRequest ()
         catch (e)
         {
             setError(e.message);
+            throw e.message;
         }
         finally
         {
@@ -148,3 +156,4 @@ export function checkChanges (currentProps, currentState, nextProps, nextState)
 
     return changes;
 }
+

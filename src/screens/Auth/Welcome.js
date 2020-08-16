@@ -45,13 +45,13 @@ export default function Welcome ({navigation})
 
         try
         {
-            const response = await request(`/auth/signIn`, {method : "POST", body : JSON.stringify({email, password})});
-            setToken(response);
+            const token = await request(`/auth/signIn`, {withAuth : false, method : "POST", body : JSON.stringify({email, password, device_name : 'test'})});
+            setToken(token);
             navigation.navigate('Albums');
         }
         catch (e)
         {
-            alert('error:' + JSON.stringify(e));
+            alert('The username or password is incorrect');
         }
     }
 
@@ -120,7 +120,7 @@ export default function Welcome ({navigation})
                                        placeholder={"Password"}/>
 
 
-                               <Button text="Submit" onPress={submit} style={styles.button}/>
+                               <Button disabled={loading} text={loading ? 'Wait...' : 'Submit'} onPress={submit} style={[styles.button, {opacity : loading ? 0.7 : 1}]}/>
 
                                <TouchableOpacity onPress={openForgotPasswordPage} style={styles.link}>
                                    <Text style={styles.linkText}>Forgot Password</Text>

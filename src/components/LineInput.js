@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         borderTopWidth : 1,
         borderBottomWidth : 1,
         borderColor: '#686363',
-        paddingHorizontal : 15
+        paddingHorizontal : 15,
     },
     title : {
         marginTop: 13,
@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
         marginRight : 30
     },
     input : {
+        width: '100%',
         color: '#827c7d',
         fontSize: 16,
         marginTop: Platform.OS === 'ios' ? 13 : 0,

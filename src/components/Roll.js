@@ -8,9 +8,9 @@ export function Roll ({roll, onPress})
 
             <View style={styles.images}>
                 {
-                    roll.images.map(image =>
+                    roll.images.slice(0, 4).map(image =>
                         <View style={styles.imageWrapper}>
-                            <Image style={styles.image} resizeMode="cover" source={{uri : image.imageUrl, width : 100, height: 100}}/>
+                            <Image style={styles.image} resizeMode="cover" source={{uri : image.image_urls.sq, width : 100, height: 100}}/>
                         </View>
                     )
                 }

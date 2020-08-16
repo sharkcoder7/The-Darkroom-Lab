@@ -1,6 +1,8 @@
-import React from 'react'
+import React, {useState} from 'react';
 import { Appearance } from 'react-native-appearance'
 import { getTheme } from './theme'
+import {setTheme} from './ducks/main';
+import {shallowEqual, useSelector} from 'react-redux';
 
 // set default colour scheme from OS
 const osTheme = Appearance.getColorScheme();
@@ -16,33 +18,28 @@ export const ManageThemeContext: React.Context<any> = React.createContext({
 export const useTheme = () => React.useContext(ManageThemeContext);
 
 // initiate context provider
-export class ThemeManager extends React.Component<any, any> {
+function ThemeManager ({children})
+{
+    const theme = useSelector(state => state.main.theme, shallowEqual);
+    const [mode, setMode] = useState(theme || osTheme);
 
-    state = {
-        mode: 'dark' || osTheme
+
+    const toggleTheme = async () =>
+    {
+        let newMode = mode === 'light' ? 'dark' : 'light';
+        setMode(newMode);
+        setTheme(newMode);
     };
 
-    componentDidUpdate ()
-    {
-        console.log('theme updated');
-    }
-
-    toggleTheme = async () =>
-    {
-        this.state.mode === 'light' ? this.setState({mode: 'dark'}) : this.setState({mode: 'light'})
-    };
-
-    render () {
-        return (
-            <ManageThemeContext.Provider value={{
-                mode: this.state.mode,
-                theme: getTheme(this.state.mode),
-                toggle: this.toggleTheme
-            }}>
-                {this.props.children}
-            </ManageThemeContext.Provider>
-        )
-    }
+    return (
+        <ManageThemeContext.Provider value={{
+            mode: mode,
+            theme: getTheme(mode),
+            toggle: toggleTheme
+        }}>
+            {children}
+        </ManageThemeContext.Provider>
+    )
 }
 
 export default ThemeManager;

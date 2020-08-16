@@ -21,21 +21,17 @@ import {SheetBody} from '../components/SheetBody';
 import {openUrl} from '../shared';
 import {OrderPromo} from '../components/icons';
 import {useTheme} from '../theme-manager';
+import Back from '../components/icons/Back';
+import {setToken} from '../ducks/main';
 
-export default function Notifications ({navigation})
+export default function Profile ({navigation})
 {
-    const [notifications, setNotifications] = useState([]);
     const [SMSEnabled, setSMSEnabled] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
     const {request, loading, error} = useRequest();
     const bottomSheetEl = useRef();
 
     const { mode, theme, toggle } = useTheme();
-
-    useEffect(() =>
-    {
-        getNotifications();
-    }, []);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -46,27 +42,14 @@ export default function Notifications ({navigation})
         });
     }, [navigation]);
 
-    async function getNotifications ()
-    {
-        try
-        {
-            const response = await request('/notifications');
-            setNotifications(response);
-        }
-        catch (e)
-        {
-            alert('error:' + e);
-        }
-    }
-
     function renderItem ({item})
     {
         return (
             <React.Fragment>
-                <View style={styles.item}>
-                    <Text style={[styles.date, styles.text, {color: theme.primaryText}]}>{item.date}</Text>
+                <TouchableOpacity onPress={item.action} style={styles.item}>
                     <Text style={[styles.text, {color: theme.primaryText}]}>{item.text}</Text>
-                </View>
+                    <Back style={styles.arrow}/>
+                </TouchableOpacity>
                 <Separator/>
             </React.Fragment>
         );
@@ -75,6 +58,12 @@ export default function Notifications ({navigation})
     function openSettingsSheet ()
     {
         bottomSheetEl.current.snapTo(1);
+    }
+
+    function logout ()
+    {
+        navigation.navigate('Main');
+        setToken(null);
     }
 
     function renderHeader()
@@ -113,14 +102,25 @@ export default function Notifications ({navigation})
         );
     }
 
+    const items = [
+        {
+            text : 'Notifications',
+            action : openSettingsSheet,
+        },
+        {
+            text : 'Terms of Service',
+            action : () => false,
+        },
+        {
+            text : 'Logout',
+            action : logout,
+        }
+    ];
+
     return (
         <React.Fragment>
             <View style={[styles.wrapper, {backgroundColor: theme.backgroundColor}]}>
-                {/*<TouchableOpacity onPress={openSettingsSheet} style={styles.link}>
-                    <Text style={styles.linkText}>Settings</Text>
-                </TouchableOpacity>
-                <Separator/>*/}
-                <FlatList data={notifications} keyExtractor={item => item.id} renderItem={renderItem}></FlatList>
+                <FlatList data={items} keyExtractor={item => item.text} renderItem={renderItem}></FlatList>
             </View>
             <BottomSheet
                 ref={bottomSheetEl}
@@ -143,23 +143,17 @@ const styles = StyleSheet.create({
     },
     item : {
         flexDirection : 'row',
+        justifyContent: 'space-between',
         paddingVertical : 5,
         paddingHorizontal: 15
-    },
-    date : {
-        marginRight: 10
     },
     text : {
         color: '#fff',
         fontSize: 18
     },
-    link : {
-        marginBottom: 10,
-        paddingHorizontal: 15
-    },
-    linkText : {
-        color: '#3e9d99',
-        fontSize: 18
+    arrow : {
+        transform: [{rotate : "180deg"}],
+        marginTop: 4
     },
     switchWrapper : {
         flexDirection: 'row',

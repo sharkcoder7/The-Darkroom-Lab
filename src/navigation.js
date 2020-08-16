@@ -15,6 +15,7 @@ import {Image, TouchableOpacity} from 'react-native';
 import EditAlbum from './screens/EditAlbum';
 import RollImages from './screens/RollImages';
 import ImageDetail from './screens/ImageDetail';
+import Profile from './screens/Profile';
 
 const headerStyle = {
     headerStyle : {
@@ -66,6 +67,7 @@ export default ({}) => {
             <RootStack.Navigator initialRouteName="Main" mode="modal">
                 <RootStack.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }}/>
                 <RootStack.Screen name="Notifications" component={Notifications} options={({ navigation, route }) => ({...headerStyle, headerLeft : null})}/>
+                <RootStack.Screen name="Profile" component={Profile} options={({ navigation, route }) => ({...headerStyle, headerLeft : null})}/>
             </RootStack.Navigator>
         </NavigationContainer>
     )

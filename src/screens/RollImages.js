@@ -5,28 +5,50 @@ import {useTheme} from '../theme-manager';
 import HeaderButton from '../components/HeaderButton';
 import BackButton, {customBackButtonHeaderProps} from '../components/BackButton';
 import {RollImagesCol} from '../components/RollImagesCol';
-import {Close, Delete, Download, Share} from '../components/icons';
+import {Close, Delete, Download, LikeOn, Share} from '../components/icons';
 import DownloadFilm from '../components/icons/DownloadFilm';
 import IconBadge from 'react-native-icon-badge';
 import {SharedUtils} from '../shared';
+import {shallowEqual, useSelector} from 'react-redux';
+import {setImagesLikes, setRolls, setSelectedImage, setSelectedRoll} from '../ducks/main';
 
 export default function RollImages ({route, navigation})
 {
-    const {album, roll} = route.params;
+    const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
+    const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
+    const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
+
+    const [favouritesFilter, setFavouritesFilter] = useState(false);
     const [selectionMode, setSelectionMode] = useState(false);
-    const [images1, setImages1] = useState(roll.images.slice(0, 2));
-    const [images2, setImages2] = useState(roll.images.slice(2));
+    const [images1, setImages1] = useState([]);
+    const [images2, setImages2] = useState([]);
     const [selectedImagesCount, setSelectedImagesCount] = useState(0);
     const {request, loading, error} = useRequest();
 
     const { mode, theme, toggle } = useTheme();
 
+    useEffect(() =>
+    {
+        const images = favouritesFilter ? roll.images.filter(image => imagesLikes[image.id] !== undefined ? imagesLikes[image.id] : image.liked) : roll.images;
+        const allImages1 = images.filter((roll, index) => index % 2 === 0);
+        const allImages2 = images.filter((roll, index) => index % 2 === 1);
+       /* const firstPart1 = allImages1.slice(0, 4);
+        const firstPart2 = allImages2.slice(0, 4);*/
+        setImages1(allImages1);
+        setImages2(allImages2);
+
+        /*setTimeout(() => {
+            setImages1([...firstPart1, ...allImages1.slice(4)]);
+            setImages2([...firstPart2, ...allImages2.slice(4)]);
+        }, 300);*/
+
+    }, [favouritesFilter]);
 
     useLayoutEffect(() => {
 
         let options = {
             headerRight: () => (
-                <HeaderButton text={selectionMode ? 'Select All' : 'Select'} onPress={selectionMode ? selectAll : () => setSelectionMode(true)}/>
+                <HeaderButton text={selectionMode ? 'Select All' : 'Select'} onPress={selectionMode ? () => toggleSelectAll(true) : () => setSelectionMode(true)}/>
             ),
             ...customBackButtonHeaderProps('Album', navigation)
         };
@@ -34,7 +56,7 @@ export default function RollImages ({route, navigation})
         if (selectionMode)
         {
             options.headerLeft = () =>
-                <TouchableOpacity style={styles.cancelButton} onPress={() => setSelectionMode(false)}>
+                <TouchableOpacity style={styles.cancelButton} onPress={() => {setSelectionMode(false); toggleSelectAll(false);}}>
                     <Close style={styles.cancelButtonIcon} fill="#fff"/>
                 </TouchableOpacity>;
         }
@@ -47,32 +69,15 @@ export default function RollImages ({route, navigation})
 
     }, [navigation, selectionMode]);
 
-    useEffect(() =>
+    function toggleSelectAll (flag)
     {
-        getImages();
-    }, []);
-
-    async function getImages ()
-    {
-        try
-        {
-            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images`);
-        }
-        catch (e)
-        {
-            alert('error:' + e);
-        }
-    }
-
-    function selectAll ()
-    {
-        setSelectedImagesCount(roll.images.length);
+        setSelectedImagesCount(flag ? roll.images.length : 0);
         setImages1(images1.map(img => {
-            return {...img, selected : true};
+            return {...img, selected : flag};
         }));
 
         setImages2(images2.map(img => {
-            return {...img, selected : true};
+            return {...img, selected : flag};
         }));
 
     }
@@ -99,6 +104,24 @@ export default function RollImages ({route, navigation})
                 return img;
             }));
 
+        }
+
+        updateImageLikeState({...image, liked : !image.liked});
+    }
+
+    async function updateImageLikeState (image)
+    {
+        let updatedImagesLikes = {...imagesLikes, [image.id] : image.liked};
+        setImagesLikes(updatedImagesLikes);
+
+        try
+        {
+            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
+                {method : "PUT", body : JSON.stringify({id : image.id, liked : image.liked})});
+        }
+        catch (e)
+        {
+            alert('Error during image update');
         }
     }
 
@@ -170,60 +193,88 @@ export default function RollImages ({route, navigation})
 
     function onImageOpen (image)
     {
-        navigation.navigate('ImageDetail', {album, roll, image : image});
+        setSelectedImage(image);
+        navigation.navigate('ImageDetail');
+    }
+
+    function toggleFavouritesFilter ()
+    {
+        setFavouritesFilter(!favouritesFilter);
     }
 
     return (
         <React.Fragment>
             <ScrollView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
-                <Text style={[styles.name, {color: theme.primaryText}]}>{roll.name}</Text>
+
+                <View style={styles.header}>
+                    <Text style={[styles.name, {color: theme.primaryText}]}>{roll.name}</Text>
+                    <TouchableOpacity onPress={toggleFavouritesFilter} style={[styles.filterIconWrapper, favouritesFilter ? {borderColor: theme.primaryText} : {}]}>
+                        <LikeOn/>
+                    </TouchableOpacity>
+                </View>
+
+                {
+                    ((images1.length + images2.length) === 0) &&
+                    <Text style={[{color: theme.primaryText}]}>No favourite images</Text>
+                }
                 <View style={styles.colsWrapper}>
                     <RollImagesCol selectionMode={selectionMode}
                                    images={images1}
                                    onImageSelectToggle={(image) => onImageSelectToggle(1, image)}
                                    onImageLikeToggle={(image) => onImageLikeToggle(1, image)}
                                    onImageOpen={onImageOpen}
+                                   colNumber={0}
                     />
                     <RollImagesCol selectionMode={selectionMode}
                                    images={images2}
                                    onImageSelectToggle={(image) => onImageSelectToggle(2, image)}
                                    onImageLikeToggle={(image) => onImageLikeToggle(2, image)}
                                    onImageOpen={onImageOpen}
+                                   colNumber={1}
                     />
                 </View>
+
+                {/*<MasonryList
+                    images={roll.images.map(image => ({uri : image.image_urls.sm}))}
+                    spacing={5}
+                />*/}
+
             </ScrollView>
-            <View style={styles.footer}>
-                <View style={styles.buttonWrapper}>
-                    <Share style={styles.footerIcon}/>
+            {
+                selectedImagesCount !== 0 &&
+                <View style={styles.footer}>
+                    <View style={styles.buttonWrapper}>
+                        <Share style={styles.footerIcon}/>
+                    </View>
+                    <View style={styles.buttonWrapper}>
+                        <IconBadge
+                            MainElement={
+                                <TouchableOpacity onPress={() => false}>
+                                    <Download style={styles.footerIcon}/>
+                                </TouchableOpacity>
+                            }
+                            BadgeElement={<Text style={styles.badgeText}>{selectedImagesCount}</Text>}
+                            IconBadgeStyle={styles.badge}
+                            Hidden={false}
+                        />
+                    </View>
+                    <View style={styles.buttonWrapper}>
+                        <IconBadge
+                            MainElement={
+                                <TouchableOpacity>
+                                    <DownloadFilm style={styles.footerIcon}/>
+                                </TouchableOpacity>
+                            }
+                            BadgeElement={<Text style={styles.badgeText}>{roll.images.length}</Text>}
+                            IconBadgeStyle={styles.badge}
+                            Hidden={false}
+                        />
+                    </View>
+                    <View style={styles.buttonWrapper}>
+                        <Delete onPress={onDeleteRequest} style={styles.footerIcon}/>
+                    </View>
                 </View>
-                <View style={styles.buttonWrapper}>
-                    <IconBadge
-                        MainElement={
-                            <TouchableOpacity onPress={() => false}>
-                                <Download style={styles.footerIcon}/>
-                            </TouchableOpacity>
-                        }
-                        BadgeElement={<Text style={styles.badgeText}>{selectedImagesCount}</Text>}
-                        IconBadgeStyle={styles.badge}
-                        Hidden={false}
-                    />
-                </View>
-                <View style={styles.buttonWrapper}>
-                    <IconBadge
-                        MainElement={
-                            <TouchableOpacity>
-                                <DownloadFilm style={styles.footerIcon}/>
-                            </TouchableOpacity>
-                        }
-                        BadgeElement={<Text style={styles.badgeText}>{selectedImagesCount}</Text>}
-                        IconBadgeStyle={styles.badge}
-                        Hidden={false}
-                    />
-                </View>
-                <View style={styles.buttonWrapper}>
-                    <Delete onPress={onDeleteRequest} style={styles.footerIcon}/>
-                </View>
-            </View>
+            }
         </React.Fragment>
     )
 }
@@ -236,11 +287,21 @@ const styles = StyleSheet.create({
         paddingTop: 15,
         paddingHorizontal : 10
     },
+    header : {
+        flexDirection : 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20
+    },
     name : {
         color: '#fff',
         fontSize: 20,
-        fontFamily : 'Montserrat-SemiBold',
-        marginBottom: 15
+        fontFamily : 'Montserrat-SemiBold'
+    },
+    filterIconWrapper : {
+        marginRight: 15,
+        padding: 5,
+        borderWidth: 1,
+        borderColor: 'transparent'
     },
     colsWrapper : {
         flexDirection : 'row',

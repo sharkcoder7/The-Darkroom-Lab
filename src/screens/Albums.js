@@ -1,7 +1,17 @@
 
 import React, {useEffect, useState} from 'react';
 import {shallowEqual, useSelector} from "react-redux";
-import {SafeAreaView, Button, Text, StyleSheet, View, Image, FlatList, TouchableOpacity} from 'react-native';
+import {
+    SafeAreaView,
+    Button,
+    Text,
+    StyleSheet,
+    View,
+    Image,
+    FlatList,
+    TouchableOpacity,
+    ActivityIndicator,
+} from 'react-native';
 import SplashScreen from "react-native-splash-screen";
 import {Album} from '../components/Album';
 import {useRequest} from '../helper';
@@ -12,11 +22,12 @@ import {Notifications} from '../components/icons';
 import DownloadFilm from '../components/icons/DownloadFilm';
 import IconBadge from 'react-native-icon-badge';
 import {ToggleThemeButton} from '../components/ToggleThemeButton';
+import Profile from '../components/icons/Profile';
+import {setAlbums, setSelectedAlbum} from '../ducks/main';
 
 export default function Albums ({navigation})
 {
-    const test = useSelector(state => state.main.test, shallowEqual);
-    const [albums, setAlbums] = useState([]);
+    const albums = useSelector(state => state.main.albums, shallowEqual);
     const {request, loading, error} = useRequest();
 
     const { mode, theme, toggle } = useTheme();
@@ -35,8 +46,8 @@ export default function Albums ({navigation})
     {
         try
         {
-            const response = await request('/albums');
-            setAlbums(response);
+            const albums = await request('/albums');
+            setAlbums(albums);
         }
         catch (e)
         {
@@ -49,9 +60,15 @@ export default function Albums ({navigation})
         navigation.navigate('Notifications');
     }
 
+    function toProfile ()
+    {
+        navigation.navigate('Profile');
+    }
+
     function selectAlbum (album)
     {
-        navigation.navigate('AlbumRolls', {album});
+        setSelectedAlbum(album);
+        navigation.navigate('AlbumRolls');
     }
 
     return (
@@ -60,9 +77,16 @@ export default function Albums ({navigation})
                 <Text style={[styles.headerText, {color : theme.primaryText}]}>Your Albums</Text>
                 <Fos style={styles.icon} fill={theme.primaryText}/>
             </View>
-            <FlatList style={styles.listWrapper} data={albums} renderItem={({item}) => <Album key={item.id} album={item} onPress={() => selectAlbum(item)}/>}/>
+
+            {
+                loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryText}/>
+            }
+
+            <FlatList style={styles.listWrapper} data={albums} renderItem={({item}) => <Album key={item.id + Math.random} album={item} onPress={() => selectAlbum(item)}/>}/>
+
             <View style={[styles.footer, {backgroundColor : mode === 'light' ? '#5e5e5e' : '#000000'}]}>
                 <ToggleThemeButton/>
+                <Profile style={styles.profileIcon} onPress={toProfile}/>
                 <IconBadge
                     MainElement={
                         <TouchableOpacity onPress={toNotifications}>
@@ -133,4 +157,14 @@ const styles = StyleSheet.create({
     badgeText : {
         color: '#fff'
     },
+    profileIcon : {
+        marginLeft: -20
+    },
+    loader : {
+        position : 'absolute',
+        top: '50%',
+        left: '50%',
+        marginLeft: -20,
+        marginTop: -20
+    }
 });

@@ -1,6 +1,14 @@
 import {persistReducer, persistStore} from "redux-persist";
 import {applyMiddleware, combineReducers, compose, createStore} from "redux";
-import main, {setToken} from "./ducks/main";
+import main, {
+    setAlbums, setImagesLikes,
+    setRolls,
+    setSelectedAlbum,
+    setSelectedImage,
+    setSelectedRoll,
+    setTheme,
+    setToken,
+} from './ducks/main';
 import FastStorage from "react-native-fast-storage";
 
 const development = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -32,4 +40,11 @@ export function configureStore ()
 
 function assignActionsCreators (store) {
     setToken.assignTo(store);
+    setTheme.assignTo(store);
+    setAlbums.assignTo(store);
+    setSelectedAlbum.assignTo(store);
+    setRolls.assignTo(store);
+    setSelectedRoll.assignTo(store);
+    setSelectedImage.assignTo(store);
+    setImagesLikes.assignTo(store);
 }

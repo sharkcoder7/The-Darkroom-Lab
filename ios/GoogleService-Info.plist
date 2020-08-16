@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>28311964999-9pjkofb8kcu69quugtig7gdkhvslc6fp.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.28311964999-9pjkofb8kcu69quugtig7gdkhvslc6fp</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>28311964999-uobre3mju472nhfgd0etnk6nddfkqb3l.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAIfHhe6Lo8hZ9gNYsgNXhGT36PlvC8lbw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>28311964999</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.thedarkroom</string>
+	<key>PROJECT_ID</key>
+	<string>thedarkroom-cc270</string>
+	<key>STORAGE_BUCKET</key>
+	<string>thedarkroom-cc270.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:28311964999:ios:d37f8a07278c50f33ad062</string>
+	<key>DATABASE_URL</key>
+	<string>https://thedarkroom-cc270.firebaseio.com</string>
+</dict>
+</plist>

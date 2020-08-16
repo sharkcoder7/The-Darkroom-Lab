@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import {
     StyleSheet,
     View,
@@ -15,9 +15,17 @@ import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
 import HeaderButton from '../components/HeaderButton';
 import {Delete, Download, LikeOff, LikeOffTool, Rotate, Share} from '../components/icons';
+import {shallowEqual, useSelector} from 'react-redux';
+import {setImagesLikes} from '../ducks/main';
+import LikeOn from '../components/icons/LikeOn';
 
 export default function ImageDetail ({route, navigation})
 {
+    const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
+    const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
+    const image = useSelector(state => state.main.selectedImage, shallowEqual);
+    const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
+
     const spinValue = new Animated.Value(0);
 
     let rotation = 0;
@@ -28,7 +36,6 @@ export default function ImageDetail ({route, navigation})
         outputRange: ['0deg', '360deg']
     });
 
-    const {album, rolls, image} = route.params;
     const {request, loading, error} = useRequest();
 
     const [saving, setSaving] = useState(false);
@@ -91,7 +98,7 @@ export default function ImageDetail ({route, navigation})
             fileCache: true,
             appendExt: 'png',
         })
-            .fetch('GET', image.imageUrl)
+            .fetch('GET', image.image_urls.sm)
             .then(res => {
                 CameraRoll.save(res.data, {type : 'photo'})
                     .then(() => {
@@ -127,6 +134,7 @@ export default function ImageDetail ({route, navigation})
     {
         let newRotation = rotation + 0.25;
         rotation = newRotation;
+        let angle = Math.round(360 * newRotation) % 360;
 
         Animated.timing(
             spinValue,
@@ -142,9 +150,9 @@ export default function ImageDetail ({route, navigation})
     async function share ()
     {
         const shareOptions = {
-            title: 'Share file',
+            title: 'Share darkroom image',
             failOnCancel: false,
-            urls: [image.imageUrl],
+            urls: [image.image_urls.sm.replace('\\/', '/')],
         };
 
         try
@@ -157,21 +165,43 @@ export default function ImageDetail ({route, navigation})
         }
     }
 
-    function like ()
+    async function like (liked)
     {
+        let updatedImagesLikes = {...imagesLikes, [image.id] : liked};
+        setImagesLikes(updatedImagesLikes);
 
+        try
+        {
+            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
+                {method : "PUT", body : JSON.stringify({id : image.id, liked : liked})});
+        }
+        catch (e)
+        {
+            alert('Error during image update');
+        }
     }
+
 
     async function deleteImage ()
     {
 
     }
 
+    const imageIsLiked = useCallback(() =>
+    {
+        if (imagesLikes[image.id] !== undefined)
+        {
+            return imagesLikes[image.id];
+        }
+
+        return image.liked;
+    }, [imagesLikes]);
+
     return (
         <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
             <Animated.Image
                 style={[styles.image, {transform: [{rotate: spin}] }]}
-                source={{uri : image.imageUrl}} />
+                source={{uri : image.image_urls.sq}} />
             <View style={styles.actions}>
                 <TouchableOpacity onPress={rotate}>
                     <Rotate fill={theme.primaryText}/>
@@ -179,8 +209,15 @@ export default function ImageDetail ({route, navigation})
                 <TouchableOpacity onPress={share}>
                     <Share fill={theme.primaryText}/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={like}>
-                    <LikeOffTool fill={theme.primaryText} style={{marginTop: 5}}/>
+                <TouchableOpacity onPress={() => like(!imageIsLiked())}>
+                    {
+                        imageIsLiked() &&
+                        <LikeOn fill={theme.primaryText} style={styles.likeIcon}/>
+                    }
+                    {
+                        !imageIsLiked() &&
+                        <LikeOff fill={theme.primaryText} style={styles.likeIcon}/>
+                    }
                 </TouchableOpacity>
                 <TouchableOpacity onPress={download}>
                     <Download fill={theme.primaryText} style={{marginTop: 3}}/>
@@ -208,5 +245,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent : 'space-around',
         marginTop: 10
+    },
+    likeIcon : {
+        transform : [{scale: 1.5}],
+        marginTop: 7
     }
 });

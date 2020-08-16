@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "28311964999",
+    "firebase_url": "https://thedarkroom-cc270.firebaseio.com",
+    "project_id": "thedarkroom-cc270",
+    "storage_bucket": "thedarkroom-cc270.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28311964999:android:6cc0a0a25967a14f3ad062",
+        "android_client_info": {
+          "package_name": "com.thedarkroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "28311964999-klpmefce9jkcna06419e6kbec6b17m47.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8HDdGBBNEIu6cgLSojflv8wPsn7C5pM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "28311964999-klpmefce9jkcna06419e6kbec6b17m47.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
