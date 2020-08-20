@@ -11,6 +11,17 @@ export function RollImagesCol ({images, onImageLikeToggle, onImageSelectToggle, 
 {
     const { mode, theme, toggle } = useTheme();
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
+    const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
+
+    function imageRotationAngle (image)
+    {
+        if (imagesRotation[image.id] !== undefined)
+        {
+            return `${imagesRotation[image.id]}deg`;
+        }
+
+        return `0deg`;
+    }
 
     function imageIsLiked (image)
     {
@@ -20,6 +31,17 @@ export function RollImagesCol ({images, onImageLikeToggle, onImageSelectToggle, 
         }
 
         return image.liked;
+    }
+
+    function imageAspectRation (image, index)
+    {
+        let ratio = index % 2 === colNumber ? 0.8 : 1.5;
+        if (imagesRotation[image.id] !== undefined && imagesRotation[image.id] % 180 !== 0)
+        {
+            return 1;
+        }
+
+        return ratio;
     }
 
     return (
@@ -50,7 +72,11 @@ export function RollImagesCol ({images, onImageLikeToggle, onImageSelectToggle, 
 
                             {/*<FullWidthImage source={{uri : image.image_urls.sm}}/>*/}
                             {/*<FullWidthImage onInit={() => setTimeout(() => setInit(true), 0)} source={{uri : image.image_urls[['sq', 'lg'][Math.floor(Math.random() * ['sq', 'lg'].length)]]}}/>*/}
-                            <Image resizeMode="cover" style={{width: '100%', aspectRatio : index % 2 === colNumber ? 0.8 : 1.5}} source={{uri : image.image_urls.sm}}/>
+                            <Image resizeMode="cover" style={{
+                                width: '100%',
+                                aspectRatio : imageAspectRation(image, index),
+                                transform : [{rotate : imageRotationAngle(image)}]
+                            }} source={{uri : image.image_urls.sm}}/>
                         </View>
                     </TouchableWithoutFeedback>
                 )
@@ -67,7 +93,8 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: 5,
         minHeight : 122,
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
     },
     image : {
         width: '100%',

@@ -11,6 +11,7 @@ import IconBadge from 'react-native-icon-badge';
 import {SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setImagesLikes, setRolls, setSelectedImage, setSelectedRoll} from '../ducks/main';
+import LikeOff from '../components/icons/LikeOff';
 
 export default function RollImages ({route, navigation})
 {
@@ -208,8 +209,8 @@ export default function RollImages ({route, navigation})
 
                 <View style={styles.header}>
                     <Text style={[styles.name, {color: theme.primaryText}]}>{roll.name}</Text>
-                    <TouchableOpacity onPress={toggleFavouritesFilter} style={[styles.filterIconWrapper, favouritesFilter ? {borderColor: theme.primaryText} : {}]}>
-                        <LikeOn/>
+                    <TouchableOpacity onPress={toggleFavouritesFilter} style={styles.filterIconWrapper}>
+                        {favouritesFilter ? <LikeOn fill={theme.primaryText}/> : <LikeOff fill={theme.primaryText}/>}
                     </TouchableOpacity>
                 </View>
 
@@ -300,8 +301,6 @@ const styles = StyleSheet.create({
     filterIconWrapper : {
         marginRight: 15,
         padding: 5,
-        borderWidth: 1,
-        borderColor: 'transparent'
     },
     colsWrapper : {
         flexDirection : 'row',

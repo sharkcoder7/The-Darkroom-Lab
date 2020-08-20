@@ -7,6 +7,7 @@ import {
     Text,
     StyleSheet,
     View,
+    TextInput,
     Image,
     FlatList,
     TouchableOpacity,
@@ -24,17 +25,27 @@ import IconBadge from 'react-native-icon-badge';
 import {ToggleThemeButton} from '../components/ToggleThemeButton';
 import Profile from '../components/icons/Profile';
 import {setAlbums, setSelectedAlbum} from '../ducks/main';
+import messaging from '@react-native-firebase/messaging';
 
 export default function Albums ({navigation})
 {
     const albums = useSelector(state => state.main.albums, shallowEqual);
     const {request, loading, error} = useRequest();
+    const [token, setToken] = useState('');
 
     const { mode, theme, toggle } = useTheme();
 
     useEffect(() =>
     {
         setTimeout(() => SplashScreen.hide(), 50);
+        messaging().getToken()
+            .then(fcmToken => {
+                if (fcmToken) {
+                   setToken(fcmToken);
+                } else {
+                }
+            }).catch((error) => {
+        });
     }, []);
 
     useEffect(() =>
@@ -78,6 +89,7 @@ export default function Albums ({navigation})
                 <Fos style={styles.icon} fill={theme.primaryText}/>
             </View>
 
+            {/*<TextInput multiline={true} numberOfLines={3} style={{backgroundColor : '#fff', color: '#000'}} value={token}/>*/}
             {
                 loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryText}/>
             }

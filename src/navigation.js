@@ -11,11 +11,12 @@ import {shallowEqual, useSelector} from 'react-redux';
 import Notifications from './screens/Notifications';
 import AlbumRolls from './screens/AlbumRolls';
 import {FosLogo} from './components/FosLogo';
-import {Image, TouchableOpacity} from 'react-native';
+import {Image, Platform, StatusBar, TouchableOpacity} from 'react-native';
 import EditAlbum from './screens/EditAlbum';
 import RollImages from './screens/RollImages';
 import ImageDetail from './screens/ImageDetail';
 import Profile from './screens/Profile';
+import {useTheme} from './theme-manager';
 
 const headerStyle = {
     headerStyle : {
@@ -63,12 +64,14 @@ const MainStackScreen = () => {
 export default ({}) => {
 
     return (
-        <NavigationContainer>
-            <RootStack.Navigator initialRouteName="Main" mode="modal">
-                <RootStack.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }}/>
-                <RootStack.Screen name="Notifications" component={Notifications} options={({ navigation, route }) => ({...headerStyle, headerLeft : null})}/>
-                <RootStack.Screen name="Profile" component={Profile} options={({ navigation, route }) => ({...headerStyle, headerLeft : null})}/>
-            </RootStack.Navigator>
-        </NavigationContainer>
+        <React.Fragment>
+            <NavigationContainer>
+                <RootStack.Navigator initialRouteName="Main" mode="modal">
+                    <RootStack.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }}/>
+                    <RootStack.Screen name="Notifications" component={Notifications} options={({ navigation, route }) => ({...headerStyle, headerLeft : null})}/>
+                    <RootStack.Screen name="Profile" component={Profile} options={({ navigation, route }) => ({...headerStyle, headerLeft : null})}/>
+                </RootStack.Navigator>
+            </NavigationContainer>
+        </React.Fragment>
     )
 };

@@ -16,7 +16,7 @@ import CameraRoll from '@react-native-community/cameraroll';
 import HeaderButton from '../components/HeaderButton';
 import {Delete, Download, LikeOff, LikeOffTool, Rotate, Share} from '../components/icons';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setImagesLikes} from '../ducks/main';
+import {setImagesLikes, setImagesRotation} from '../ducks/main';
 import LikeOn from '../components/icons/LikeOn';
 
 export default function ImageDetail ({route, navigation})
@@ -25,10 +25,10 @@ export default function ImageDetail ({route, navigation})
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
     const image = useSelector(state => state.main.selectedImage, shallowEqual);
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
+    const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
 
-    const spinValue = new Animated.Value(0);
-
-    let rotation = 0;
+    let rotation = imagesRotation[image.id] !== undefined ? (imagesRotation[image.id] / 360) : 0;
+    const spinValue = new Animated.Value(rotation);
 
 // Second interpolate beginning and end values (in this case 0 and 1)
     const spin = spinValue.interpolate({
@@ -145,6 +145,22 @@ export default function ImageDetail ({route, navigation})
                 useNativeDriver: true
             }
         ).start();
+
+
+        setTimeout(async () => {
+            let updatedImagesRotation = {...imagesRotation, [image.id] : angle};
+            setImagesRotation(updatedImagesRotation);
+
+            try
+            {
+                const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
+                    {method : "PUT", body : JSON.stringify({id : image.id, rotationAngle : 90})});
+            }
+            catch (e)
+            {
+                alert('Error during image rotate');
+            }
+        }, 350);
     }
 
     async function share ()
@@ -181,10 +197,33 @@ export default function ImageDetail ({route, navigation})
         }
     }
 
+    function onDeleteRequest ()
+    {
+        SharedUtils.Alert.alert('Delete images', 'Do you really want to delete selected imaged?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress : () => false
+                },
+                {
+                    text: 'Delete',
+                    onPress: deleteImage
+                }
+            ], {cancelable: false});
+
+    }
 
     async function deleteImage ()
     {
-
+        try
+        {
+            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`, {method : "DELETE"});
+            navigation.goBack();
+        }
+        catch (e)
+        {
+            alert('Error during image delete');
+        }
     }
 
     const imageIsLiked = useCallback(() =>
@@ -222,7 +261,7 @@ export default function ImageDetail ({route, navigation})
                 <TouchableOpacity onPress={download}>
                     <Download fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={deleteImage}>
+                <TouchableOpacity onPress={onDeleteRequest}>
                     <Delete fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
