@@ -90,7 +90,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 
 ###
 
-PUT https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159/images
+DELETE https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159/images/delete
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

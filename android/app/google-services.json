@@ -1,35 +1,42 @@
 {
   "project_info": {
-    "project_number": "28311964999",
-    "firebase_url": "https://thedarkroom-cc270.firebaseio.com",
-    "project_id": "thedarkroom-cc270",
-    "storage_bucket": "thedarkroom-cc270.appspot.com"
+    "project_number": "647793920541",
+    "firebase_url": "https://the-darkroom-app.firebaseio.com",
+    "project_id": "the-darkroom-app",
+    "storage_bucket": "the-darkroom-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:28311964999:android:6cc0a0a25967a14f3ad062",
+        "mobilesdk_app_id": "1:647793920541:android:0e4da1d926553d8e9f94f4",
         "android_client_info": {
           "package_name": "com.thedarkroom"
         }
       },
       "oauth_client": [
         {
-          "client_id": "28311964999-klpmefce9jkcna06419e6kbec6b17m47.apps.googleusercontent.com",
+          "client_id": "647793920541-h09ps4u90n5t80jc06s4s484cc1tsdvs.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC8HDdGBBNEIu6cgLSojflv8wPsn7C5pM8"
+          "current_key": "AIzaSyA5U3aCb9O_rGnrEQHf2pmg2kdg2EvTAA8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "28311964999-klpmefce9jkcna06419e6kbec6b17m47.apps.googleusercontent.com",
+              "client_id": "647793920541-h09ps4u90n5t80jc06s4s484cc1tsdvs.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "647793920541-82saff6g3sa7falui7chi68ju28jl5v1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.thedarkroom"
+              }
             }
           ]
         }

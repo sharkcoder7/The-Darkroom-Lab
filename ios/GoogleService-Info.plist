@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>28311964999-9pjkofb8kcu69quugtig7gdkhvslc6fp.apps.googleusercontent.com</string>
+	<string>647793920541-82saff6g3sa7falui7chi68ju28jl5v1.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.28311964999-9pjkofb8kcu69quugtig7gdkhvslc6fp</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>28311964999-uobre3mju472nhfgd0etnk6nddfkqb3l.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.647793920541-82saff6g3sa7falui7chi68ju28jl5v1</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAIfHhe6Lo8hZ9gNYsgNXhGT36PlvC8lbw</string>
+	<string>AIzaSyCuzmpe-_TQJ82Aaxelsr4lk2hkXf2PGlQ</string>
 	<key>GCM_SENDER_ID</key>
-	<string>28311964999</string>
+	<string>647793920541</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.thedarkroom</string>
 	<key>PROJECT_ID</key>
-	<string>thedarkroom-cc270</string>
+	<string>the-darkroom-app</string>
 	<key>STORAGE_BUCKET</key>
-	<string>thedarkroom-cc270.appspot.com</string>
+	<string>the-darkroom-app.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:28311964999:ios:d37f8a07278c50f33ad062</string>
+	<string>1:647793920541:ios:9e1841ecdf0d8fc49f94f4</string>
 	<key>DATABASE_URL</key>
-	<string>https://thedarkroom-cc270.firebaseio.com</string>
+	<string>https://the-darkroom-app.firebaseio.com</string>
 </dict>
 </plist>
