@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import {StyleSheet, View, Text, Image, ScrollView, TouchableOpacity} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -12,6 +12,7 @@ import {SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setImagesLikes, setRolls, setSelectedImage, setSelectedRoll} from '../ducks/main';
 import LikeOff from '../components/icons/LikeOff';
+import analytics from '@react-native-firebase/analytics';
 
 export default function RollImages ({route, navigation})
 {
@@ -203,6 +204,16 @@ export default function RollImages ({route, navigation})
         setFavouritesFilter(!favouritesFilter);
     }
 
+    const downloadSelectedImages = useCallback(() =>
+    {
+        analytics().logEvent('downloadSelectedImages', {imagesCount : selectedImagesCount});
+    }, [selectedImagesCount]);
+
+    const downloadEntireRoll = useCallback(() =>
+    {
+        analytics().logEvent('downloadEntireRoll', {idRoll : roll.id});
+    }, [roll]);
+
     return (
         <React.Fragment>
             <ScrollView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
@@ -250,7 +261,7 @@ export default function RollImages ({route, navigation})
                     <View style={styles.buttonWrapper}>
                         <IconBadge
                             MainElement={
-                                <TouchableOpacity onPress={() => false}>
+                                <TouchableOpacity onPress={downloadSelectedImages}>
                                     <Download style={styles.footerIcon}/>
                                 </TouchableOpacity>
                             }
@@ -262,7 +273,7 @@ export default function RollImages ({route, navigation})
                     <View style={styles.buttonWrapper}>
                         <IconBadge
                             MainElement={
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={downloadEntireRoll}>
                                     <DownloadFilm style={styles.footerIcon}/>
                                 </TouchableOpacity>
                             }

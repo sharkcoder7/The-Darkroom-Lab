@@ -17,6 +17,7 @@ import {openUrl, SharedUtils} from '../../shared';
 import BottomSheet from 'reanimated-bottom-sheet'
 import {SheetHeader} from '../../components/SheetHeader';
 import {SheetBody} from '../../components/SheetBody';
+import analytics from '@react-native-firebase/analytics';
 
 export default function Welcome ({navigation})
 {
@@ -48,6 +49,7 @@ export default function Welcome ({navigation})
             const token = await request(`/auth/signIn`, {withAuth : false, method : "POST", body : JSON.stringify({email, password, device_name : 'test'})});
             setToken(token);
             navigation.navigate('Albums');
+            analytics().logEvent('signIn', {email});
         }
         catch (e)
         {

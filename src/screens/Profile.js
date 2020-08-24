@@ -23,6 +23,7 @@ import {OrderPromo} from '../components/icons';
 import {useTheme} from '../theme-manager';
 import Back from '../components/icons/Back';
 import {setToken} from '../ducks/main';
+import { TextInputMask } from 'react-native-masked-text'
 
 export default function Profile ({navigation})
 {
@@ -91,11 +92,16 @@ export default function Profile ({navigation})
                     <Text style={styles.inputLabel}>
                         Phone number
                     </Text>
-                    <TextInput style={styles.input}
-                               returnKeyType="done"
-                               onChangeText={setPhoneNumber}
-                               placeholder="555-555-555-555"
-                               autoCapitalize='none'/>
+                    <TextInputMask
+                        style={styles.input}
+                        type={'custom'}
+                        returnKeyType="done"
+                        autoCapitalize='none'
+                        placeholder="555 555-5555"
+                        options={{mask: '999 999-9999'}}
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
+                    />
                 </View>
 
             </SheetBody>

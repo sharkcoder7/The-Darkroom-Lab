@@ -18,6 +18,7 @@ import {Delete, Download, LikeOff, LikeOffTool, Rotate, Share} from '../componen
 import {shallowEqual, useSelector} from 'react-redux';
 import {setImagesLikes, setImagesRotation} from '../ducks/main';
 import LikeOn from '../components/icons/LikeOn';
+import analytics from '@react-native-firebase/analytics';
 
 export default function ImageDetail ({route, navigation})
 {
@@ -84,6 +85,8 @@ export default function ImageDetail ({route, navigation})
 
     async function download ()
     {
+        analytics().logEvent('downloadImage', {idImage : image.id});
+
         // if device is android you have to ensure you have permission
         if (Platform.OS === 'android') {
             const granted = await getPermissionAndroid();

@@ -2,6 +2,7 @@ import React from "react";
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import { createStackNavigator, HeaderStyleInterpolators } from '@react-navigation/stack';
 import { register } from 'react-native-bundle-splitter';
+import analytics from '@react-native-firebase/analytics';
 
 import Albums from './screens/Albums';
 import Welcome from './screens/Auth/Welcome';
@@ -63,9 +64,26 @@ const MainStackScreen = () => {
 
 export default ({}) => {
 
+    const routeNameRef = React.useRef();
+    const navigationRef = React.useRef();
+
+    function onStateChange (state)
+    {
+        const previousRouteName = routeNameRef.current;
+        const currentRouteName = navigationRef.current.getCurrentRoute().name;
+
+        if (previousRouteName !== currentRouteName)
+        {
+            analytics().setCurrentScreen(currentRouteName, currentRouteName);
+        }
+
+        // Save the current route name for later comparision
+        routeNameRef.current = currentRouteName;
+    }
+
     return (
         <React.Fragment>
-            <NavigationContainer>
+            <NavigationContainer ref={navigationRef} onReady={() => routeNameRef.current = navigationRef.current.getCurrentRoute().name} onStateChange={onStateChange}>
                 <RootStack.Navigator initialRouteName="Main" mode="modal">
                     <RootStack.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }}/>
                     <RootStack.Screen name="Notifications" component={Notifications} options={({ navigation, route }) => ({...headerStyle, headerLeft : null})}/>
