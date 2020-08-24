@@ -3,6 +3,8 @@ import { Appearance } from 'react-native-appearance'
 
 const osTheme = Appearance.getColorScheme();
 
+export const hitSlop = {top: 10, bottom: 10, left: 10, right: 10};
+
 export const ThemeColors = {
     primaryText: {
         light: 'black',

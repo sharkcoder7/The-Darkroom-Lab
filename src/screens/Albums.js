@@ -26,6 +26,7 @@ import {ToggleThemeButton} from '../components/ToggleThemeButton';
 import Profile from '../components/icons/Profile';
 import {setAlbums, setSelectedAlbum} from '../ducks/main';
 import messaging from '@react-native-firebase/messaging';
+import {hitSlop} from '../theme';
 
 export default function Albums ({navigation})
 {
@@ -98,14 +99,16 @@ export default function Albums ({navigation})
 
             <View style={[styles.footer, {backgroundColor : mode === 'light' ? '#5e5e5e' : '#000000'}]}>
                 <ToggleThemeButton/>
-                <Profile style={styles.profileIcon} onPress={toProfile}/>
+                <TouchableOpacity hitSlop={hitSlop} onPress={toProfile}>
+                    <Profile style={styles.profileIcon}/>
+                </TouchableOpacity>
                 <IconBadge
                     MainElement={
-                        <TouchableOpacity onPress={toNotifications}>
+                        <TouchableOpacity hitSlop={hitSlop} onPress={toNotifications}>
                             <Notifications style={styles.notificationsIcon}/>
                         </TouchableOpacity>
                     }
-                    BadgeElement={<Text style={styles.badgeText}>{3}</Text>}
+                    BadgeElement={<Text onPress={toNotifications} style={styles.badgeText}>{3}</Text>}
                     IconBadgeStyle={styles.badge}
                     Hidden={false}
                 />
