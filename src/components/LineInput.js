@@ -6,14 +6,14 @@ import {
 } from 'react-native';
 import {useTheme} from '../theme-manager';
 
-export function LineInput ({style, title, value, onChange})
+export function LineInput ({style, title, value, onChange, labelWidth = null, forceMode = null, disabled = false})
 {
     const { mode, theme, toggle } = useTheme();
 
     return (
         <View style={[styles.wrapper, style]}>
-            <Text style={[styles.title, {color: mode === 'light' ? '#777' : '#bcb9b9'}]}>{title}</Text>
-            <TextInput style={styles.input} value={value} onChangeText={onChange}/>
+            <Text style={[styles.title, {color: (forceMode || mode) === 'light' ? '#777' : '#bcb9b9'}, labelWidth ? {width : labelWidth} : {}]}>{title}</Text>
+            <TextInput editable={!disabled} style={styles.input} value={value} onChangeText={onChange}/>
         </View>
     )
 }

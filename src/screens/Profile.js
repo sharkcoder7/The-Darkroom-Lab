@@ -13,7 +13,7 @@ import {
 import {Album} from '../components/Album';
 import {useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
-import {style} from 'redux-logger/src/diff';
+import {render, style} from 'redux-logger/src/diff';
 import Separator from '../components/Separator';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {SheetHeader} from '../components/SheetHeader';
@@ -24,6 +24,7 @@ import {useTheme} from '../theme-manager';
 import Back from '../components/icons/Back';
 import {setToken} from '../ducks/main';
 import { TextInputMask } from 'react-native-masked-text'
+import {LineInput} from '../components/LineInput';
 
 export default function Profile ({navigation})
 {
@@ -31,6 +32,7 @@ export default function Profile ({navigation})
     const [phoneNumber, setPhoneNumber] = useState('');
     const {request, loading, error} = useRequest();
     const bottomSheetEl = useRef();
+    const [bottomSheetMode, setBottomSheetMode] = useState('SETTINGS');
 
     const { mode, theme, toggle } = useTheme();
 
@@ -58,6 +60,13 @@ export default function Profile ({navigation})
 
     function openSettingsSheet ()
     {
+        setBottomSheetMode('SETTINGS');
+        bottomSheetEl.current.snapTo(1);
+    }
+
+    function openAccountSheet ()
+    {
+        setBottomSheetMode('ACCOUNT');
         bottomSheetEl.current.snapTo(1);
     }
 
@@ -69,10 +78,10 @@ export default function Profile ({navigation})
 
     function renderHeader()
     {
-        return <SheetHeader title="Settings" onPress={() => bottomSheetEl.current.snapTo(0)}/>;
+        return <SheetHeader title={bottomSheetMode === 'SETTINGS' ? 'Settings' : 'Account Details'} onPress={() => bottomSheetEl.current.snapTo(0)}/>;
     }
 
-    function renderContent ()
+    function renderSettingsContent ()
     {
         return (
             <SheetBody>
@@ -108,10 +117,25 @@ export default function Profile ({navigation})
         );
     }
 
+    function renderAccountContent ()
+    {
+        return (
+            <SheetBody style={{paddingHorizontal: 0}}>
+                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Email address" value={'example@gmail.com'} onChange={newValue => false}/>
+                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Name" value={'Jhon Doe'} onChange={newValue => false}/>
+                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Address" value={'72 Avenue, New York'} onChange={newValue => false}/>
+            </SheetBody>
+        );
+    }
+
     const items = [
         {
             text : 'Notifications',
             action : openSettingsSheet,
+        },
+        {
+            text : 'Account details',
+            action : openAccountSheet,
         },
         {
             text : 'Terms of Service',
@@ -132,7 +156,7 @@ export default function Profile ({navigation})
                 ref={bottomSheetEl}
                 initialSnap={0}
                 snapPoints={[0, 400]}
-                renderContent={renderContent}
+                renderContent={bottomSheetMode === 'SETTINGS' ? renderSettingsContent : renderAccountContent}
                 renderHeader={renderHeader}
             />
         </React.Fragment>
@@ -189,5 +213,8 @@ const styles = StyleSheet.create({
         borderColor: '#4893fb',
         marginBottom: 10,
         color: '#000'
+    },
+    accountInput : {
+        marginTop: 25
     }
 });
