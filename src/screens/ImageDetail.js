@@ -22,6 +22,8 @@ import analytics from '@react-native-firebase/analytics';
 
 export default function ImageDetail ({route, navigation})
 {
+    let rotationBlock = false;
+
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
     const image = useSelector(state => state.main.selectedImage, shallowEqual);
@@ -135,6 +137,13 @@ export default function ImageDetail ({route, navigation})
 
     function rotate ()
     {
+        if (rotationBlock)
+        {
+            return;
+        }
+
+        rotationBlock = true;
+
         let newRotation = rotation + 0.25;
         rotation = newRotation;
         let angle = Math.round(360 * newRotation) % 360;
@@ -151,6 +160,9 @@ export default function ImageDetail ({route, navigation})
 
 
         setTimeout(async () => {
+
+            rotationBlock = false;
+
             let updatedImagesRotation = {...imagesRotation, [image.id] : angle};
             setImagesRotation(updatedImagesRotation);
 

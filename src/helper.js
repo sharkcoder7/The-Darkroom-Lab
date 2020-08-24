@@ -19,7 +19,7 @@ export function useRequest ()
         }
 
         const headers = new Headers({'Content-Type' : 'application/json', ...additionalHeaders});
-        options = {...options, timeout : options.timeout || 5000, headers};
+        options = {...options, mode: 'cors', timeout : options.timeout || 5000, headers};
         let response = await timeoutPromise(options.timeout, fetch(API_ENDPOINT + endpoint, options));
 
         try

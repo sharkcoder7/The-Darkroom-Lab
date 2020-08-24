@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
-import {StyleSheet, View, Image, ScrollView, KeyboardAvoidingView, ActivityIndicator} from 'react-native';
+import {StyleSheet, View, Image, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import {AlbumInfo} from '../components/AlbumInfo';
@@ -116,31 +116,31 @@ export default function EditAlbum ({route, navigation})
     }
 
     return (
-        <ScrollView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
-            <AlbumInfo album={album} isInsideAlbumBlock={false} showName={false}/>
-            <LineInput style={styles.albumInput} title="Album name" value={updatedAlbum.name} onChange={updateAlbum}/>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
+            <ScrollView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
+                <AlbumInfo album={album} isInsideAlbumBlock={false} showName={false}/>
+                <LineInput style={styles.albumInput} title="Album name" value={updatedAlbum.name} onChange={updateAlbum}/>
 
-            <KeyboardAvoidingView>
-                {
-                    updatedRolls.map((roll) =>
-                        <View style={styles.rollWrapper}>
-                            <View style={styles.imagesWrapper}>
-                                <View style={styles.images}>
-                                    {
-                                        roll.images.slice(0, 2).map(image =>
-                                            <View style={styles.imageWrapper}>
-                                                <Image style={styles.image} resizeMode="cover" source={{uri : image.image_urls.sq, width : 100, height: 100}}/>
-                                            </View>
-                                        )
-                                    }
+                    {
+                        updatedRolls.map((roll) =>
+                            <View style={styles.rollWrapper}>
+                                <View style={styles.imagesWrapper}>
+                                    <View style={styles.images}>
+                                        {
+                                            roll.images.slice(0, 2).map(image =>
+                                                <View style={styles.imageWrapper}>
+                                                    <Image style={styles.image} resizeMode="cover" source={{uri : image.image_urls.sq, width : 100, height: 100}}/>
+                                                </View>
+                                            )
+                                        }
+                                    </View>
                                 </View>
+                                <LineInput title="Roll name" value={roll.name} onChange={text => updateRolls(roll, text)}/>
                             </View>
-                            <LineInput title="Roll name" value={roll.name} onChange={text => updateRolls(roll, text)}/>
-                        </View>
-                    )
-                }
-            </KeyboardAvoidingView>
-        </ScrollView>
+                        )
+                    }
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     },
     containerStyle : {
         paddingTop: 15,
-        paddingBottom: 25
+        paddingBottom: 150
     },
     imagesWrapper : {
         width: '100%',

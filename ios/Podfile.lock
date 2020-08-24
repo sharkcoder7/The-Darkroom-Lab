@@ -398,6 +398,10 @@ PODS:
     - React
   - RNCPushNotificationIOS (1.4.1):
     - React
+  - RNFBAnalytics (7.4.2):
+    - Firebase/Analytics (~> 6.28.1)
+    - React
+    - RNFBApp
   - RNFBApp (8.3.0):
     - Firebase/CoreOnly (~> 6.28.1)
     - React
@@ -477,6 +481,7 @@ DEPENDENCIES:
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
+  - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -586,6 +591,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/masked-view"
   RNCPushNotificationIOS:
     :path: "../node_modules/@react-native-community/push-notification-ios"
+  RNFBAnalytics:
+    :path: "../node_modules/@react-native-firebase/analytics"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBMessaging:
@@ -664,6 +671,7 @@ SPEC CHECKSUMS:
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCMaskedView: f5c7d14d6847b7b44853f7acb6284c1da30a3459
   RNCPushNotificationIOS: c625dde093c3c8351d4babd34285d772f551dc36
+  RNFBAnalytics: 715279002cf21b600aec33bc2e315c4cdf5d05e6
   RNFBApp: d55b3a69d199cff25ecf4f3bf41a86c47aa37d57
   RNFBMessaging: 3bb7dcf398789ce359a9f6b97b83472a3090f65a
   RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08

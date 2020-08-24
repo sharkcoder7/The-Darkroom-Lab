@@ -88,6 +88,7 @@ export default function App ({})
 
     useEffect(() => {
 
+        alert('s');
         const unsubscribe = messaging().onMessage(async notification => {
             console.log('============', JSON.stringify(notification));
             PushNotification.localNotification({
@@ -99,7 +100,7 @@ export default function App ({})
         messaging().getToken()
             .then(fcmToken => {
                 if (fcmToken) {
-                    console.log(fcmToken);
+                    console.log('TOKEN: ', fcmToken);
                 } else {
                 }
             }).catch((error) => {

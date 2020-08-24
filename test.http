@@ -101,3 +101,21 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 }
 
 ###
+
+POST https://fcm.googleapis.com/fcm/send
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: key=AAAAltOGyh0:APA91bFVEcXINFITjwxvQO7XuwXJ-RcXR7JJ-65AbjltPtBa8FD9lwQS_XaNoarevl86t9Sk88R6RLTTC90oT4UwN_l8GpXgkOiOv1YwXhNfH1AjQSwzhPgZAnzHqqYsI0CSnnmu-PAB
+
+{
+ "to" : "d74SsTdvnkvhgu4nlqanck:APA91bFXjCltRL0WnkjPLol1tER-txzhDlSYBiBPoEwengIJ2-g2BY9LxjY5e9tdK2fYSE9wddvtPCWVGh0a-Jfrar8dU7LGdKylERn4QmdQtEmLBjRGyHwcBfm73xw6G8ACrorkkTIf",
+  "priority" : "high",
+  "notification" :
+  {
+    "title" : "test",
+    "body" : "test"
+  }
+}
+
+###

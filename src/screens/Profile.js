@@ -8,7 +8,7 @@ import {
     View,
     TouchableOpacity,
     Switch,
-    TextInput, Platform,
+    TextInput, Platform, KeyboardAvoidingView, Keyboard,
 } from 'react-native';
 import {Album} from '../components/Album';
 import {useRequest} from '../helper';
@@ -78,7 +78,7 @@ export default function Profile ({navigation})
 
     function renderHeader()
     {
-        return <SheetHeader title={bottomSheetMode === 'SETTINGS' ? 'Settings' : 'Account Details'} onPress={() => bottomSheetEl.current.snapTo(0)}/>;
+        return <SheetHeader title={bottomSheetMode === 'SETTINGS' ? 'Settings' : 'Account Details'} onPress={() => {bottomSheetEl.current.snapTo(0); Keyboard.dismiss()}}/>;
     }
 
     function renderSettingsContent ()
@@ -148,7 +148,7 @@ export default function Profile ({navigation})
     ];
 
     return (
-        <React.Fragment>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
             <View style={[styles.wrapper, {backgroundColor: theme.backgroundColor}]}>
                 <FlatList data={items} keyExtractor={item => item.text} renderItem={renderItem}></FlatList>
             </View>
@@ -159,7 +159,7 @@ export default function Profile ({navigation})
                 renderContent={bottomSheetMode === 'SETTINGS' ? renderSettingsContent : renderAccountContent}
                 renderHeader={renderHeader}
             />
-        </React.Fragment>
+        </KeyboardAvoidingView>
     )
 }
 
