@@ -149,16 +149,16 @@ android {
     }
     signingConfigs {
             debug {
-                storeFile file('debug.keystore')
-                storePassword 'darkmoon-password-debug'
-                keyAlias 'darkmoonDebugAlias'
-                keyPassword 'darkmoon-password-debug'
+                storeFile file('thedarkroom-debug.keystore')
+                storePassword 'K3Qn6AJuHGS7b8DL'
+                keyAlias 'thedarkroom-debug-alias'
+                keyPassword 'K3Qn6AJuHGS7b8DL'
             }
             release {
-                storeFile file('release.keystore')
-                storePassword 'darkmoon-password-release'
-                keyAlias 'darkmoonReleaseAlias'
-                keyPassword 'darkmoon-password-release'
+                storeFile file('thedarkroom-release.keystore')
+                storePassword 'K3Qn6AJuHGS7b8DL'
+                keyAlias 'thedarkroom-release-alias'
+                keyPassword 'K3Qn6AJuHGS7b8DL'
            }
         }
 	dexOptions {
