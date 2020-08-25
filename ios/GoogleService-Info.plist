@@ -32,5 +32,7 @@
 	<string>1:647793920541:ios:9e1841ecdf0d8fc49f94f4</string>
 	<key>DATABASE_URL</key>
 	<string>https://the-darkroom-app.firebaseio.com</string>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<false/>
 </dict>
 </plist>
