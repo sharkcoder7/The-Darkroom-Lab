@@ -10,6 +10,9 @@
     <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/splash_screen_color" />
+    <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
 
     <!-- Change the value to true to enable pop-up for in foreground (remote-only, for local use ignoreInForeground) -->
     <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground" android:value="true"/>
