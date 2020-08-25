@@ -63,7 +63,7 @@ export default function Albums ({navigation})
         }
         catch (e)
         {
-            alert('error:' + e);
+            console.warn('error:' + e);
         }
     }
 
@@ -110,7 +110,7 @@ export default function Albums ({navigation})
                     }
                     BadgeElement={<Text onPress={toNotifications} style={styles.badgeText}>{3}</Text>}
                     IconBadgeStyle={styles.badge}
-                    Hidden={false}
+                    Hidden={true}
                 />
             </View>
         </View>

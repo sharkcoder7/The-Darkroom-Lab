@@ -88,7 +88,6 @@ export default function App ({})
 
     useEffect(() => {
 
-        alert('s');
         const unsubscribe = messaging().onMessage(async notification => {
             console.log('============', JSON.stringify(notification));
             PushNotification.localNotification({

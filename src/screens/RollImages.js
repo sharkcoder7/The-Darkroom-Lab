@@ -123,7 +123,7 @@ export default function RollImages ({route, navigation})
         }
         catch (e)
         {
-            alert('Error during image update');
+            console.warn('Error during image update');
         }
     }
 
@@ -189,7 +189,7 @@ export default function RollImages ({route, navigation})
         }
         catch (error)
         {
-            alert(error.toString());
+            console.warn(error.toString());
         }
     }
 

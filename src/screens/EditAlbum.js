@@ -49,7 +49,7 @@ export default function EditAlbum ({route, navigation})
             }
             catch (e)
             {
-                alert('Error during album update');
+                console.warn('Error during album update');
                 return;
             }
 
@@ -79,7 +79,7 @@ export default function EditAlbum ({route, navigation})
             }
             catch (e)
             {
-                alert('Error during roll update');
+                console.warn('Error during roll update');
             }
         }
 

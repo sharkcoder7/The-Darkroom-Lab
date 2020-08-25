@@ -55,7 +55,7 @@ export default function Notifications ({navigation})
         }
         catch (e)
         {
-            alert('error:' + e);
+            console.warn('error:' + e);
         }
     }
 

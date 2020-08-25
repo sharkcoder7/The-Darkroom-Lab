@@ -53,7 +53,7 @@ export default function Welcome ({navigation})
         }
         catch (e)
         {
-            alert('The username or password is incorrect');
+            console.warn('The username or password is incorrect');
         }
     }
 

@@ -173,7 +173,7 @@ export default function ImageDetail ({route, navigation})
             }
             catch (e)
             {
-                alert('Error during image rotate');
+                console.warn('Error during image rotate');
             }
         }, 350);
     }
@@ -192,7 +192,7 @@ export default function ImageDetail ({route, navigation})
         }
         catch (error)
         {
-            alert(error.toString());
+            console.warn(error.toString());
         }
     }
 
@@ -208,7 +208,7 @@ export default function ImageDetail ({route, navigation})
         }
         catch (e)
         {
-            alert('Error during image update');
+            console.warn('Error during image update');
         }
     }
 
@@ -237,7 +237,7 @@ export default function ImageDetail ({route, navigation})
         }
         catch (e)
         {
-            alert('Error during image delete');
+            console.warn('Error during image delete');
         }
     }
 

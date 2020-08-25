@@ -41,7 +41,7 @@ export default function AlbumRolls ({route, navigation})
         }
         catch (e)
         {
-            alert('error:' + e);
+            console.warn('error:' + e);
         }
     }
 

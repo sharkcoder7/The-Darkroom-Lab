@@ -17,3 +17,16 @@ TheDarkRoom mobile application
 ## Run app 
 
 `react-native run-android` or `react-native run-ios`
+
+## Warning
+
+This project includes library `react-native-toggle-element`. It has bug with initial state.
+So in order to fix it, you should add 
+
+` useEffect(() =>
+   {
+     updateThumbButton(value, true);
+   }, []);
+`
+
+on the line 136 in `node_modules/react-native-toggle-element/toggle.js`
