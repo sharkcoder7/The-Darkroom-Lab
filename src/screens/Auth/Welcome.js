@@ -5,7 +5,7 @@ import {
     StyleSheet,
     Image,
     View,
-    TouchableOpacity, TextInput, KeyboardAvoidingView,
+    TouchableOpacity, TextInput, KeyboardAvoidingView, Alert,
 } from 'react-native';
 import SplashScreen from "react-native-splash-screen";
 import LinearGradient from 'react-native-linear-gradient';
@@ -53,7 +53,14 @@ export default function Welcome ({navigation})
         }
         catch (e)
         {
-            console.warn('The username or password is incorrect');
+            Alert.alert('Darkroom Lab', 'Incorrect username or password',
+                [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+                {cancelable: false},
+            );
+        }
+        finally
+        {
+
         }
     }
 

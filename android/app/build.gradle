@@ -148,7 +148,7 @@ android {
         }
     }
     signingConfigs {
-            debug {
+         /*    debug {
                 storeFile file('thedarkroom-debug.keystore')
                 storePassword 'K3Qn6AJuHGS7b8DL'
                 keyAlias 'thedarkroom-debug-alias'
@@ -159,7 +159,19 @@ android {
                 storePassword 'K3Qn6AJuHGS7b8DL'
                 keyAlias 'thedarkroom-release-alias'
                 keyPassword 'K3Qn6AJuHGS7b8DL'
-           }
+           } */
+            debug {
+			   storeFile file('debug.keystore')
+			   storePassword 'darkmoon-password-debug'
+			   keyAlias 'darkmoonDebugAlias'
+			   keyPassword 'darkmoon-password-debug'
+		   }
+		   release {
+			   storeFile file('release.keystore')
+			   storePassword 'darkmoon-password-release'
+			   keyAlias 'darkmoonReleaseAlias'
+			   keyPassword 'darkmoon-password-release'
+		  }
         }
 	dexOptions {
 			javaMaxHeapSize "5g"
