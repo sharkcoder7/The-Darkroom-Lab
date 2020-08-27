@@ -14,7 +14,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
 import {Delete, Download, LikeOff, Rotate, Share} from '../components/icons';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setImagesLikes, setImagesRotation} from '../ducks/main';
+import {setImagesLikes, setImagesRotation, setRolls, setSelectedRoll} from '../ducks/main';
 import LikeOn from '../components/icons/LikeOn';
 import analytics from '@react-native-firebase/analytics';
 
@@ -24,12 +24,13 @@ export default function ImageDetail ({navigation})
     let windowWidth = Dimensions.get('window').width;
 
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
+    const rolls = useSelector(state => state.main.rolls, shallowEqual);
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
     const image = useSelector(state => state.main.selectedImage, shallowEqual);
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
 
-    let rotation = imagesRotation[image.id] !== undefined ? (imagesRotation[image.id] / 360) : 0;
+    let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
     const spinValue = React.useMemo(() => new Animated.Value(rotation), [rotation]);
 
     const spin = React.useMemo(() => spinValue.interpolate({
@@ -160,7 +161,7 @@ export default function ImageDetail ({navigation})
         setTimeout(() =>
         {
             rotationBlock = false;
-            setImagesRotation({...imagesRotation, [image.id] : angle});
+            setImagesRotation({...imagesRotation, [image.id] : {angle, date : new Date().toISOString()}});
         }, 300);
 
         try
@@ -228,8 +229,18 @@ export default function ImageDetail ({navigation})
     {
         try
         {
-            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`, {method : "DELETE"});
+            let updatedImages = roll.images.filter(existingImage => existingImage.id !== image.id),
+                updatedRoll = {...roll, images : updatedImages},
+                updatedRolls = rolls.map(roll => roll.id === updatedRoll.id ? updatedRoll : roll);
+
+            setSelectedRoll({...roll, images : updatedImages});
+
             navigation.goBack();
+
+            setTimeout(() => {
+                setRolls(updatedRolls);
+                request(`/albums/${album.id}/rolls/${roll.id}/images`, {method : "DELETE", body : JSON.stringify({imageIds : [image.id]})} );
+            }, 0);
         }
         catch (e)
         {

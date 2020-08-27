@@ -13,9 +13,9 @@ export function RollImagesCol ({images, onImageLikeToggle, onImageSelectToggle, 
 
     function imageRotationAngle (image)
     {
-        if (imagesRotation[image.id] !== undefined)
+        if (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at)
         {
-            return `${imagesRotation[image.id]}deg`;
+            return `${imagesRotation[image.id].angle}deg`;
         }
 
         return `0deg`;

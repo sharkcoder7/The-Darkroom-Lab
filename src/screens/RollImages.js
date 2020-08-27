@@ -10,13 +10,14 @@ import DownloadFilm from '../components/icons/DownloadFilm';
 import IconBadge from 'react-native-icon-badge';
 import {SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setImagesLikes, setRolls, setSelectedImage} from '../ducks/main';
+import {setImagesLikes, setRolls, setSelectedAlbum, setSelectedImage, setSelectedRoll} from '../ducks/main';
 import LikeOff from '../components/icons/LikeOff';
 import analytics from '@react-native-firebase/analytics';
 
 export default function RollImages ({navigation})
 {
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
+    const rolls = useSelector(state => state.main.rolls, shallowEqual);
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
 
@@ -44,9 +45,23 @@ export default function RollImages ({navigation})
             setImages2([...firstPart2, ...allImages2.slice(4)]);
         }, 300);*/
 
-    }, [favouritesFilter]);
+    }, [roll, favouritesFilter]);
 
     useLayoutEffect(() => {
+
+        let options = {
+            headerLeft : () => <BackButton title={'Album'} navigation={navigation}/>,
+            headerRight: () => (
+                <HeaderButton text={'Select'} onPress={() => setSelectionMode(true)}/>
+            ),
+            ...customBackButtonHeaderProps('Album', navigation)
+        };
+
+        navigation.setOptions(options);
+
+    }, [navigation]);
+
+    useEffect(() => {
 
         let options = {
             headerRight: () => (
@@ -69,9 +84,9 @@ export default function RollImages ({navigation})
 
         navigation.setOptions(options);
 
-    }, [navigation, selectionMode]);
+    }, [navigation, selectionMode, images1, images2]);
 
-    function toggleSelectAll (flag)
+    const toggleSelectAll = (flag) =>
     {
         setSelectedImagesCount(flag ? roll.images.length : 0);
         setImages1(images1.map(img => {
@@ -82,9 +97,9 @@ export default function RollImages ({navigation})
             return {...img, selected : flag};
         }));
 
-    }
+    };
 
-    function onImageLikeToggle (col, image)
+    const onImageLikeToggle = (col, image) =>
     {
         if (col === 1)
         {
@@ -109,7 +124,7 @@ export default function RollImages ({navigation})
         }
 
         updateImageLikeState({...image, liked : !image.liked});
-    }
+    };
 
     async function updateImageLikeState (image)
     {
@@ -118,7 +133,7 @@ export default function RollImages ({navigation})
 
         try
         {
-            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
+            await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
                 {method : "PUT", body : JSON.stringify({id : image.id, liked : image.liked})});
         }
         catch (e)
@@ -127,7 +142,7 @@ export default function RollImages ({navigation})
         }
     }
 
-    function onImageSelectToggle (col, image)
+    const onImageSelectToggle = (col, image) =>
     {
         image.selected = image.selected !== undefined ? image.selected : false;
         setSelectedImagesCount(selectedImagesCount + (image.selected ? -1 : 1));
@@ -152,7 +167,7 @@ export default function RollImages ({navigation})
             }));
 
         }
-    }
+    };
 
     function onDeleteRequest ()
     {
@@ -164,15 +179,31 @@ export default function RollImages ({navigation})
                 },
                 {
                     text: 'Delete',
-                    onPress: () => false
+                    onPress: deleteImages
                 }
             ], {cancelable: false});
 
     }
 
-    function onDelete ()
+    function deleteImages ()
     {
+        try
+        {
+            let imageIds = [...images1, ...images2].filter(image => image.selected).map(item => item.id),
+                updatedImages = roll.images.filter(image => imageIds.indexOf(image.id) === -1),
+                updatedRoll = {...roll, images : updatedImages},
+                updatedRolls = rolls.map(roll => roll.id === updatedRoll.id ? updatedRoll : roll);
 
+            setSelectedImagesCount(0);
+            setRolls(updatedRolls);
+            setSelectedRoll({...roll, images : updatedImages});
+
+            request(`/albums/${album.id}/rolls/${roll.id}/images`, {method : "DELETE", body: JSON.stringify({imageIds}) });
+        }
+        catch (e)
+        {
+            console.warn('Error during image delete');
+        }
     }
 
     async function share ()
