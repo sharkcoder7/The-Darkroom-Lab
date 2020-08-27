@@ -156,7 +156,7 @@ export default function RollImages ({route, navigation})
 
     function onDeleteRequest ()
     {
-        SharedUtils.Alert.alert('The Darkroom Lab', 'Do you really want to delete selected imaged?',
+        SharedUtils.Alert.alert('The Darkroom Lab', 'Do you really want to delete selected photo?',
             [
                 {
                     text: 'Cancel',
