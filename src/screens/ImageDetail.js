@@ -214,7 +214,7 @@ export default function ImageDetail ({route, navigation})
 
     function onDeleteRequest ()
     {
-        SharedUtils.Alert.alert('Delete images', 'Do you really want to delete selected imaged?',
+        SharedUtils.Alert.alert('The Darkroom Lab', 'Do you really want to delete selected imaged?',
             [
                 {
                     text: 'Cancel',

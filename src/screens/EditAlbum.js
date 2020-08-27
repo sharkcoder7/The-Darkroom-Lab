@@ -117,7 +117,7 @@ export default function EditAlbum ({route, navigation})
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
-            <ScrollView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
+            <ScrollView showsVerticalScrollIndicator={false} style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
                 <AlbumInfo album={album} isInsideAlbumBlock={false} showName={false}/>
                 <LineInput style={styles.albumInput} title="Album name" value={updatedAlbum.name} onChange={updateAlbum}/>
 

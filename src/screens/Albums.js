@@ -95,7 +95,7 @@ export default function Albums ({navigation})
                 loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryText}/>
             }
 
-            <FlatList style={styles.listWrapper} data={albums} renderItem={({item}) => <Album key={item.id + Math.random} album={item} onPress={() => selectAlbum(item)}/>}/>
+            <FlatList showsVerticalScrollIndicator={false} style={styles.listWrapper} data={albums} renderItem={({item}) => <Album key={item.id + Math.random} album={item} onPress={() => selectAlbum(item)}/>}/>
 
             <View style={[styles.footer, {backgroundColor : mode === 'light' ? '#5e5e5e' : '#000000'}]}>
                 <ToggleThemeButton/>

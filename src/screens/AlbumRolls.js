@@ -64,7 +64,7 @@ export default function AlbumRolls ({route, navigation})
             }
             {
                 !loading &&
-                <FlatList style={styles.listWrapper} data={rolls} renderItem={({item}) => <Roll key={item.id} roll={item} onPress={() => selectRoll(item)}/>}/>
+                <FlatList showsVerticalScrollIndicator={false} style={styles.listWrapper} data={rolls} renderItem={({item}) => <Roll key={item.id} roll={item} onPress={() => selectRoll(item)}/>}/>
             }
         </View>
     )
@@ -75,11 +75,11 @@ const styles = StyleSheet.create({
     wrapper : {
         flex: 1,
         width: '100%',
-        paddingTop: 15
+        paddingTop: 15,
+        paddingHorizontal: 10
     },
     listWrapper : {
         width: '100%',
-        paddingHorizontal: 10,
         marginTop: 15
     },
     loader : {

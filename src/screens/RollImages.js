@@ -156,7 +156,7 @@ export default function RollImages ({route, navigation})
 
     function onDeleteRequest ()
     {
-        SharedUtils.Alert.alert('Delete images', 'Do you really want to delete selected imaged?',
+        SharedUtils.Alert.alert('The Darkroom Lab', 'Do you really want to delete selected imaged?',
             [
                 {
                     text: 'Cancel',
@@ -216,7 +216,7 @@ export default function RollImages ({route, navigation})
 
     return (
         <React.Fragment>
-            <ScrollView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
+            <ScrollView showsVerticalScrollIndicator={false} style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
 
                 <View style={styles.header}>
                     <Text style={[styles.name, {color: theme.primaryText}]}>{roll.name}</Text>
