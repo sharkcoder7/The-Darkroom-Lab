@@ -37,10 +37,10 @@ export default function ImageDetail ({navigation})
         outputRange: ['0deg', '360deg']
     }), [rotation]);
 
-    const {request, loading, error} = useRequest();
+    const {request} = useRequest();
 
     const [saving, setSaving] = useState(false);
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
 
     useLayoutEffect(() => {
         navigation.setOptions({
