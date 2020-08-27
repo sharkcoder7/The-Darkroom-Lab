@@ -1,16 +1,13 @@
 import React from 'react';
-import {Image, View, StyleSheet, Text} from 'react-native';
-import Film from './icons/Film';
-import Picture from './icons/Picture';
+import {StyleSheet} from 'react-native';
 import {useTheme} from '../theme-manager';
 import Toggle from 'react-native-toggle-element';
-import {G, Path, Circle, Svg} from 'react-native-svg';
 import ToggleThemeLight from './icons/ToggleThemeLight';
 import ToggleThemeDark from './icons/ToggleThemeDark';
 
 export function ToggleThemeButton ()
 {
-    const { mode, theme, toggle } = useTheme();
+    const { mode, toggle } = useTheme();
 
     return (
         <Toggle

@@ -24,7 +24,7 @@ export default function Welcome ({navigation})
     const [password, setPassword] = useState('');
     const passwordInput = useRef();
     const bottomSheetEl = useRef();
-    const {request, loading, error} = useRequest();
+    const {request, loading} = useRequest();
 
     useEffect(() =>
     {
@@ -47,7 +47,7 @@ export default function Welcome ({navigation})
         {
             const token = await request(`/auth/signIn`, {withAuth : false, method : "POST", body : JSON.stringify({email, password, device_name : 'test'})});
             setToken(token);
-            navigation.navigate('Albums');
+            navigation.replace('Albums');
             analytics().logEvent('signIn', {email});
         }
         catch (e)

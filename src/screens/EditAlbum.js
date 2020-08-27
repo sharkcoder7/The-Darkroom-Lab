@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
 import {StyleSheet, View, Image, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -9,15 +9,15 @@ import {LineInput} from '../components/LineInput';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setAlbums, setRolls, setSelectedAlbum} from '../ducks/main';
 
-export default function EditAlbum ({route, navigation})
+export default function EditAlbum ({navigation})
 {
     const albums = useSelector(state => state.main.albums, shallowEqual);
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const rolls = useSelector(state => state.main.rolls, shallowEqual);
 
-    const {request, loading, error} = useRequest();
+    const {request, loading} = useRequest();
 
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
     const [updatedAlbum, setUpdatedAlbum] = useState(JSON.parse(JSON.stringify(album)));
     const [updatedRolls, setUpdatedRolls] = useState(JSON.parse(JSON.stringify(rolls)));
 

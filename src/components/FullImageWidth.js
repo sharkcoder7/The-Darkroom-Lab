@@ -1,6 +1,6 @@
 
-import React, {Component, useState} from 'react';
-import {Image, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {Image, View} from 'react-native';
 
 function FullWidthImage ({source, ratio, onInit})
 {

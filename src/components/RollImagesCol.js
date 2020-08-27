@@ -1,15 +1,13 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, StyleSheet, TouchableWithoutFeedback, Image} from 'react-native';
-import {useTheme} from '../theme-manager';
+
 import LikeOff from './icons/LikeOff';
 import {LikeOn, SelectOn} from './icons';
 import SelectOff from './icons/SelectOff';
-import FullWidthImage from './FullImageWidth';
 import {shallowEqual, useSelector} from 'react-redux';
 
 export function RollImagesCol ({images, onImageLikeToggle, onImageSelectToggle, selectionMode, onImageOpen, colNumber})
 {
-    const { mode, theme, toggle } = useTheme();
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
 

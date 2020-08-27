@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 
 export function SheetBody ({children, style = {}})
 {

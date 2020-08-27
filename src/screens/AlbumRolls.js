@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
-import {StyleSheet, View, FlatList, Image, TouchableOpacity, Text, ActivityIndicator} from 'react-native';
+import React, {useCallback, useEffect, useLayoutEffect} from 'react';
+import {StyleSheet, View, FlatList, ActivityIndicator} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import {AlbumInfo} from '../components/AlbumInfo';
@@ -9,14 +9,14 @@ import {customBackButtonHeaderProps} from '../components/BackButton';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setRolls, setSelectedRoll} from '../ducks/main';
 
-export default function AlbumRolls ({route, navigation})
+export default function AlbumRolls ({navigation})
 {
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const rolls = useSelector(state => state.main.rolls, shallowEqual);
 
-    const {request, loading, error} = useRequest();
+    const {request, loading} = useRequest();
 
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
 
     useLayoutEffect(() => {
         navigation.setOptions({

@@ -2,13 +2,9 @@
 import React, {useEffect, useState} from 'react';
 import {shallowEqual, useSelector} from "react-redux";
 import {
-    SafeAreaView,
-    Button,
     Text,
     StyleSheet,
     View,
-    TextInput,
-    Image,
     FlatList,
     TouchableOpacity,
     ActivityIndicator,
@@ -18,9 +14,7 @@ import {Album} from '../components/Album';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import Fos from '../components/icons/Fos';
-import ToggleTheme from '../components/icons/ToggleTheme';
 import {Notifications} from '../components/icons';
-import DownloadFilm from '../components/icons/DownloadFilm';
 import IconBadge from 'react-native-icon-badge';
 import {ToggleThemeButton} from '../components/ToggleThemeButton';
 import Profile from '../components/icons/Profile';
@@ -31,10 +25,10 @@ import {hitSlop} from '../theme';
 export default function Albums ({navigation})
 {
     const albums = useSelector(state => state.main.albums, shallowEqual);
-    const {request, loading, error} = useRequest();
+    const {request, loading} = useRequest();
     const [token, setToken] = useState('');
 
-    const { mode, theme, toggle } = useTheme();
+    const { mode, theme } = useTheme();
 
     useEffect(() =>
     {

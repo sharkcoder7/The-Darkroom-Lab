@@ -8,7 +8,7 @@ import {useTheme} from '../theme-manager';
 
 export function LineInput ({style, title, value, onChange, labelWidth = null, forceMode = null, disabled = false})
 {
-    const { mode, theme, toggle } = useTheme();
+    const { mode } = useTheme();
 
     return (
         <View style={[styles.wrapper, style]}>

@@ -1,7 +1,6 @@
-import { ThemeColors as ReactNavigationThemeColors } from '@react-navigation/native'
-import { Appearance } from 'react-native-appearance'
+/*import { Appearance } from 'react-native-appearance'*/
 
-const osTheme = Appearance.getColorScheme();
+/*const osTheme = Appearance.getColorScheme();*/
 
 export const hitSlop = {top: 10, bottom: 10, left: 10, right: 10};
 

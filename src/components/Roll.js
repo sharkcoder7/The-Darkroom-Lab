@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Image, View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 
 export function Roll ({roll, onPress})

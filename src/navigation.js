@@ -1,7 +1,7 @@
 import React from "react";
-import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
-import { createStackNavigator, HeaderStyleInterpolators } from '@react-navigation/stack';
-import { register } from 'react-native-bundle-splitter';
+import {NavigationContainer} from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+/*import { register } from 'react-native-bundle-splitter';*/
 import analytics from '@react-native-firebase/analytics';
 
 import Albums from './screens/Albums';
@@ -12,12 +12,10 @@ import {shallowEqual, useSelector} from 'react-redux';
 import Notifications from './screens/Notifications';
 import AlbumRolls from './screens/AlbumRolls';
 import {FosLogo} from './components/FosLogo';
-import {Image, Platform, StatusBar, TouchableOpacity} from 'react-native';
 import EditAlbum from './screens/EditAlbum';
 import RollImages from './screens/RollImages';
 import ImageDetail from './screens/ImageDetail';
 import Profile from './screens/Profile';
-import {useTheme} from './theme-manager';
 
 const headerStyle = {
     headerStyle : {
@@ -40,24 +38,13 @@ const MainStackScreen = () => {
     const token = useSelector(state => state.main.token, shallowEqual);
 
     return (
-        <MainStack.Navigator initialRouteName="Welcome" headerMode="screen" >
-            {
-                !token &&
-                <React.Fragment>
-                    <MainStack.Screen name="Welcome" component={Welcome} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
-                </React.Fragment>
-            }
-            {
-                token &&
-                <React.Fragment>
-                    <MainStack.Screen name="Albums" component={Albums} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
-                    <MainStack.Screen name="AlbumRolls" component={AlbumRolls} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
-                    <MainStack.Screen name="EditAlbum" component={EditAlbum} options={{...headerStyle, headerTitle : 'Edit'}}/>
-                    <MainStack.Screen name="RollImages" component={RollImages} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
-                    <MainStack.Screen name="ImageDetail" component={ImageDetail} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
-                    {/*<MainStack.Screen name="Main2" component={register({require : () => require('./screens/Details')})} />*/}
-                </React.Fragment>
-            }
+        <MainStack.Navigator initialRouteName={token ? 'Albums' : 'Welcome'} headerMode="screen" >
+            <MainStack.Screen name="Albums" component={Albums} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
+            <MainStack.Screen name="Welcome" component={Welcome} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
+            <MainStack.Screen name="AlbumRolls" component={AlbumRolls} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
+            <MainStack.Screen name="EditAlbum" component={EditAlbum} options={{...headerStyle, headerTitle : 'Edit'}}/>
+            <MainStack.Screen name="RollImages" component={RollImages} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
+            <MainStack.Screen name="ImageDetail" component={ImageDetail} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
         </MainStack.Navigator>
     )
 };

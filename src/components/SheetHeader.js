@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import Close from './icons/Close';
 
 export function SheetHeader ({title, onPress})

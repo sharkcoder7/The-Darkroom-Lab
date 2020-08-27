@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useLayoutEffect, useState} from 'react';
 import {
     StyleSheet,
+    Dimensions,
     View,
-    Image,
     TouchableOpacity,
-    Text,
     PermissionsAndroid, Alert, Animated, Easing,
 } from 'react-native';
 import {useRequest} from '../helper';
@@ -13,16 +12,16 @@ import {customBackButtonHeaderProps} from '../components/BackButton';
 import {SharedUtils} from '../shared';
 import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
-import HeaderButton from '../components/HeaderButton';
-import {Delete, Download, LikeOff, LikeOffTool, Rotate, Share} from '../components/icons';
+import {Delete, Download, LikeOff, Rotate, Share} from '../components/icons';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setImagesLikes, setImagesRotation} from '../ducks/main';
 import LikeOn from '../components/icons/LikeOn';
 import analytics from '@react-native-firebase/analytics';
 
-export default function ImageDetail ({route, navigation})
+export default function ImageDetail ({navigation})
 {
     let rotationBlock = false;
+    let windowWidth = Dimensions.get('window').width;
 
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
@@ -31,13 +30,12 @@ export default function ImageDetail ({route, navigation})
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
 
     let rotation = imagesRotation[image.id] !== undefined ? (imagesRotation[image.id] / 360) : 0;
-    const spinValue = new Animated.Value(rotation);
+    const spinValue = React.useMemo(() => new Animated.Value(rotation), [rotation]);
 
-// Second interpolate beginning and end values (in this case 0 and 1)
-    const spin = spinValue.interpolate({
+    const spin = React.useMemo(() => spinValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg']
-    });
+    }), [rotation]);
 
     const {request, loading, error} = useRequest();
 
@@ -51,6 +49,7 @@ export default function ImageDetail ({route, navigation})
             ),
             ...customBackButtonHeaderProps('Roll', navigation)
         });
+
     }, [navigation]);
 
     async function getPermissionAndroid ()
@@ -135,7 +134,7 @@ export default function ImageDetail ({route, navigation})
             });
     }
 
-    function rotate ()
+    async function rotate ()
     {
         if (rotationBlock)
         {
@@ -158,24 +157,21 @@ export default function ImageDetail ({route, navigation})
             }
         ).start();
 
-
-        setTimeout(async () => {
-
+        setTimeout(() =>
+        {
             rotationBlock = false;
+            setImagesRotation({...imagesRotation, [image.id] : angle});
+        }, 300);
 
-            let updatedImagesRotation = {...imagesRotation, [image.id] : angle};
-            setImagesRotation(updatedImagesRotation);
-
-            try
-            {
-                const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
-                    {method : "PUT", body : JSON.stringify({id : image.id, rotationAngle : 90})});
-            }
-            catch (e)
-            {
-                console.warn('Error during image rotate');
-            }
-        }, 350);
+        try
+        {
+            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
+                {method : "PUT", body : JSON.stringify({id : image.id, rotationAngle : 90})});
+        }
+        catch (e)
+        {
+            console.warn('Error during image rotate');
+        }
     }
 
     async function share ()
@@ -253,9 +249,11 @@ export default function ImageDetail ({route, navigation})
 
     return (
         <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
-            <Animated.Image
-                style={[styles.image, {transform: [{rotate: spin}] }]}
-                source={{uri : image.image_urls.sq}} />
+            <View style={[styles.imageWrapper, {height : [0, 0.5].indexOf(rotation) !== -1 ? windowWidth * (795 / 1200) + 20 : windowWidth - 50}]}>
+                <Animated.Image
+                    style={[styles.image, {transform: [{rotate: spin}]}]}
+                    source={{uri : image.image_urls.social}} />
+            </View>
             <View style={styles.actions}>
                 <TouchableOpacity onPress={rotate}>
                     <Rotate fill={theme.primaryText}/>
@@ -291,14 +289,18 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingTop: 30
     },
+    imageWrapper : {
+        width: '100%',
+        marginTop: 50
+    },
     image : {
         width: '100%',
-        aspectRatio: 1
+        aspectRatio: 1200 / 795
     },
     actions : {
         flexDirection: 'row',
         justifyContent : 'space-around',
-        marginTop: 10
+        marginTop: 0
     },
     likeIcon : {
         transform : [{scale: 1.5}],

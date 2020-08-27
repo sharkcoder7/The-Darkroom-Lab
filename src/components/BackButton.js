@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, StyleSheet, TouchableOpacity, Image, Platform} from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, Platform} from 'react-native';
 import {Back} from './icons';
 
 export default function BackButton ({navigation, title})

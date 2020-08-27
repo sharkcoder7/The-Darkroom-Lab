@@ -1,7 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {
-    SafeAreaView,
-    Button,
     Text,
     StyleSheet,
     FlatList,
@@ -10,16 +8,12 @@ import {
     Switch,
     TextInput, Platform,
 } from 'react-native';
-import {Album} from '../components/Album';
 import {useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
-import {style} from 'redux-logger/src/diff';
 import Separator from '../components/Separator';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
-import {openUrl} from '../shared';
-import {OrderPromo} from '../components/icons';
 import {useTheme} from '../theme-manager';
 
 export default function Notifications ({navigation})
@@ -27,10 +21,10 @@ export default function Notifications ({navigation})
     const [notifications, setNotifications] = useState([]);
     const [SMSEnabled, setSMSEnabled] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
-    const {request, loading, error} = useRequest();
+    const {request} = useRequest();
     const bottomSheetEl = useRef();
 
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
 
     useEffect(() =>
     {

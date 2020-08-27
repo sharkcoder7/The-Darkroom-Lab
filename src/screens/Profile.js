@@ -1,25 +1,19 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {
-    SafeAreaView,
-    Button,
     Text,
     StyleSheet,
     FlatList,
     View,
     TouchableOpacity,
     Switch,
-    TextInput, Platform, KeyboardAvoidingView, Keyboard,
+    Platform, KeyboardAvoidingView, Keyboard,
 } from 'react-native';
-import {Album} from '../components/Album';
 import {useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
-import {render, style} from 'redux-logger/src/diff';
 import Separator from '../components/Separator';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
-import {openUrl} from '../shared';
-import {OrderPromo} from '../components/icons';
 import {useTheme} from '../theme-manager';
 import Back from '../components/icons/Back';
 import {setToken} from '../ducks/main';
@@ -34,7 +28,7 @@ export default function Profile ({navigation})
     const bottomSheetEl = useRef();
     const [bottomSheetMode, setBottomSheetMode] = useState('SETTINGS');
 
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -73,6 +67,7 @@ export default function Profile ({navigation})
     function logout ()
     {
         navigation.navigate('Main');
+        navigation.replace('Welcome');
         setToken(null);
     }
 

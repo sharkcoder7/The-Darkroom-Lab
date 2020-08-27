@@ -13,7 +13,7 @@ export function Album ({album, onPress})
         setViewRef(findNodeHandle(backgroundImage));
     }
 
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
 
     return (
         <TouchableOpacity onPress={onPress} style={styles.wrapper}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, Dimensions} from 'react-native';
 
-export function TdrLogo (props)
+export function TdrLogo ()
 {
     let windowWidth = Dimensions.get('window').width,
         imageOriginalWidth = 332,

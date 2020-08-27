@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Hr from 'react-native-hr-component';
 
 function Separator ({style = {}})

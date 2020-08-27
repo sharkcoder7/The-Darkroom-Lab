@@ -1,12 +1,12 @@
 import React from 'react';
-import {Image, View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 import Film from './icons/Film';
 import Picture from './icons/Picture';
 import {useTheme} from '../theme-manager';
 
 export function AlbumInfo ({album, isInsideAlbumBlock = true, showName = true})
 {
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
 
     return (
         <View style={[styles.infoWrapper, isInsideAlbumBlock ? {position : 'absolute', backgroundColor: '#00000070'} : {}]}>

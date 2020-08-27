@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
-import {StyleSheet, View, Text, Image, ScrollView, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, Text, ScrollView, TouchableOpacity} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import HeaderButton from '../components/HeaderButton';
@@ -10,11 +10,11 @@ import DownloadFilm from '../components/icons/DownloadFilm';
 import IconBadge from 'react-native-icon-badge';
 import {SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setImagesLikes, setRolls, setSelectedImage, setSelectedRoll} from '../ducks/main';
+import {setImagesLikes, setRolls, setSelectedImage} from '../ducks/main';
 import LikeOff from '../components/icons/LikeOff';
 import analytics from '@react-native-firebase/analytics';
 
-export default function RollImages ({route, navigation})
+export default function RollImages ({navigation})
 {
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
@@ -25,9 +25,9 @@ export default function RollImages ({route, navigation})
     const [images1, setImages1] = useState([]);
     const [images2, setImages2] = useState([]);
     const [selectedImagesCount, setSelectedImagesCount] = useState(0);
-    const {request, loading, error} = useRequest();
+    const {request} = useRequest();
 
-    const { mode, theme, toggle } = useTheme();
+    const { theme } = useTheme();
 
     useEffect(() =>
     {
