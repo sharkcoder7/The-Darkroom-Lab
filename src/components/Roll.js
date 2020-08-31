@@ -1,8 +1,21 @@
 import React from 'react';
 import {Image, View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {shallowEqual, useSelector} from 'react-redux';
 
 export function Roll ({roll, onPress})
 {
+    const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
+
+    function imageRotationAngle (image)
+    {
+        if (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at)
+        {
+            return `${imagesRotation[image.id].angle}deg`;
+        }
+
+        return `0deg`;
+    }
+
     return (
         <TouchableOpacity onPress={onPress} style={styles.wrapper}>
 
@@ -10,7 +23,11 @@ export function Roll ({roll, onPress})
                 {
                     roll.images.slice(0, 4).map(image =>
                         <View style={styles.imageWrapper}>
-                            <Image style={styles.image} resizeMode="cover" source={{uri : image.image_urls.sq, width : 100, height: 100}}/>
+                            {/*<Text>
+                                local: {imagesRotation[image.id] && imagesRotation[image.id].date}
+                                remote: {image.updated_at}
+                            </Text>*/}
+                            <Image style={[styles.image, {transform : [{rotate : imageRotationAngle(image)}]}]} resizeMode="cover" source={{uri : image.image_urls.sm, width : 100, height: 100}}/>
                         </View>
                     )
                 }
