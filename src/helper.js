@@ -9,7 +9,7 @@ export function useRequest ()
     const [error, setError] = useState(null);
     const token = useSelector(state => state.main.token, shallowEqual);
 
-    const request = useCallback( async (endpoint, options = {}, additionalHeaders = {}) => {
+    const request = useCallback( async (endpoint, options = {}, additionalHeaders = {}, returnFullResponse = false) => {
 
         setLoading(true);
 
@@ -44,7 +44,7 @@ export function useRequest ()
                 throw new Error(result.message);
             }
 
-            return result.data;
+            return returnFullResponse ? result : result.data;
         }
         catch (e)
         {

@@ -4,7 +4,7 @@ import {
     Dimensions,
     View,
     TouchableOpacity,
-    PermissionsAndroid, Alert, Animated, Easing,
+    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator,
 } from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -14,7 +14,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
 import {Delete, Download, LikeOff, Rotate, Share} from '../components/icons';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setImagesLikes, setImagesRotation, setRolls, setSelectedRoll} from '../ducks/main';
+import {setImagesLikes, setImagesRotation, setRolls, setSelectedImage, setSelectedRoll} from '../ducks/main';
 import LikeOn from '../components/icons/LikeOn';
 import analytics from '@react-native-firebase/analytics';
 
@@ -30,7 +30,8 @@ export default function ImageDetail ({navigation})
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
 
-    let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
+    //let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
+    let rotation = 0;
     const spinValue = React.useMemo(() => new Animated.Value(rotation), [rotation]);
 
     const spin = React.useMemo(() => spinValue.interpolate({
@@ -137,7 +138,7 @@ export default function ImageDetail ({navigation})
 
     async function rotate ()
     {
-        if (rotationBlock)
+        if (rotationBlock || saving)
         {
             return;
         }
@@ -146,9 +147,10 @@ export default function ImageDetail ({navigation})
 
         let newRotation = rotation + 0.25;
         rotation = newRotation;
+        let originalAngle = Math.round(360 * rotation) % 360;
         let angle = Math.round(360 * newRotation) % 360;
 
-        Animated.timing(
+        /*Animated.timing(
             spinValue,
             {
                 toValue: newRotation,
@@ -156,22 +158,42 @@ export default function ImageDetail ({navigation})
                 easing: Easing.linear,
                 useNativeDriver: true
             }
-        ).start();
+        ).start();*/
 
         setTimeout(() =>
         {
             rotationBlock = false;
-            setImagesRotation({...imagesRotation, [image.id] : {angle, date : new Date().toISOString()}});
+            //setImagesRotation({...imagesRotation, [image.id] : {angle, date : new Date().toISOString()}});
         }, 300);
 
+        setSaving(true);
         try
         {
-            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
-                {method : "PUT", body : JSON.stringify({id : image.id, rotationAngle : 90})});
+            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}/rotate`,
+                {method : "PUT", body : JSON.stringify({id : image.id, rotationAngle : 90})}, {}, true);
+
+            if (!response.thumbnail)
+            {
+                alert('Thumbnail not found');
+                throw new Error();
+            }
+
+            let updatedImage = {...image, image_urls : {...image.image_urls, sm : response.thumbnail, social : response.thumbnail}, updated_at : new Date().toISOString()},
+                updatedImages = roll.images.map(existingImage => {return existingImage.id === image.id ? updatedImage : existingImage}),
+                updatedRoll = {...roll, images : updatedImages},
+                updatedRolls = rolls.map(roll => roll.id === updatedRoll.id ? updatedRoll : roll);
+
+            setSelectedImage(updatedImage);
+            setSelectedRoll(updatedRoll);
+            setRolls(updatedRolls);
+            //setImagesRotation({...imagesRotation, [image.id] : {angle : originalAngle, date : new Date().toISOString()}});
         }
         catch (e)
         {
             console.warn('Error during image rotate');
+        }
+        finally {
+            setSaving(false);
         }
     }
 
@@ -201,7 +223,7 @@ export default function ImageDetail ({navigation})
         try
         {
             const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
-                {method : "PUT", body : JSON.stringify({id : image.id, liked : liked})});
+                {method : "PUT", body : JSON.stringify({id : image.id, liked : liked})}, {});
         }
         catch (e)
         {
@@ -265,10 +287,16 @@ export default function ImageDetail ({navigation})
                     style={[styles.image, {transform: [{rotate: spin}]}]}
                     source={{uri : image.image_urls.social}} />
             </View>
-            <View style={styles.actions}>
-                <TouchableOpacity onPress={rotate}>
-                    <Rotate fill={theme.primaryText}/>
-                </TouchableOpacity>
+            <View style={[styles.actions, saving && styles.disabled]}>
+                {
+                    !saving &&
+                    <TouchableOpacity style={styles.rotateBtn} onPress={rotate}>
+                        <Rotate fill={theme.primaryText}/>
+                    </TouchableOpacity>
+                }
+                {
+                    saving && <ActivityIndicator style={styles.rotateBtn} size="large" color={theme.primaryText}/>
+                }
                 <TouchableOpacity onPress={share}>
                     <Share fill={theme.primaryText}/>
                 </TouchableOpacity>
@@ -289,6 +317,7 @@ export default function ImageDetail ({navigation})
                     <Delete fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
+
         </View>
     )
 }
@@ -302,7 +331,8 @@ const styles = StyleSheet.create({
     },
     imageWrapper : {
         width: '100%',
-        marginTop: 50
+        marginTop: 50,
+        position: 'relative',
     },
     image : {
         width: '100%',
@@ -316,5 +346,11 @@ const styles = StyleSheet.create({
     likeIcon : {
         transform : [{scale: 1.5}],
         marginTop: 7
+    },
+    rotateBtn : {
+        width: 24
+    },
+    disabled : {
+        opacity: 0.5
     }
 });

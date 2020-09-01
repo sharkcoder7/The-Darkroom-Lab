@@ -27,7 +27,7 @@ export function Roll ({roll, onPress})
                                 local: {imagesRotation[image.id] && imagesRotation[image.id].date}
                                 remote: {image.updated_at}
                             </Text>*/}
-                            <Image style={[styles.image, {transform : [{rotate : imageRotationAngle(image)}]}]} resizeMode="cover" source={{uri : image.image_urls.sm, width : 100, height: 100}}/>
+                            <Image style={[styles.image, {transform : [{rotate : imageRotationAngle(image)}]}]} resizeMode="cover" source={{uri : image.image_urls.sq, width : 100, height: 100}}/>
                         </View>
                     )
                 }

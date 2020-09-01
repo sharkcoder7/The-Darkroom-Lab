@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, TouchableWithoutFeedback, Image} from 'react-native';
+import {View, StyleSheet, TouchableWithoutFeedback, Image, TextInput} from 'react-native';
 
 import LikeOff from './icons/LikeOff';
 import {LikeOn, SelectOn} from './icons';
