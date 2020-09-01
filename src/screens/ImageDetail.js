@@ -30,8 +30,8 @@ export default function ImageDetail ({navigation})
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
 
-    //let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
-    let rotation = 0;
+    let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
+    //let rotation = 0;
     const spinValue = React.useMemo(() => new Animated.Value(rotation), [rotation]);
 
     const spin = React.useMemo(() => spinValue.interpolate({
@@ -150,7 +150,7 @@ export default function ImageDetail ({navigation})
         let originalAngle = Math.round(360 * rotation) % 360;
         let angle = Math.round(360 * newRotation) % 360;
 
-        /*Animated.timing(
+        Animated.timing(
             spinValue,
             {
                 toValue: newRotation,
@@ -158,16 +158,16 @@ export default function ImageDetail ({navigation})
                 easing: Easing.linear,
                 useNativeDriver: true
             }
-        ).start();*/
+        ).start();
 
         setTimeout(() =>
         {
             rotationBlock = false;
-            //setImagesRotation({...imagesRotation, [image.id] : {angle, date : new Date().toISOString()}});
-        }, 300);
+            setImagesRotation({...imagesRotation, [image.id] : {angle, date : new Date().toISOString()}});
+        }, 100);
 
-        setSaving(true);
-        try
+        //setSaving(true);
+        /*try
         {
             const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}/rotate`,
                 {method : "PUT", body : JSON.stringify({id : image.id, rotationAngle : 90})}, {}, true);
@@ -194,7 +194,7 @@ export default function ImageDetail ({navigation})
         }
         finally {
             setSaving(false);
-        }
+        }*/
     }
 
     async function share ()
@@ -287,7 +287,7 @@ export default function ImageDetail ({navigation})
                     style={[styles.image, {transform: [{rotate: spin}]}]}
                     source={{uri : image.image_urls.social}} />
             </View>
-            <View style={[styles.actions, saving && styles.disabled]}>
+            <View style={[styles.actions]}>
                 {
                     !saving &&
                     <TouchableOpacity style={styles.rotateBtn} onPress={rotate}>
