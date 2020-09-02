@@ -1,4 +1,4 @@
-POST https://staging.thedarkroom.com/api/api/auth/signIn
+POST https://thedarkroom.com/api/api/auth/signIn
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -11,7 +11,7 @@ Content-Type: application/json
 
 ###
 
-POST https://staging.thedarkroom.com/api/api/auth/signIn
+POST https://thedarkroom.com/api/api/auth/signIn
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ###
 
-GET https://staging.thedarkroom.com/api/api/albums
+GET https://thedarkroom.com/api/api/albums
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -32,7 +32,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 
 ###
 
-GET https://staging.thedarkroom.com/api/api/albums/36374/rolls
+GET https://thedarkroom.com/api/api/albums/36374/rolls
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -40,7 +40,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 
 ###
 
-PUT https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159
+PUT https://thedarkroom.com/api/api/albums/36374/rolls/25159
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -52,7 +52,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 }
 ###
 
-PUT https://staging.thedarkroom.com/api/api/albums/36374
+PUT https://thedarkroom.com/api/api/albums/36374
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -64,7 +64,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 }
 ###
 
-PUT https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532
+PUT https://thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -77,7 +77,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 
 ###
 
-PUT https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532/rotate
+PUT https://thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532/rotate
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -90,7 +90,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 
 ###
 
-DELETE https://staging.thedarkroom.com/api/api/albums/36374/rolls/25159/images
+DELETE https://thedarkroom.com/api/api/albums/36374/rolls/25159/images
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
