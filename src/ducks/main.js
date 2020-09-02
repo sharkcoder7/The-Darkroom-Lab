@@ -9,6 +9,7 @@ export const setSelectedRoll = createAction('Set selected roll');
 export const setSelectedImage = createAction('Set selected image');
 export const setImagesLikes = createAction('Set images likes');
 export const setImagesRotation = createAction('Set images rotation');
+export const setImagesTooltipProcessed = createAction('Set image tooltip processed');
 
 const initialState = {
     token: null,
@@ -20,6 +21,7 @@ const initialState = {
     selectedImage: null,
     imagesLikes : {},
     imagesRotation : {},
+    imagesTooltipProcessed : false,
 };
 
 const main = createReducer({
@@ -32,6 +34,7 @@ const main = createReducer({
     [setSelectedImage]: (state, payload) => ({...state, selectedImage: payload}),
     [setImagesLikes]: (state, payload) => ({...state, imagesLikes: payload}),
     [setImagesRotation]: (state, payload) => ({...state, imagesRotation: payload}),
+    [setImagesTooltipProcessed]: (state, payload) => ({...state, imagesTooltipProcessed: payload}),
 }, initialState);
 
 export default main;

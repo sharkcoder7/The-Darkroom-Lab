@@ -53,7 +53,7 @@ export default function Albums ({navigation})
         try
         {
             const albums = await request('/albums');
-            setAlbums(albums);
+            setAlbums(albums.filter(album => album.filmsCount + album.imagesCount > 0));
         }
         catch (e)
         {

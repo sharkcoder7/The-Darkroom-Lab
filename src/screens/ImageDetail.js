@@ -4,7 +4,7 @@ import {
     Dimensions,
     View,
     TouchableOpacity,
-    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator,
+    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform,
 } from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -14,9 +14,15 @@ import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
 import {Delete, Download, LikeOff, Rotate, Share} from '../components/icons';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setImagesLikes, setImagesRotation, setRolls, setSelectedImage, setSelectedRoll} from '../ducks/main';
+import {
+    setImagesLikes,
+    setImagesRotation, setImagesTooltipProcessed,
+    setRolls,
+    setSelectedRoll,
+} from '../ducks/main';
 import LikeOn from '../components/icons/LikeOn';
 import analytics from '@react-native-firebase/analytics';
+import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 
 export default function ImageDetail ({navigation})
 {
@@ -29,6 +35,7 @@ export default function ImageDetail ({navigation})
     const image = useSelector(state => state.main.selectedImage, shallowEqual);
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
+    const imagesTooltipProcessed = useSelector(state => state.main.imagesTooltipProcessed, shallowEqual);
 
     let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
     //let rotation = 0;
@@ -145,6 +152,20 @@ export default function ImageDetail ({navigation})
 
         rotationBlock = true;
 
+        if (!imagesTooltipProcessed)
+        {
+            SharedUtils.Alert.alert('The Darkroom Lab', 'It won’t be rotated in your online gallery. Coming soon!',
+                [
+                    {
+                        text: 'OK',
+                        onPress : () => false
+                    }
+                ], {cancelable: false});
+
+            setImagesTooltipProcessed(true);
+            return ;
+        }
+
         let newRotation = rotation + 0.25;
         rotation = newRotation;
         let originalAngle = Math.round(360 * rotation) % 360;
@@ -164,7 +185,7 @@ export default function ImageDetail ({navigation})
         {
             rotationBlock = false;
             setImagesRotation({...imagesRotation, [image.id] : {angle, date : new Date().toISOString()}});
-        }, 100);
+        }, 300);
 
         //setSaving(true);
         /*try
@@ -199,10 +220,27 @@ export default function ImageDetail ({navigation})
 
     async function share ()
     {
+        const url = image.image_urls.sm.replace('\\/', '/');
         const shareOptions = {
             title: 'Share darkroom image',
             failOnCancel: false,
-            urls: [image.image_urls.sm.replace('\\/', '/')],
+            urls: [url],
+            activityItemSources : [
+                { // For sharing url with custom title.
+                    placeholderItem: { type: 'url', content: url },
+                    item: {
+                        default: { type: 'copyToPasteBoard', content: url },
+                        addToReadingList : { type: 'url', content: url },
+                        airDrop : { type: 'url', content: url },
+                        assignToContact : { type: 'url', content: url },
+                        copyToPasteBoard : { type: 'url', content: url },
+                    },
+                    subject: {
+                        default: 'TEST',
+                    },
+                    linkMetadata: { originalUrl: url, url, title : 'test' },
+                },
+            ]
         };
 
         try
@@ -281,13 +319,23 @@ export default function ImageDetail ({navigation})
     }, [imagesLikes]);
 
     return (
-        <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
-            <View style={[styles.imageWrapper, {height : [0, 0.5].indexOf(rotation) !== -1 ? windowWidth * (795 / 1200) + 20 : windowWidth - 50}]}>
-                <Animated.Image
-                    style={[styles.image, {transform: [{rotate: spin}]}]}
-                    source={{uri : image.image_urls.social}} />
-            </View>
-            <View style={[styles.actions]}>
+        <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
+                <View style={[styles.imageWrapper, {height : [0, 0.5].indexOf(rotation) !== -1 ? windowWidth * (795 / 1200) + 20 : windowWidth - 50}]}>
+                    <ReactNativeZoomableView
+                        maxZoom={1.5}
+                        minZoom={0.5}
+                        zoomStep={0.5}
+                        initialZoom={1}
+                        bindToBorders={true}
+                        onZoomAfter={() => false}
+                        style={{}}
+                    >
+                    <Animated.Image
+                        style={[styles.image, {transform: [{rotate: spin}]}]}
+                        source={{uri : image.image_urls.social}} />
+                    </ReactNativeZoomableView>
+                </View>
+            <View style={[styles.actions, {backgroundColor : theme.backgroundColor}]}>
                 {
                     !saving &&
                     <TouchableOpacity style={styles.rotateBtn} onPress={rotate}>
@@ -318,7 +366,7 @@ export default function ImageDetail ({navigation})
                 </TouchableOpacity>
             </View>
 
-        </View>
+        </SafeAreaView>
     )
 }
 
@@ -327,18 +375,24 @@ const styles = StyleSheet.create({
     wrapper : {
         flex: 1,
         width: '100%',
-        paddingTop: 30
+        justifyContent: 'center'
     },
     imageWrapper : {
         width: '100%',
-        marginTop: 50,
         position: 'relative',
+        marginTop: -30
     },
     image : {
         width: '100%',
         aspectRatio: 1200 / 795
     },
     actions : {
+        position : 'absolute',
+        paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+        bottom: 0,
+        paddingTop: 20,
+        left: 0,
+        width: '100%',
         flexDirection: 'row',
         justifyContent : 'space-around',
         marginTop: 0

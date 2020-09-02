@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Text, Dimensions} from 'react-native';
 import Film from './icons/Film';
 import Picture from './icons/Picture';
 import {useTheme} from '../theme-manager';
@@ -38,9 +38,10 @@ const styles = StyleSheet.create({
         paddingHorizontal : 10,
     },
     name : {
-        fontSize: 16,
+        fontSize: 14,
         color: '#fff',
-        fontFamily : 'Roboto-Regular'
+        fontFamily : 'Roboto-Regular',
+        maxWidth : Dimensions.get('window').width - 200
     },
     secondaryInfo : {
         flexDirection : 'row'

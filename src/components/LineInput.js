@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    Dimensions,
     Platform,
     StyleSheet,
     Text, TextInput, View,
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
         marginRight : 30
     },
     input : {
-        width: '100%',
+        width: Dimensions.get('window').width - 150,
         color: '#827c7d',
         fontSize: 16,
         marginTop: Platform.OS === 'ios' ? 13 : 0,

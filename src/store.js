@@ -8,7 +8,7 @@ import main, {
     setSelectedRoll,
     setTheme,
     setToken,
-    setImagesRotation
+    setImagesRotation, setImagesTooltipProcessed,
 } from './ducks/main';
 import FastStorage from "react-native-fast-storage";
 
@@ -27,7 +27,7 @@ export function configureStore ()
     const withStorage = true;
 
     const rootReducer = combineReducers({
-        main : withStorage ? persistReducer({key: "main", storage : FastStorage, blacklist: ['imagesRotation']}, main) : main
+        main : withStorage ? persistReducer({key: "main", storage : FastStorage, blacklist: ['selectedImage', 'selectedRoll', 'rolls', 'selectedAlbum']}, main) : main
     });
     const enhancer = compose(applyMiddleware(...middlewares));
     const store = createStore(rootReducer, enhancer);
@@ -49,4 +49,5 @@ function assignActionsCreators (store) {
     setSelectedImage.assignTo(store);
     setImagesLikes.assignTo(store);
     setImagesRotation.assignTo(store);
+    setImagesTooltipProcessed.assignTo(store);
 }

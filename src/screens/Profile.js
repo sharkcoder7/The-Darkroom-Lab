@@ -6,7 +6,7 @@ import {
     View,
     TouchableOpacity,
     Switch,
-    Platform, KeyboardAvoidingView, Keyboard,
+    Platform, KeyboardAvoidingView, Keyboard, Alert,
 } from 'react-native';
 import {useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
@@ -19,6 +19,7 @@ import Back from '../components/icons/Back';
 import {setToken} from '../ducks/main';
 import { TextInputMask } from 'react-native-masked-text'
 import {LineInput} from '../components/LineInput';
+import {openUrl, SharedUtils} from '../shared';
 
 export default function Profile ({navigation})
 {
@@ -117,12 +118,25 @@ export default function Profile ({navigation})
         return (
             <SheetBody style={{paddingHorizontal: 0}}>
                 <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Email address" value={'example@gmail.com'} onChange={newValue => false}/>
-                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Name" value={'Jhon Doe'} onChange={newValue => false}/>
-                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Address" value={'72 Avenue, New York'} onChange={newValue => false}/>
+                {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Name" value={'Jhon Doe'} onChange={newValue => false}/>*/}
+                {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Address" value={'72 Avenue, New York'} onChange={newValue => false}/>*/}
+                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Phone number" value={'555 555-5555'} onChange={newValue => false}/>
             </SheetBody>
         );
     }
 
+    function askBeforeOpenTerms ()
+    {
+        Alert.alert(
+            'The Darkroom Lab',
+            'You will be redirected to TheDarkroom.com website.',
+            [{
+                text: 'Cancel',
+                onPress : () => false
+            }, {text: 'OK', onPress: () => openUrl('https://thedarkroom.com/terms/')}],
+            {cancelable: false},
+        );
+    }
     const items = [
         {
             text : 'Notifications',
@@ -134,7 +148,7 @@ export default function Profile ({navigation})
         },
         {
             text : 'Terms of Service',
-            action : () => false,
+            action : askBeforeOpenTerms,
         },
         {
             text : 'Logout',
