@@ -1,7 +1,7 @@
 import {useCallback, useState} from "react";
 import {shallowEqual, useSelector} from 'react-redux';
 
-export const API_ENDPOINT = 'https://thedarkroom.com/api';
+export const API_ENDPOINT = 'https://thedarkroom.com/api/api';
 
 export function useRequest ()
 {
