@@ -48,17 +48,12 @@ export default function RollImages ({navigation})
     }, [roll, favouritesFilter]);
 
     useLayoutEffect(() => {
-
-        let options = {
-            headerLeft : () => <BackButton title={'Album'} navigation={navigation}/>,
+        navigation.setOptions({
             headerRight: () => (
                 <HeaderButton text={'Select'} onPress={() => setSelectionMode(true)}/>
             ),
             ...customBackButtonHeaderProps('Album', navigation)
-        };
-
-        navigation.setOptions(options);
-
+        });
     }, [navigation]);
 
     useEffect(() => {
@@ -79,7 +74,7 @@ export default function RollImages ({navigation})
         }
         else
         {
-            options.headerLeft = () => <BackButton title={'Album'} navigation={navigation}/>;
+            options.headerLeft = () => <BackButton title={'Album'} navigation={navigation} forceTitle={true}/>;
         }
 
         navigation.setOptions(options);

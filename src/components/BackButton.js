@@ -2,13 +2,13 @@ import React from 'react';
 import {Text, StyleSheet, TouchableOpacity, Platform} from 'react-native';
 import {Back} from './icons';
 
-export default function BackButton ({navigation, title})
+export default function BackButton ({navigation, title, forceTitle = false})
 {
     return (
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Back style={styles.backButtonIcon}/>
             {
-                Platform.OS !== 'ios' && <Text style={styles.title}>{title}</Text>
+                (forceTitle || Platform.OS !== 'ios') && <Text style={styles.title}>{title}</Text>
             }
         </TouchableOpacity>
     )
