@@ -8,7 +8,7 @@ import main, {
     setSelectedRoll,
     setTheme,
     setToken,
-    setImagesRotation, setImagesTooltipProcessed,
+    setImagesRotation, setImagesTooltipProcessed, setFcmToken,
 } from './ducks/main';
 import FastStorage from "react-native-fast-storage";
 
@@ -50,4 +50,5 @@ function assignActionsCreators (store) {
     setImagesLikes.assignTo(store);
     setImagesRotation.assignTo(store);
     setImagesTooltipProcessed.assignTo(store);
+    setFcmToken.assignTo(store);
 }

@@ -1,19 +1,18 @@
 import React, {useEffect} from 'react';
 import {PersistGate} from 'redux-persist/integration/react'
-import {Provider} from "react-redux";
+import {Provider} from 'react-redux';
 import {configureStore} from './src/store';
 import NavigationWrapper from './src/navigation';
 import {AppearanceProvider} from 'react-native-appearance';
-import ThemeManager, {useTheme} from './src/theme-manager';
+import ThemeManager from './src/theme-manager';
 import messaging from '@react-native-firebase/messaging';
-import {SharedUtils} from './src/shared';
 import PushNotificationIOS from "@react-native-community/push-notification-ios"
 import * as PushNotification from 'react-native-push-notification';
-import {Platform, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 
 console.disableYellowBox = true;
 
-StatusBar.setBackgroundColor("rgba(0,0,0,0)")
+StatusBar.setBackgroundColor("rgba(0,0,0,0)");
 StatusBar.setBarStyle("light-content");
 StatusBar.setTranslucent(true);
 
@@ -94,15 +93,6 @@ export default function App ({})
                 title: notification.notification.title,
                 message: notification.notification.body
             });
-        });
-
-        messaging().getToken()
-            .then(fcmToken => {
-                if (fcmToken) {
-                    console.log('TOKEN: ', fcmToken);
-                } else {
-                }
-            }).catch((error) => {
         });
 
         return unsubscribe;

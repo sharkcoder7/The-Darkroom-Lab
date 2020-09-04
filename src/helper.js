@@ -157,3 +157,4 @@ export function checkChanges (currentProps, currentState, nextProps, nextState)
     return changes;
 }
 
+

@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {
     Text,
     StyleSheet,
@@ -16,16 +16,25 @@ import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
 import {useTheme} from '../theme-manager';
 import Back from '../components/icons/Back';
-import {setToken} from '../ducks/main';
+import {setAlbums, setToken} from '../ducks/main';
 import { TextInputMask } from 'react-native-masked-text'
 import {LineInput} from '../components/LineInput';
 import {openUrl, SharedUtils} from '../shared';
+import {shallowEqual, useSelector} from 'react-redux';
 
 export default function Profile ({navigation})
 {
-    const [SMSEnabled, setSMSEnabled] = useState(false);
+    const fcmToken = useSelector(state => state.main.fcmToken, shallowEqual);
+
+    const [phoneNumberChanged, setPhoneNumberChanged] = useState(false);
+
+    const [smsEnabled, setSmsEnabled] = useState(false);
+    const [initialSmsEnabled, setInitialSmsEnabled] = useState(false);
+
     const [phoneNumber, setPhoneNumber] = useState('');
-    const {request, loading, error} = useRequest();
+    const [initialPhoneNumber, setInitialPhoneNumber] = useState('');
+
+    const {request} = useRequest();
     const bottomSheetEl = useRef();
     const [bottomSheetMode, setBottomSheetMode] = useState('SETTINGS');
 
@@ -39,6 +48,44 @@ export default function Profile ({navigation})
             ),
         });
     }, [navigation]);
+
+    useEffect(() => {
+        getProfile();
+    }, []);
+
+    async function getProfile ()
+    {
+        try
+        {
+            const profile = await request('/profile');
+            setSmsEnabled(profile.smsEnabled);
+            setInitialSmsEnabled(profile.smsEnabled);
+            setPhoneNumber(profile.phoneNumber);
+            setInitialPhoneNumber(profile.phoneNumber);
+        }
+        catch (e)
+        {
+            console.warn('error:' + e);
+        }
+    }
+
+    async function updateProfile ()
+    {
+        try
+        {
+            let updates = {smsEnabled, phoneNumber};
+            if (fcmToken)
+            {
+                updates.notificationsToken = fcmToken;
+            }
+
+            await request('/profile', {method : "PUT", body : JSON.stringify(updates)});
+        }
+        catch (e)
+        {
+            console.warn('error:' + e);
+        }
+    }
 
     function renderItem ({item})
     {
@@ -55,6 +102,7 @@ export default function Profile ({navigation})
 
     function openSettingsSheet ()
     {
+        setPhoneNumberChanged(false);
         setBottomSheetMode('SETTINGS');
         bottomSheetEl.current.snapTo(1);
     }
@@ -72,23 +120,49 @@ export default function Profile ({navigation})
         setToken(null);
     }
 
+    function closeBottomSheet ()
+    {
+        bottomSheetEl.current.snapTo(0);
+        Keyboard.dismiss();
+        if (bottomSheetMode !== 'SETTINGS' || initialSmsEnabled === smsEnabled && initialPhoneNumber === phoneNumber)
+        {
+            return;
+        }
+
+        console.log(initialSmsEnabled, smsEnabled, initialPhoneNumber, phoneNumber);
+        updateProfile();
+    }
+
     function renderHeader()
     {
-        return <SheetHeader title={bottomSheetMode === 'SETTINGS' ? 'Settings' : 'Account Details'} onPress={() => {bottomSheetEl.current.snapTo(0); Keyboard.dismiss()}}/>;
+        return <SheetHeader title={bottomSheetMode === 'SETTINGS' ? 'Settings' : 'Account Details'} onPress={closeBottomSheet}/>;
+    }
+
+    function checkPhoneNumber (phoneNumber) {
+        setPhoneNumberChanged(!phoneNumber.match(/\d{3}-\d{3}-\d{4}/));
+    }
+
+    function onPhoneNumberChange (newPhoneNumber)
+    {
+        setPhoneNumber(newPhoneNumber);
+        if (phoneNumberChanged)
+        {
+            checkPhoneNumber(newPhoneNumber);
+        }
     }
 
     function renderSettingsContent ()
     {
         return (
             <SheetBody>
-                <TouchableOpacity onPress={() => setSMSEnabled(!SMSEnabled)} style={styles.switchWrapper}>
+                <TouchableOpacity onPress={() => setSmsEnabled(!smsEnabled)} style={styles.switchWrapper}>
                     <Switch
                         style={styles.switch}
                         trackColor={{ false: "#999", true: "rgba(33,183,153,0.32)" }}
-                        thumbColor={SMSEnabled ? "#42ada8" : "#f4f3f4"}
+                        thumbColor={smsEnabled ? "#42ada8" : "#f4f3f4"}
                         ios_backgroundColor="#3e3e3e"
-                        onValueChange={setSMSEnabled}
-                        value={SMSEnabled}
+                        onValueChange={setSmsEnabled}
+                        value={smsEnabled}
                     />
                     <Text style={styles.switchLabel}>SMS Notification</Text>
                 </TouchableOpacity>
@@ -98,15 +172,22 @@ export default function Profile ({navigation})
                         Phone number
                     </Text>
                     <TextInputMask
-                        style={styles.input}
+                        style={[styles.input, phoneNumberChanged ? {borderColor: 'red'} : {}]}
                         type={'custom'}
+                        onBlur={() => checkPhoneNumber(phoneNumber)}
                         returnKeyType="done"
                         autoCapitalize='none'
-                        placeholder="555 555-5555"
-                        options={{mask: '999 999-9999'}}
+                        placeholder="555-555-5555"
+                        options={{mask: '999-999-9999'}}
                         value={phoneNumber}
-                        onChangeText={setPhoneNumber}
+                        onChangeText={onPhoneNumberChange}
                     />
+                    {
+                        phoneNumberChanged &&
+                        <Text style={styles.phoneError}>
+                            Format should be 555-555-5555. Phone will not be saved.
+                        </Text>
+                    }
                 </View>
 
             </SheetBody>
@@ -120,7 +201,7 @@ export default function Profile ({navigation})
                 <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Email address" value={'example@gmail.com'} onChange={newValue => false}/>
                 {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Name" value={'Jhon Doe'} onChange={newValue => false}/>*/}
                 {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Address" value={'72 Avenue, New York'} onChange={newValue => false}/>*/}
-                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Phone number" value={'555 555-5555'} onChange={newValue => false}/>
+                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Phone number" value={phoneNumber} onChange={newValue => false}/>
             </SheetBody>
         );
     }
@@ -225,5 +306,9 @@ const styles = StyleSheet.create({
     },
     accountInput : {
         marginTop: 25
+    },
+    phoneError : {
+        fontSize: 12,
+        color: 'red'
     }
 });

@@ -18,30 +18,45 @@ import {Notifications} from '../components/icons';
 import IconBadge from 'react-native-icon-badge';
 import {ToggleThemeButton} from '../components/ToggleThemeButton';
 import Profile from '../components/icons/Profile';
-import {setAlbums, setSelectedAlbum} from '../ducks/main';
+import {setAlbums, setFcmToken, setSelectedAlbum} from '../ducks/main';
 import messaging from '@react-native-firebase/messaging';
 import {hitSlop} from '../theme';
 
 export default function Albums ({navigation})
 {
     const albums = useSelector(state => state.main.albums, shallowEqual);
+    const fcmToken = useSelector(state => state.main.fcmToken, shallowEqual);
+
     const {request, loading} = useRequest();
-    const [token, setToken] = useState('');
 
     const { mode, theme } = useTheme();
 
-    useEffect(() =>
-    {
+    useEffect(() => {
+
         setTimeout(() => SplashScreen.hide(), 50);
-        messaging().getToken()
-            .then(fcmToken => {
-                if (fcmToken) {
-                   setToken(fcmToken);
-                } else {
-                }
-            }).catch((error) => {
+        messaging().getToken().then(newFcmToken =>
+        {
+            setFcmToken(newFcmToken);
+            if (newFcmToken !== fcmToken)
+            {
+                updateProfile(newFcmToken);
+            }
+        }).catch((error) => {
         });
+
     }, []);
+
+    async function updateProfile (newFcmToken)
+    {
+        try
+        {
+            await request('/profile', {method : "PUT", body : JSON.stringify({notificationsToken : newFcmToken})});
+        }
+        catch (e)
+        {
+            console.warn('error:' + e);
+        }
+    }
 
     useEffect(() =>
     {

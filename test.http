@@ -6,7 +6,7 @@ Content-Type: application/json
 {
   "email" : "kaswan434343@gmail.com",
   "password" : "lfV92VrlxpiL",
-  "device_name" : "test"
+  "device_name" : "test",
 }
 
 ###
@@ -23,6 +23,13 @@ Content-Type: application/json
 }
 
 ###
+GET https://thedarkroom.com/api/api/profile
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 6|PmoIdEKQpN9MFVRNb4LTDq2i4UY42EgJ4VmplyI5RXnOkUjVUviJCBzwELGB8hD1kjF5P1Y0xLAB5Z1D
+
+###
 GET https://thedarkroom.com/api/api/notifications
 Accept: */*
 Cache-Control: no-cache
@@ -35,7 +42,7 @@ GET https://thedarkroom.com/api/api/albums
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
+Authorization: Bearer 6|PmoIdEKQpN9MFVRNb4LTDq2i4UY42EgJ4VmplyI5RXnOkUjVUviJCBzwELGB8hD1kjF5P1Y0xLAB5Z1D
 
 ###
 

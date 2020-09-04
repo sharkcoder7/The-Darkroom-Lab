@@ -10,6 +10,7 @@ export const setSelectedImage = createAction('Set selected image');
 export const setImagesLikes = createAction('Set images likes');
 export const setImagesRotation = createAction('Set images rotation');
 export const setImagesTooltipProcessed = createAction('Set image tooltip processed');
+export const setFcmToken = createAction('Set Firebase Messaging Token');
 
 const initialState = {
     token: null,
@@ -22,6 +23,7 @@ const initialState = {
     imagesLikes : {},
     imagesRotation : {},
     imagesTooltipProcessed : false,
+    fcmToken : ''
 };
 
 const main = createReducer({
@@ -35,6 +37,7 @@ const main = createReducer({
     [setImagesLikes]: (state, payload) => ({...state, imagesLikes: payload}),
     [setImagesRotation]: (state, payload) => ({...state, imagesRotation: payload}),
     [setImagesTooltipProcessed]: (state, payload) => ({...state, imagesTooltipProcessed: payload}),
+    [setFcmToken]: (state, payload) => ({...state, fcmToken: payload}),
 }, initialState);
 
 export default main;
