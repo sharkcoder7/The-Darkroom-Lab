@@ -19,6 +19,7 @@ import {SheetBody} from '../components/SheetBody';
 import CopyLink from '../components/icons/CopyLink';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Clipboard from "@react-native-community/clipboard";
+import {ImageDownloadModal} from '../components/ImageDownloadModal';
 
 export default function RollImages ({navigation})
 {
@@ -27,6 +28,7 @@ export default function RollImages ({navigation})
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
 
+    const [imageDownloadModalVisible, setImageDownloadModalVisible] = useState(false);
     const [favouritesFilter, setFavouritesFilter] = useState(false);
     const [selectionMode, setSelectionMode] = useState(false);
     const [images1, setImages1] = useState([]);
@@ -260,14 +262,17 @@ export default function RollImages ({navigation})
 
     function renderContent ()
     {
+        const downloadUrl = roll.download && roll.download.downloadURL || '';
         return (
-            <SheetBody>
+            <SheetBody style={{height: 180}}>
 
                 <View style={styles.inputWrapper}>
                     <View pointerEvents='none'>
-                        <TextInput style={styles.input} value="https://www.dropbox.com/?12312312......."></TextInput>
+                        <Text style={styles.linkBlock} numberOfLines={1}>
+                            {downloadUrl}
+                        </Text>
                     </View>
-                    <TouchableOpacity onPress={() => Clipboard.setString('https://www.dropbox.com/?12312312.......')} style={styles.copyWrapper}>
+                    <TouchableOpacity onPress={() => Clipboard.setString(downloadUrl)} style={styles.copyWrapper}>
                         <CopyLink style={styles.copyIcon}/>
                         <Text style={styles.copyText}>COPY LINK</Text>
                     </TouchableOpacity>
@@ -290,7 +295,10 @@ export default function RollImages ({navigation})
                     </TouchableOpacity>
                 </View>
 
-                <RollDownload openSheet={openSheet}/>
+                {
+                    roll.download !== null &&
+                    <RollDownload date={roll.download.date} error={roll.download.failed} openSheet={openSheet}/>
+                }
 
                 {
                     ((images1.length + images2.length) === 0) &&
@@ -328,7 +336,7 @@ export default function RollImages ({navigation})
                     <View style={styles.buttonWrapper}>
                         <IconBadge
                             MainElement={
-                                <TouchableOpacity onPress={downloadSelectedImages}>
+                                <TouchableOpacity onPress={() => setImageDownloadModalVisible(true)}>
                                     <Download style={styles.footerIcon}/>
                                 </TouchableOpacity>
                             }
@@ -354,6 +362,8 @@ export default function RollImages ({navigation})
                     </View>
                 </View>
             }
+
+            <ImageDownloadModal isVisible={imageDownloadModalVisible} close={() => setImageDownloadModalVisible(false)}/>
 
             <BottomSheet
                 ref={bottomSheetEl}
@@ -441,8 +451,9 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         marginTop: 10
     },
-    input : {
-        width: Dimensions.get('window').width - 50 - 60
+    linkBlock : {
+        width: Dimensions.get('window').width - 50 - 60,
+        paddingVertical: 15
     },
     copyWrapper : {
         backgroundColor: '#bfbcbc',

@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import analytics from '@react-native-firebase/analytics';
 
 import Albums from './screens/Albums';
-import Welcome from './screens/Auth/Welcome';
+import Welcome from './screens/Welcome';
 import {ImageHeader} from './components/ImageHeader';
 import {TdrLogo} from './components/TdrLogo';
 import {shallowEqual, useSelector} from 'react-redux';

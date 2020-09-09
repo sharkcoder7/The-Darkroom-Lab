@@ -24,7 +24,7 @@ PushNotification.configure({
 
     // (required) Called when a remote is received or opened, or local notification is opened
     onNotification: function (notification) {
-        console.log("NOTIFICATION:", notification);
+        console.log("NOTIFICATION OPENED:", notification);
 
         // process the notification
 
@@ -66,10 +66,6 @@ PushNotification.configure({
     requestPermissions: true,
 });
 
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('Message handled in the background!', remoteMessage);
-});
-
 async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -88,11 +84,34 @@ export default function App ({})
     useEffect(() => {
 
         const unsubscribe = messaging().onMessage(async notification => {
-            console.log('============', JSON.stringify(notification));
+            console.log('==================================== ON MESSAGE ==================================== ', JSON.stringify(notification));
             PushNotification.localNotification({
                 title: notification.notification.title,
                 message: notification.notification.body
             });
+        });
+
+        return unsubscribe;
+    }, []);
+
+    useEffect(() => {
+
+        const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
+            console.log(
+                'Notification caused app to open from background state:',
+                remoteMessage.notification,
+            );
+            console.log('==================================== DATA FROM NOTIFICATION ==================================== ' + JSON.stringify(remoteMessage));
+            //navigation.navigate(remoteMessage.data.type);
+        });
+
+        return unsubscribe;
+    }, []);
+
+    useEffect(() => {
+
+        const unsubscribe = messaging().setBackgroundMessageHandler(async remoteMessage => {
+            console.log('==================================== BACKGROUND NOTIFICATION ==================================== ', remoteMessage);
         });
 
         return unsubscribe;

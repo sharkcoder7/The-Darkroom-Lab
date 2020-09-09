@@ -36,6 +36,7 @@ export default function Albums ({navigation})
         setTimeout(() => SplashScreen.hide(), 50);
         messaging().getToken().then(newFcmToken =>
         {
+            console.log('TOKEN====================', newFcmToken);
             setFcmToken(newFcmToken);
             if (newFcmToken !== fcmToken)
             {

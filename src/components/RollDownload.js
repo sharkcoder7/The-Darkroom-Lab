@@ -1,15 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View, StyleSheet, Dimensions, Text, TouchableOpacity, Switch, Keyboard, TextInput} from 'react-native';
+import React, {useState} from 'react';
+import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {useTheme} from '../theme-manager';
 import DownloadFilm from './icons/DownloadFilm';
 import Close from './icons/Close';
-import {SheetBody} from './SheetBody';
-import {TextInputMask} from 'react-native-masked-text';
-import {SheetHeader} from './SheetHeader';
-import BottomSheet from 'reanimated-bottom-sheet';
-import CopyLink from './icons/CopyLink';
 
-export function RollDownload ({openSheet})
+export function RollDownload ({date, openSheet, error})
 {
     const { theme } = useTheme();
 
@@ -21,12 +16,20 @@ export function RollDownload ({openSheet})
         return null;
     }
 
+    function getDownloadDate ()
+    {
+        let dateComponents = date.split('/'),
+            months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        return months[dateComponents[0] - 1] + ' ' + dateComponents[1];
+    }
+
     return (
         <React.Fragment>
-            <View style={styles.wrapper}>
-                <TouchableOpacity onPress={openSheet} style={styles.textWrapper}>
+            <View style={[styles.wrapper, error && {backgroundColor: 'ff000050'}]}>
+                <TouchableOpacity onPress={() => error ? false : openSheet()} style={styles.textWrapper}>
                     <DownloadFilm style={styles.icon}/>
-                    <Text style={styles.text}>Sep 3 - Download is Ready</Text>
+                    <Text style={styles.text}>{getDownloadDate()} - Download is Ready</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => setHide(true)}>
                     <Close style={styles.icon} fill="#d8d8d8"/>
@@ -52,7 +55,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         marginLeft: 10,
-        marginTop: 4
+        marginTop: 6
     },
     button : {
         backgroundColor: '#00000070',

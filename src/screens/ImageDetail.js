@@ -23,6 +23,7 @@ import {
 import LikeOn from '../components/icons/LikeOn';
 import analytics from '@react-native-firebase/analytics';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
+import {ImageDownloadModal} from '../components/ImageDownloadModal';
 
 export default function ImageDetail ({navigation})
 {
@@ -48,6 +49,7 @@ export default function ImageDetail ({navigation})
 
     const {request} = useRequest();
 
+    const [imageDownloadModalVisible, setImageDownloadModalVisible] = useState(false);
     const [saving, setSaving] = useState(false);
     const { theme } = useTheme();
 
@@ -95,6 +97,8 @@ export default function ImageDetail ({navigation})
 
     async function download ()
     {
+        setImageDownloadModalVisible(true);
+        return ;
         analytics().logEvent('downloadImage', {idImage : image.id});
 
         // if device is android you have to ensure you have permission
@@ -365,6 +369,8 @@ export default function ImageDetail ({navigation})
                     <Delete fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
+
+            <ImageDownloadModal isVisible={imageDownloadModalVisible} close={() => setImageDownloadModalVisible(false)}/>
 
         </SafeAreaView>
     )

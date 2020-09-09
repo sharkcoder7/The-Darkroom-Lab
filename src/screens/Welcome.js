@@ -8,14 +8,14 @@ import {
 } from 'react-native';
 import SplashScreen from "react-native-splash-screen";
 import LinearGradient from 'react-native-linear-gradient';
-import {Button} from '../../components/Button';
-import {useRequest} from '../../helper';
-import {setToken} from '../../ducks/main';
-import {BestLabSeal, OrderPromo, YearsOfQuality} from '../../components/icons';
-import {openUrl, SharedUtils} from '../../shared';
+import {Button} from '../components/Button';
+import {useRequest} from '../helper';
+import {setToken} from '../ducks/main';
+import {BestLabSeal, OrderPromo, YearsOfQuality} from '../components/icons';
+import {openUrl, SharedUtils} from '../shared';
 import BottomSheet from 'reanimated-bottom-sheet'
-import {SheetHeader} from '../../components/SheetHeader';
-import {SheetBody} from '../../components/SheetBody';
+import {SheetHeader} from '../components/SheetHeader';
+import {SheetBody} from '../components/SheetBody';
 import analytics from '@react-native-firebase/analytics';
 
 export default function Welcome ({navigation})
@@ -95,7 +95,7 @@ export default function Welcome ({navigation})
     return (
         <React.Fragment>
                 <LinearGradient colors={['#474042', '#000']} style={styles.gradient}>
-                <ImageBackground source={require('../../assets/textured_background.png')} style={styles.image}>
+                <ImageBackground source={require('../assets/textured_background.png')} style={styles.image}>
 
                     <View style={styles.wrapper}>
                         <View></View>

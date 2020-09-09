@@ -9,7 +9,15 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+ 		Intent fcmIntent = this.getIntent();
+        Bundle extras = getIntent().getExtras();
+
         Intent intent = new Intent(this, MainActivity.class);
+
+         if (extras != null) {
+            intent.putExtras(extras);
+         }
+
         startActivity(intent);
         finish();
     }
