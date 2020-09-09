@@ -6,7 +6,7 @@ Content-Type: application/json
 {
   "email" : "kaswan434343@gmail.com",
   "password" : "lfV92VrlxpiL",
-  "device_name" : "test",
+  "device_name" : "test"
 }
 
 ###
@@ -27,7 +27,7 @@ GET https://thedarkroom.com/api/api/profile
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-Authorization: Bearer 6|PmoIdEKQpN9MFVRNb4LTDq2i4UY42EgJ4VmplyI5RXnOkUjVUviJCBzwELGB8hD1kjF5P1Y0xLAB5Z1D
+Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
 
 ###
 GET https://thedarkroom.com/api/api/notifications
@@ -42,23 +42,23 @@ GET https://thedarkroom.com/api/api/albums
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
+Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
+
+###
+
+GET https://thedarkroom.com/api/api/albums/24/rolls
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
+
+###
+
+PUT https://thedarkroom.com/api/api/albums/338200/rolls/18819
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
 Authorization: Bearer 6|PmoIdEKQpN9MFVRNb4LTDq2i4UY42EgJ4VmplyI5RXnOkUjVUviJCBzwELGB8hD1kjF5P1Y0xLAB5Z1D
-
-###
-
-GET https://thedarkroom.com/api/api/albums/36374/rolls
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
-Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
-
-###
-
-PUT https://thedarkroom.com/api/api/albums/36374/rolls/25159
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
-Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAmQc1FVBxqD1ePrRNDYGJcv27M6
 
 {
   "id": "25159",

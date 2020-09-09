@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
-import {StyleSheet, View, Text, ScrollView, TouchableOpacity} from 'react-native';
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Dimensions} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import HeaderButton from '../components/HeaderButton';
@@ -13,6 +13,12 @@ import {shallowEqual, useSelector} from 'react-redux';
 import {setImagesLikes, setRolls, setSelectedAlbum, setSelectedImage, setSelectedRoll} from '../ducks/main';
 import LikeOff from '../components/icons/LikeOff';
 import analytics from '@react-native-firebase/analytics';
+import {RollDownload} from '../components/RollDownload';
+import {SheetHeader} from '../components/SheetHeader';
+import {SheetBody} from '../components/SheetBody';
+import CopyLink from '../components/icons/CopyLink';
+import BottomSheet from 'reanimated-bottom-sheet';
+import Clipboard from "@react-native-community/clipboard";
 
 export default function RollImages ({navigation})
 {
@@ -27,6 +33,8 @@ export default function RollImages ({navigation})
     const [images2, setImages2] = useState([]);
     const [selectedImagesCount, setSelectedImagesCount] = useState(0);
     const {request} = useRequest();
+
+    const bottomSheetEl = useRef();
 
     const { theme } = useTheme();
 
@@ -240,6 +248,37 @@ export default function RollImages ({navigation})
         analytics().logEvent('downloadEntireRoll', {idRoll : roll.id});
     }, [roll]);
 
+    function openSheet ()
+    {
+        bottomSheetEl.current.snapTo(1);
+    }
+
+    function renderHeader()
+    {
+        return <SheetHeader rollDownloadIcon={true} title={'Roll Download'} additionalText={'Copy link to share or download'} onPress={() => bottomSheetEl.current.snapTo(0)}/>;
+    }
+
+    function renderContent ()
+    {
+        return (
+            <SheetBody>
+
+                <View style={styles.inputWrapper}>
+                    <View pointerEvents='none'>
+                        <TextInput style={styles.input} value="https://www.dropbox.com/?12312312......."></TextInput>
+                    </View>
+                    <TouchableOpacity onPress={() => Clipboard.setString('https://www.dropbox.com/?12312312.......')} style={styles.copyWrapper}>
+                        <CopyLink style={styles.copyIcon}/>
+                        <Text style={styles.copyText}>COPY LINK</Text>
+                    </TouchableOpacity>
+                </View>
+                <Text style={styles.copyAdditionalText}>
+                    Download is a compressed ZIP file with full resolution images. Downloading to your phone is not recommended.
+                </Text>
+            </SheetBody>
+        );
+    }
+
     return (
         <React.Fragment>
             <ScrollView showsVerticalScrollIndicator={false} style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
@@ -250,6 +289,8 @@ export default function RollImages ({navigation})
                         {favouritesFilter ? <LikeOn fill={theme.primaryText}/> : <LikeOff fill={theme.primaryText}/>}
                     </TouchableOpacity>
                 </View>
+
+                <RollDownload openSheet={openSheet}/>
 
                 {
                     ((images1.length + images2.length) === 0) &&
@@ -313,6 +354,14 @@ export default function RollImages ({navigation})
                     </View>
                 </View>
             }
+
+            <BottomSheet
+                ref={bottomSheetEl}
+                initialSnap={0}
+                snapPoints={[0, 400]}
+                renderContent={renderContent}
+                renderHeader={renderHeader}
+            />
         </React.Fragment>
     )
 }
@@ -384,5 +433,33 @@ const styles = StyleSheet.create({
     },
     containerStyle : {
         paddingBottom: 100
+    },
+    inputWrapper : {
+        backgroundColor : '#e1e1e1',
+        flexDirection : 'row',
+        width : '100%',
+        paddingLeft: 10,
+        marginTop: 10
+    },
+    input : {
+        width: Dimensions.get('window').width - 50 - 60
+    },
+    copyWrapper : {
+        backgroundColor: '#bfbcbc',
+        width: 70,
+        flexDirection : 'column',
+        justifyContent : 'center',
+        alignItems : 'center'
+    },
+    copyIcon : {
+
+    },
+    copyText : {
+        fontSize: 8,
+        marginTop: 3
+    },
+    copyAdditionalText : {
+        color: '#999',
+        marginTop: 20
     }
 });
