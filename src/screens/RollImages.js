@@ -1,5 +1,15 @@
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Dimensions, Platform} from 'react-native';
+import {
+    StyleSheet,
+    View,
+    Text,
+    ScrollView,
+    TouchableOpacity,
+    TextInput,
+    Dimensions,
+    Platform,
+    Alert, PermissionsAndroid, ActivityIndicator,
+} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import HeaderButton from '../components/HeaderButton';
@@ -8,7 +18,7 @@ import {RollImagesCol} from '../components/RollImagesCol';
 import {Close, Delete, Download, LikeOn, Share} from '../components/icons';
 import DownloadFilm from '../components/icons/DownloadFilm';
 import IconBadge from 'react-native-icon-badge';
-import {SharedUtils} from '../shared';
+import {hasAndroidPermissionForCameraRoll, SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setImagesLikes, setRolls, setSelectedAlbum, setSelectedImage, setSelectedRoll} from '../ducks/main';
 import LikeOff from '../components/icons/LikeOff';
@@ -22,6 +32,8 @@ import Clipboard from "@react-native-community/clipboard";
 import {ImageDownloadModal} from '../components/ImageDownloadModal';
 import {hitSlop} from '../theme';
 import ImgToBase64 from 'react-native-image-base64';
+import RNFetchBlob from 'rn-fetch-blob';
+import CameraRoll from '@react-native-community/cameraroll';
 
 export default function RollImages ({navigation})
 {
@@ -37,6 +49,8 @@ export default function RollImages ({navigation})
     const [images2, setImages2] = useState([]);
     const [selectedImagesCount, setSelectedImagesCount] = useState(0);
     const {request} = useRequest();
+
+    const [saving, setSaving] = useState(false);
 
     const bottomSheetEl = useRef();
 
@@ -254,9 +268,46 @@ export default function RollImages ({navigation})
         setFavouritesFilter(!favouritesFilter);
     }
 
-    const downloadSelectedImages = useCallback(() =>
+    const downloadSelectedImages = useCallback(async () =>
     {
+        setSaving(true);
         analytics().logEvent('downloadSelectedImages', {imagesCount : selectedImagesCount});
+        let urls = [...images1, ...images2].filter(image => image.selected).map(image => image.image_urls.social.replace('\\/', '/'));
+
+        if (Platform.OS === 'android' && !(await hasAndroidPermissionForCameraRoll()))
+        {
+            alert('No permission');
+            return;
+        }
+
+        const onError = err =>
+        {
+            Alert.alert(
+                'Save Images',
+                'Failed to save Images: ' + err.message,
+                [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+                {cancelable: false},
+            );
+        };
+
+        const onEnd = () =>
+        {
+            setSaving(false);
+            toggleSelectAll(false);
+            setSelectionMode(false);
+        };
+
+        urls = urls.map(url => RNFetchBlob.config({fileCache: true, appendExt: 'png'}).fetch('GET', url));
+        Promise.all(urls).then(images => {
+
+            let fetches = images.map(imageData => CameraRoll.save(imageData.data, {type : 'photo'}));
+            Promise.all(fetches).then(result =>
+            {
+                setImageDownloadModalVisible(true);
+            })
+            .catch(onError).finally(() => onEnd());
+        }).catch(err => {onError(err); onEnd();});
+
     }, [selectedImagesCount]);
 
     const downloadEntireRoll = useCallback(() =>
@@ -348,16 +399,22 @@ export default function RollImages ({navigation})
                         <Share style={styles.footerIcon}/>
                     </TouchableOpacity>
                     <View style={styles.buttonWrapper}>
-                        <IconBadge
-                            MainElement={
-                                <TouchableOpacity hitSlop={hitSlop} onPress={() => setImageDownloadModalVisible(true)}>
-                                    <Download style={styles.footerIcon}/>
-                                </TouchableOpacity>
-                            }
-                            BadgeElement={<Text style={styles.badgeText}>{selectedImagesCount}</Text>}
-                            IconBadgeStyle={styles.badge}
-                            Hidden={false}
-                        />
+                        {
+                            saving && <ActivityIndicator style={{width: 24, marginLeft: 10}} size="large" color={theme.primaryText}/>
+                        }
+                        {
+                            !saving &&
+                            <IconBadge
+                                MainElement={
+                                    <TouchableOpacity hitSlop={hitSlop} onPress={downloadSelectedImages}>
+                                        <Download style={styles.footerIcon}/>
+                                    </TouchableOpacity>
+                                }
+                                BadgeElement={<Text onPress={downloadSelectedImages} style={styles.badgeText}>{selectedImagesCount}</Text>}
+                                IconBadgeStyle={styles.badge}
+                                Hidden={false}
+                            />
+                        }
                     </View>
                     <View style={styles.buttonWrapper}>
                         <IconBadge
@@ -366,7 +423,7 @@ export default function RollImages ({navigation})
                                     <DownloadFilm style={styles.footerIcon}/>
                                 </TouchableOpacity>
                             }
-                            BadgeElement={<Text style={styles.badgeText}>{roll.images.length}</Text>}
+                            BadgeElement={<Text onPress={downloadEntireRoll} style={styles.badgeText}>{roll.images.length}</Text>}
                             IconBadgeStyle={styles.badge}
                             Hidden={false}
                         />

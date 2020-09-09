@@ -9,7 +9,7 @@ import {
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import {customBackButtonHeaderProps} from '../components/BackButton';
-import {SharedUtils} from '../shared';
+import {hasAndroidPermissionForCameraRoll, SharedUtils} from '../shared';
 import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
 import {Delete, Download, LikeOff, Rotate, Share} from '../components/icons';
@@ -66,88 +66,35 @@ export default function ImageDetail ({navigation})
 
     }, [navigation]);
 
-    async function getPermissionAndroid ()
+
+    async function download ()
     {
-        try
+        analytics().logEvent('downloadImage', {idImage : image.id});
+
+        if (Platform.OS === 'android' && !(await hasAndroidPermissionForCameraRoll()))
         {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: 'Image Download Permission',
-                    message: 'Your permission is required to save images to your device',
-                    buttonNegative: 'Cancel',
-                    buttonPositive: 'OK',
-                },
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                return true;
-            }
+            alert('No permission');
+            return ;
+        }
+
+        const onError = err =>
+        {
             Alert.alert(
-                'Save remote Image',
-                'Grant Me Permission to save Image',
-                [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-                {cancelable: false},
-            );
-        } catch (err) {
-            Alert.alert(
-                'Save remote Image',
+                'Save Image',
                 'Failed to save Image: ' + err.message,
                 [{text: 'OK', onPress: () => console.log('OK Pressed')}],
                 {cancelable: false},
             );
-        }
-    }
+        };
 
-    async function download ()
-    {
-        setImageDownloadModalVisible(true);
-        return ;
-        analytics().logEvent('downloadImage', {idImage : image.id});
-
-        // if device is android you have to ensure you have permission
-        if (Platform.OS === 'android') {
-            const granted = await getPermissionAndroid();
-            if (!granted) {
-                return;
-            }
-        }
-
-        setSaving(true);
-
-        RNFetchBlob.config({
-            fileCache: true,
-            appendExt: 'png',
-        })
+        RNFetchBlob.config({fileCache: true, appendExt: 'png'})
             .fetch('GET', image.image_urls.sm)
             .then(res => {
                 CameraRoll.save(res.data, {type : 'photo'})
-                    .then(() => {
-                        Alert.alert(
-                            'Save remote Image',
-                            'Image Saved Successfully',
-                            [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-                            {cancelable: false},
-                        );
-                    })
-                    .catch(err => {
-                        Alert.alert(
-                            'Save remote Image',
-                            'Failed to save Image: ' + err.message,
-                            [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-                            {cancelable: false},
-                        );
-                    })
-                    .finally(() => setSaving(false));
+                    .then(() => setImageDownloadModalVisible(true))
+                    .catch(onError)
             })
-            .catch(error => {
-                setSaving(false);
-                Alert.alert(
-                    'Save remote Image',
-                    'Failed to save Image: ' + error.message,
-                    [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-                    {cancelable: false},
-                );
-            });
+            .catch(onError);
     }
 
     async function rotate ()

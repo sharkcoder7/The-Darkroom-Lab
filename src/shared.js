@@ -1,3 +1,8 @@
+import {PermissionsAndroid, Platform} from 'react-native';
+import {useCallback, useState} from 'react';
+import analytics from '@react-native-firebase/analytics';
+import RNFetchBlob from 'rn-fetch-blob';
+import CameraRoll from '@react-native-community/cameraroll';
 
 export function openUrl (url)
 {
@@ -13,6 +18,20 @@ export function openUrl (url)
         }
     });
 }
+
+export async function hasAndroidPermissionForCameraRoll ()
+{
+    const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+    const hasPermission = await PermissionsAndroid.check(permission);
+    if (hasPermission) {
+        return true;
+    }
+
+    const status = await PermissionsAndroid.request(permission);
+    return status === 'granted';
+}
+
 
 export const SharedUtils =
 {

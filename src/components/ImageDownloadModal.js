@@ -15,7 +15,7 @@ export function ImageDownloadModal ({isVisible = true, close})
                     <View style={styles.imageDownloadIconWrapper}>
                         <Download style={styles.imageDownloadIcon}/>
                     </View>
-                    <Text style={styles.headerText}>Image Download</Text>
+                    <Text style={styles.headerText}>Image(s) Successfully Downloaded</Text>
                 </View>
                 <Text style={styles.mainText}>Image resolution is sized for social sharing and mobile devices.</Text>
                 <Text style={styles.mainText}>Use the download roll feature to get a link to the full resolution images.</Text>
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     },
     headerText : {
         fontSize: 24,
-        marginTop: 8,
         marginLeft: 5
     },
     imageDownloadIconWrapper : {
@@ -53,7 +52,8 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 50000,
         paddingHorizontal: 8,
         paddingVertical: 5,
-        marginRight: 10
+        marginRight: 10,
+        height: 53
     },
     imageDownloadIcon : {
         transform : [{scale : 0.75}],
