@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Dimensions} from 'react-native';
+import {StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Dimensions, Platform} from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import HeaderButton from '../components/HeaderButton';
@@ -20,6 +20,8 @@ import CopyLink from '../components/icons/CopyLink';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Clipboard from "@react-native-community/clipboard";
 import {ImageDownloadModal} from '../components/ImageDownloadModal';
+import {hitSlop} from '../theme';
+import ImgToBase64 from 'react-native-image-base64';
 
 export default function RollImages ({navigation})
 {
@@ -213,10 +215,22 @@ export default function RollImages ({navigation})
 
     async function share ()
     {
+        let urls = [...images1, ...images2].filter(image => image.selected).map(image => image.image_urls.sm.replace('\\/', '/'));
+
+        if (urls.length === 0)
+        {
+            return;
+        }
+
+        if (Platform.OS === 'ios')
+        {
+          //  urls = urls.map(async url => 'data:image/png;base64,' + await ImgToBase64.getBase64String(url));
+        }
+
         const shareOptions = {
-            title: 'Share file',
+            title: 'Share darkroom image',
             failOnCancel: false,
-            urls: [],
+            urls
         };
 
         try
@@ -330,13 +344,13 @@ export default function RollImages ({navigation})
             {
                 selectedImagesCount !== 0 &&
                 <View style={styles.footer}>
-                    <View style={styles.buttonWrapper}>
+                    <TouchableOpacity hitSlop={hitSlop} onPress={share} style={styles.buttonWrapper}>
                         <Share style={styles.footerIcon}/>
-                    </View>
+                    </TouchableOpacity>
                     <View style={styles.buttonWrapper}>
                         <IconBadge
                             MainElement={
-                                <TouchableOpacity onPress={() => setImageDownloadModalVisible(true)}>
+                                <TouchableOpacity hitSlop={hitSlop} onPress={() => setImageDownloadModalVisible(true)}>
                                     <Download style={styles.footerIcon}/>
                                 </TouchableOpacity>
                             }
@@ -348,7 +362,7 @@ export default function RollImages ({navigation})
                     <View style={styles.buttonWrapper}>
                         <IconBadge
                             MainElement={
-                                <TouchableOpacity onPress={downloadEntireRoll}>
+                                <TouchableOpacity hitSlop={hitSlop} onPress={downloadEntireRoll}>
                                     <DownloadFilm style={styles.footerIcon}/>
                                 </TouchableOpacity>
                             }
@@ -357,9 +371,9 @@ export default function RollImages ({navigation})
                             Hidden={false}
                         />
                     </View>
-                    <View style={styles.buttonWrapper}>
-                        <Delete onPress={onDeleteRequest} style={styles.footerIcon}/>
-                    </View>
+                    <TouchableOpacity hitSlop={hitSlop} onPress={onDeleteRequest} style={styles.buttonWrapper}>
+                        <Delete style={styles.footerIcon}/>
+                    </TouchableOpacity>
                 </View>
             }
 

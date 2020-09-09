@@ -24,6 +24,8 @@ import LikeOn from '../components/icons/LikeOn';
 import analytics from '@react-native-firebase/analytics';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 import {ImageDownloadModal} from '../components/ImageDownloadModal';
+import ImgToBase64 from 'react-native-image-base64';
+import {hitSlop} from '../theme';
 
 export default function ImageDetail ({navigation})
 {
@@ -51,6 +53,7 @@ export default function ImageDetail ({navigation})
 
     const [imageDownloadModalVisible, setImageDownloadModalVisible] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [sharing, setSharing] = useState(false);
     const { theme } = useTheme();
 
     useLayoutEffect(() => {
@@ -224,36 +227,30 @@ export default function ImageDetail ({navigation})
 
     async function share ()
     {
-        const url = image.image_urls.sm.replace('\\/', '/');
-        const shareOptions = {
-            title: 'Share darkroom image',
-            failOnCancel: false,
-            urls: [url],
-            activityItemSources : [
-                { // For sharing url with custom title.
-                    placeholderItem: { type: 'url', content: url },
-                    item: {
-                        default: { type: 'copyToPasteBoard', content: url },
-                        addToReadingList : { type: 'url', content: url },
-                        airDrop : { type: 'url', content: url },
-                        assignToContact : { type: 'url', content: url },
-                        copyToPasteBoard : { type: 'url', content: url },
-                    },
-                    subject: {
-                        default: 'TEST',
-                    },
-                    linkMetadata: { originalUrl: url, url, title : 'test' },
-                },
-            ]
-        };
+        setSharing(true);
+        let url = image.image_urls.sm.replace('\\/', '/');
 
         try
         {
-            const ShareResponse = await SharedUtils.Share.open(shareOptions);
+            if (Platform.OS === 'ios')
+            {
+                url = 'data:image/png;base64,' + await ImgToBase64.getBase64String(url);
+            }
+
+            const ShareResponse = await SharedUtils.Share.open({
+                title: 'Share darkroom image',
+                failOnCancel: false,
+                type : 'image/png',
+                urls: [url]
+            });
         }
         catch (error)
         {
             console.warn(error.toString());
+        }
+        finally
+        {
+            setSharing(false);
         }
     }
 
@@ -342,17 +339,23 @@ export default function ImageDetail ({navigation})
             <View style={[styles.actions, {backgroundColor : theme.backgroundColor}]}>
                 {
                     !saving &&
-                    <TouchableOpacity style={styles.rotateBtn} onPress={rotate}>
+                    <TouchableOpacity hitSlop={hitSlop} style={{width: 24}} onPress={rotate}>
                         <Rotate fill={theme.primaryText}/>
                     </TouchableOpacity>
                 }
                 {
-                    saving && <ActivityIndicator style={styles.rotateBtn} size="large" color={theme.primaryText}/>
+                    saving && <ActivityIndicator style={{width: 24}} size="large" color={theme.primaryText}/>
                 }
-                <TouchableOpacity onPress={share}>
-                    <Share fill={theme.primaryText}/>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => like(!imageIsLiked())}>
+                {
+                    !sharing &&
+                    <TouchableOpacity hitSlop={hitSlop} onPress={share}>
+                        <Share fill={theme.primaryText}/>
+                    </TouchableOpacity>
+                }
+                {
+                    sharing && <ActivityIndicator style={{width: 33}} size="large" color={theme.primaryText}/>
+                }
+                <TouchableOpacity hitSlop={hitSlop} onPress={() => like(!imageIsLiked())}>
                     {
                         imageIsLiked() &&
                         <LikeOn fill={theme.primaryText} style={styles.likeIcon}/>
@@ -362,10 +365,10 @@ export default function ImageDetail ({navigation})
                         <LikeOff fill={theme.primaryText} style={styles.likeIcon}/>
                     }
                 </TouchableOpacity>
-                <TouchableOpacity onPress={download}>
+                <TouchableOpacity hitSlop={hitSlop} onPress={download}>
                     <Download fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={onDeleteRequest}>
+                <TouchableOpacity hitSlop={hitSlop} onPress={onDeleteRequest}>
                     <Delete fill={theme.primaryText} style={{marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
@@ -406,9 +409,6 @@ const styles = StyleSheet.create({
     likeIcon : {
         transform : [{scale: 1.5}],
         marginTop: 7
-    },
-    rotateBtn : {
-        width: 24
     },
     disabled : {
         opacity: 0.5
