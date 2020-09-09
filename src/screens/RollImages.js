@@ -358,7 +358,7 @@ export default function RollImages ({navigation})
             <BottomSheet
                 ref={bottomSheetEl}
                 initialSnap={0}
-                snapPoints={[0, 400]}
+                snapPoints={[0, 250]}
                 renderContent={renderContent}
                 renderHeader={renderHeader}
             />
