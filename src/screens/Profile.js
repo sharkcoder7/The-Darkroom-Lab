@@ -34,6 +34,8 @@ export default function Profile ({navigation})
     const [phoneNumber, setPhoneNumber] = useState('');
     const [initialPhoneNumber, setInitialPhoneNumber] = useState('');
 
+    const [email, setEmail] = useState('');
+
     const {request} = useRequest();
     const bottomSheetEl = useRef();
     const [bottomSheetMode, setBottomSheetMode] = useState('SETTINGS');
@@ -62,6 +64,7 @@ export default function Profile ({navigation})
             setInitialSmsEnabled(profile.smsEnabled);
             setPhoneNumber(profile.phoneNumber);
             setInitialPhoneNumber(profile.phoneNumber);
+            setEmail(profile.email);
         }
         catch (e)
         {
@@ -198,7 +201,7 @@ export default function Profile ({navigation})
     {
         return (
             <SheetBody style={{paddingHorizontal: 0}}>
-                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Email address" value={'example@gmail.com'} onChange={newValue => false}/>
+                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Email address" value={email} onChange={newValue => false}/>
                 {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Name" value={'Jhon Doe'} onChange={newValue => false}/>*/}
                 {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Address" value={'72 Avenue, New York'} onChange={newValue => false}/>*/}
                 <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Phone number" value={phoneNumber} onChange={newValue => false}/>

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {useTheme} from '../theme-manager';
 import Modal from 'react-native-modal';
 import {Download} from './icons';
@@ -34,14 +34,17 @@ const styles = StyleSheet.create({
     wrapper : {
         backgroundColor : '#fff',
         paddingHorizontal: 15,
-        paddingVertical: 10
+        paddingVertical: 10,
+        borderWidth: 1,
+        borderColor: '#000'
     },
     header : {
         flexDirection : 'row'
     },
     headerText : {
         fontSize: 24,
-        marginLeft: 5
+        marginLeft: 5,
+        width: Dimensions.get('window').width - 100
     },
     imageDownloadIconWrapper : {
         backgroundColor: '#423c3d',
