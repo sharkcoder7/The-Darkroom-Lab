@@ -7,12 +7,13 @@ import {Roll} from '../components/Roll';
 import HeaderButton from '../components/HeaderButton';
 import {customBackButtonHeaderProps} from '../components/BackButton';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setRolls, setSelectedRoll} from '../ducks/main';
+import {setForceAlbumId, setForceRollId, setRolls, setSelectedRoll} from '../ducks/main';
 
 export default function AlbumRolls ({navigation})
 {
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const rolls = useSelector(state => state.main.rolls, shallowEqual);
+    const forceRollId = useSelector(state => state.main.forceRollId, shallowEqual);
 
     const {request, loading} = useRequest();
 
@@ -38,6 +39,10 @@ export default function AlbumRolls ({navigation})
         {
             const response = await request(`/albums/${album.id}/rolls`);
             setRolls(response);
+            if (forceRollId)
+            {
+                findAndSelectForceRoll();
+            }
         }
         catch (e)
         {
@@ -56,6 +61,34 @@ export default function AlbumRolls ({navigation})
         navigation.navigate('RollImages');
     }
 
+    useEffect(() =>
+    {
+        if (!forceRollId)
+        {
+            return () => false;
+        }
+
+        if (rolls.length !== 0)
+        {
+            findAndSelectForceRoll();
+        }
+        else
+        {
+            getRolls();
+        }
+
+    }, [forceRollId]);
+
+    function findAndSelectForceRoll ()
+    {
+        const existingRoll = rolls.find(roll => roll.id === forceRollId);
+        if (existingRoll !== undefined)
+        {
+            selectRoll(existingRoll);
+            setForceRollId(null);
+        }
+    }
+
     return (
         <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
             <AlbumInfo album={album} isInsideAlbumBlock={false}/>
@@ -64,7 +97,7 @@ export default function AlbumRolls ({navigation})
             }
             {
                 !loading &&
-                <FlatList showsVerticalScrollIndicator={false} style={styles.listWrapper} data={rolls} renderItem={({item}) => <Roll key={item.id} roll={item} onPress={() => selectRoll(item)}/>}/>
+                <FlatList showsVerticalScrollIndicator={false} style={styles.listWrapper} data={rolls} keyExtractor={item => item.id.toString()} renderItem={({item}) => <Roll roll={item} onPress={() => selectRoll(item)}/>}/>
             }
         </View>
     )

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, TouchableWithoutFeedback, Image} from 'react-native';
+import {View, StyleSheet, TouchableWithoutFeedback, Image, Dimensions} from 'react-native';
 
 import LikeOff from './icons/LikeOff';
 import {LikeOn, SelectOn} from './icons';
@@ -8,6 +8,7 @@ import {shallowEqual, useSelector} from 'react-redux';
 
 export function RollImagesColImage ({image, index, onImageLikeToggle, onImageSelectToggle, selectionMode, onImageOpen, colNumber})
 {
+    const window = Dimensions.get('window');
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
     const [loaded, setLoaded] = useState(false);
@@ -34,6 +35,8 @@ export function RollImagesColImage ({image, index, onImageLikeToggle, onImageSel
 
     function imageAspectRation (image, index)
     {
+        const rotationAngle = imageRotationAngle(image);
+        return ["0deg", "180deg"].indexOf(rotationAngle) !== -1 ? 360 / 232 : 232 / 360;
         let ratio = index % 2 === colNumber ? 0.8 : 1.5;
         if (imagesRotation[image.id] !== undefined && imagesRotation[image.id] % 180 !== 0)
         {
@@ -43,9 +46,43 @@ export function RollImagesColImage ({image, index, onImageLikeToggle, onImageSel
         return ratio;
     }
 
+    function getImageDimensions ()
+    {
+        const rotationAngle = imageRotationAngle(image);
+
+        if (["0deg", "180deg"].indexOf(rotationAngle) !== -1)
+        {
+            return {
+                width:  (window.width - 30) * 0.5,
+                height: (window.width - 30) * 0.5 * (232 / 360),
+                resizeMode : 'cover',
+                marginTop : 0,
+                marginBottom : 0,
+            };
+        }
+        else
+        {
+            let width = (window.width - 40) * 0.5 * 360 / 232,
+                height = (window.width - 30) * 0.5,
+                diff = Math.round((width - height) / 2);
+
+            return {
+                width,
+                height,
+                resizeMode : 'cover',
+                marginLeft: -diff,
+                marginTop : diff,
+                marginBottom : diff,
+            };
+        }
+
+    }
+
+    const imageDimensions = getImageDimensions();
+
     return (
         <TouchableWithoutFeedback onPress={() => selectionMode ? onImageSelectToggle(image) : onImageOpen(image)}>
-            <View style={styles.imageWrapper}>
+            <View style={[styles.imageWrapper]}>
 
                 <React.Fragment>
                     {
@@ -68,10 +105,9 @@ export function RollImagesColImage ({image, index, onImageLikeToggle, onImageSel
 
                 {/*<FullWidthImage source={{uri : image.image_urls.sm}}/>*/}
                 {/*<FullWidthImage onInit={() => setTimeout(() => setInit(true), 0)} source={{uri : image.image_urls[['sq', 'lg'][Math.floor(Math.random() * ['sq', 'lg'].length)]]}}/>*/}
-                <Image resizeMode="cover" onLoad={() => setLoaded(true)} style={{
-                    width: '100%',
-                    aspectRatio : imageAspectRation(image, index),
-                    transform : [{rotate : imageRotationAngle(image)}]
+                <Image resizeMode={imageDimensions.resizeMode} onLoad={() => setLoaded(true)} style={{
+                    transform : [{rotate : imageRotationAngle(image)}],
+                    ...imageDimensions
                 }} source={{uri : image.image_urls.sm}}/>
             </View>
         </TouchableWithoutFeedback>
@@ -80,7 +116,7 @@ export function RollImagesColImage ({image, index, onImageLikeToggle, onImageSel
 
 const styles = StyleSheet.create({
     wrapper : {
-        width: '50%'
+        width: '100%'
     },
     imageWrapper : {
         width: '100%',

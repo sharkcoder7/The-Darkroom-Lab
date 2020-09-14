@@ -16,7 +16,7 @@ import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
 import {useTheme} from '../theme-manager';
 import Back from '../components/icons/Back';
-import {setAlbums, setToken} from '../ducks/main';
+import {setAlbums, setFcmToken, setToken} from '../ducks/main';
 import { TextInputMask } from 'react-native-masked-text'
 import {LineInput} from '../components/LineInput';
 import {openUrl, SharedUtils} from '../shared';
@@ -121,6 +121,7 @@ export default function Profile ({navigation})
         navigation.navigate('Main');
         navigation.replace('Welcome');
         setToken(null);
+        setFcmToken(null);
     }
 
     function closeBottomSheet ()

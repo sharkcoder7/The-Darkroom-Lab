@@ -7,7 +7,7 @@ export function RollImagesCol ({images, onImageLikeToggle, onImageSelectToggle, 
     return (
         <View style={styles.wrapper}>
             {
-                images.map((image, index) => <RollImagesColImage image={image} index={index} onImageLikeToggle={onImageLikeToggle}
+                images.map((image, index) => <RollImagesColImage key={image.id.toString()} image={image} index={index} onImageLikeToggle={onImageLikeToggle}
                                                             onImageSelectToggle={onImageSelectToggle}
                                                             onImageOpen={onImageOpen} selectionMode={selectionMode}
                                                             colNumber={colNumber}/>)

@@ -11,6 +11,10 @@ export const setImagesLikes = createAction('Set images likes');
 export const setImagesRotation = createAction('Set images rotation');
 export const setImagesTooltipProcessed = createAction('Set image tooltip processed');
 export const setFcmToken = createAction('Set Firebase Messaging Token');
+export const setUncheckedNotificationsCount = createAction('Set unchecked notifications count');
+export const setOrientation = createAction('Set orientation');
+export const setForceAlbumId = createAction('Set force album id');
+export const setForceRollId = createAction('Set force roll id');
 
 const initialState = {
     token: null,
@@ -23,7 +27,11 @@ const initialState = {
     imagesLikes : {},
     imagesRotation : {},
     imagesTooltipProcessed : false,
-    fcmToken : ''
+    fcmToken : '',
+    uncheckedNotificationsCount : 0,
+    orientation : null,
+    forceAlbumId : null,
+    forceRollId : null
 };
 
 const main = createReducer({
@@ -38,6 +46,10 @@ const main = createReducer({
     [setImagesRotation]: (state, payload) => ({...state, imagesRotation: payload}),
     [setImagesTooltipProcessed]: (state, payload) => ({...state, imagesTooltipProcessed: payload}),
     [setFcmToken]: (state, payload) => ({...state, fcmToken: payload}),
+    [setUncheckedNotificationsCount]: (state, payload) => ({...state, uncheckedNotificationsCount: payload}),
+    [setOrientation]: (state, payload) => ({...state, orientation: payload}),
+    [setForceAlbumId]: (state, payload) => ({...state, forceAlbumId: payload}),
+    [setForceRollId]: (state, payload) => ({...state, forceRollId: payload}),
 }, initialState);
 
 export default main;

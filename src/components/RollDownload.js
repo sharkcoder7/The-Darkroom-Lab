@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {useTheme} from '../theme-manager';
 import DownloadFilm from './icons/DownloadFilm';
 import Close from './icons/Close';
 
-export function RollDownload ({date, openSheet, error})
+export function RollDownload ({download, openSheet})
 {
     const { theme } = useTheme();
 
@@ -18,24 +18,56 @@ export function RollDownload ({date, openSheet, error})
 
     function getDownloadDate ()
     {
-        let dateComponents = date.split('/'),
+        let date = download.date.split('T')[0],
+            dateComponents = date.split('-'),
             months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        return months[dateComponents[0] - 1] + ' ' + dateComponents[1];
+        return months[+dateComponents[1] - 1] + ' ' + dateComponents[2];
+    }
+
+    function downloadFailed ()
+    {
+        return download.failed;
+    }
+
+    function downloadIsReady ()
+    {
+        return download.date !== undefined;
     }
 
     return (
-        <React.Fragment>
-            <View style={[styles.wrapper, error && {backgroundColor: 'ff000050'}]}>
-                <TouchableOpacity onPress={() => error ? false : openSheet()} style={styles.textWrapper}>
-                    <DownloadFilm style={styles.icon}/>
-                    <Text style={styles.text}>{getDownloadDate()} - Download is Ready</Text>
-                </TouchableOpacity>
+        <View style={[styles.wrapper, downloadFailed() && {backgroundColor: '#ff000050', height: 50}]}>
+
+            <TouchableOpacity onPress={() => downloadFailed() || !downloadIsReady() ? false : openSheet()} style={styles.textWrapper}>
+                {
+                    downloadFailed() &&
+                    <React.Fragment>
+                        <Text style={[styles.text]}>Download failed</Text>
+                    </React.Fragment>
+                }
+                {
+                    !downloadFailed() && !downloadIsReady() &&
+                    <React.Fragment>
+                        <ActivityIndicator style={styles.loader} size="small" color={theme.primaryText}/>
+                        <Text style={[styles.text, {marginTop: 0}]}>Download preparing</Text>
+                    </React.Fragment>
+                }
+                {
+                    !downloadFailed() && downloadIsReady() &&
+                    <React.Fragment>
+                        <DownloadFilm style={styles.icon}/>
+                        <Text style={styles.text}>{getDownloadDate()} - Download is Ready</Text>
+                    </React.Fragment>
+                }
+            </TouchableOpacity>
+
+            {
+                downloadIsReady() &&
                 <TouchableOpacity style={styles.button} onPress={() => setHide(true)}>
                     <Close style={styles.icon} fill="#d8d8d8"/>
                 </TouchableOpacity>
-            </View>
-        </React.Fragment>
+            }
+        </View>
     )
 }
 
@@ -71,5 +103,8 @@ const styles = StyleSheet.create({
     },
     icon : {
         transform : [{scale: 0.8}]
+    },
+    loadingBlock : {
+        flexDirection : 'row'
     }
 });

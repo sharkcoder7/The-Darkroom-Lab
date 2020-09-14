@@ -18,7 +18,7 @@ import {Notifications} from '../components/icons';
 import IconBadge from 'react-native-icon-badge';
 import {ToggleThemeButton} from '../components/ToggleThemeButton';
 import Profile from '../components/icons/Profile';
-import {setAlbums, setFcmToken, setSelectedAlbum} from '../ducks/main';
+import {setAlbums, setFcmToken, setForceAlbumId, setSelectedAlbum, setUncheckedNotificationsCount} from '../ducks/main';
 import messaging from '@react-native-firebase/messaging';
 import {hitSlop} from '../theme';
 
@@ -26,6 +26,8 @@ export default function Albums ({navigation})
 {
     const albums = useSelector(state => state.main.albums, shallowEqual);
     const fcmToken = useSelector(state => state.main.fcmToken, shallowEqual);
+    const uncheckedNotificationsCount = useSelector(state => state.main.uncheckedNotificationsCount, shallowEqual);
+    const forceAlbumId = useSelector(state => state.main.forceAlbumId, shallowEqual);
 
     const {request, loading} = useRequest();
 
@@ -33,12 +35,14 @@ export default function Albums ({navigation})
 
     useEffect(() => {
 
+        //setTimeout(() => setForceAlbumId(338200), 1000);
+
         setTimeout(() => SplashScreen.hide(), 50);
         messaging().getToken().then(newFcmToken =>
         {
             console.log('TOKEN====================', newFcmToken);
             setFcmToken(newFcmToken);
-            if (newFcmToken !== fcmToken)
+            if (true || newFcmToken !== fcmToken)
             {
                 updateProfile(newFcmToken);
             }
@@ -51,7 +55,7 @@ export default function Albums ({navigation})
     {
         try
         {
-            await request('/profile', {method : "PUT", body : JSON.stringify({notificationsToken : newFcmToken})});
+            let response = await request('/profile', {method : "PUT", body : JSON.stringify({notificationsToken : newFcmToken})});
         }
         catch (e)
         {
@@ -64,12 +68,64 @@ export default function Albums ({navigation})
         getAlbums();
     }, []);
 
+    useEffect(() =>
+    {
+        if (!forceAlbumId)
+        {
+            return () => false;
+        }
+
+        if (albums.length !== 0)
+        {
+            findAndSelectForceAlbum();
+        }
+        else
+        {
+            getAlbums();
+        }
+
+    }, [forceAlbumId]);
+
+    function findAndSelectForceAlbum ()
+    {
+        const existingAlbum = albums.find(album => album.id === forceAlbumId);
+        if (existingAlbum !== undefined)
+        {
+            selectAlbum(existingAlbum);
+            setForceAlbumId(null);
+        }
+    }
+
+    useEffect(() =>
+    {
+        getNewAlertsCount();
+    }, []);
+
     async function getAlbums ()
     {
         try
         {
             const albums = await request('/albums');
             setAlbums(albums.filter(album => album.filmsCount + album.imagesCount > 0));
+            if (forceAlbumId)
+            {
+                findAndSelectForceAlbum();
+            }
+
+        }
+        catch (e)
+        {
+            console.warn('error:' + e);
+        }
+    }
+
+    async function getNewAlertsCount ()
+    {
+        try
+        {
+            const notifications = await request('/notifications');
+            const uncheckedNotifications = notifications.filter(notification => notification.seenAt === null);
+            setUncheckedNotificationsCount(uncheckedNotifications.length);
         }
         catch (e)
         {
@@ -105,7 +161,7 @@ export default function Albums ({navigation})
                 loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryText}/>
             }
 
-            <FlatList showsVerticalScrollIndicator={false} style={styles.listWrapper} data={albums} renderItem={({item}) => <Album key={item.id + Math.random} album={item} onPress={() => selectAlbum(item)}/>}/>
+            <FlatList showsVerticalScrollIndicator={false} style={styles.listWrapper} data={albums} keyExtractor={item => item.id.toString()} renderItem={({item}) => <Album album={item} onPress={() => selectAlbum(item)}/>}/>
 
             <View style={[styles.footer, {backgroundColor : mode === 'light' ? '#5e5e5e' : '#000000'}]}>
                 <ToggleThemeButton/>
@@ -118,9 +174,9 @@ export default function Albums ({navigation})
                             <Notifications style={styles.notificationsIcon}/>
                         </TouchableOpacity>
                     }
-                    BadgeElement={<Text onPress={toNotifications} style={styles.badgeText}>{3}</Text>}
+                    BadgeElement={<Text onPress={toNotifications} style={styles.badgeText}>{uncheckedNotificationsCount}</Text>}
                     IconBadgeStyle={styles.badge}
-                    Hidden={true}
+                    Hidden={uncheckedNotificationsCount === 0}
                 />
             </View>
         </View>
@@ -165,7 +221,7 @@ const styles = StyleSheet.create({
         justifyContent : 'space-between',
         flexDirection: 'row',
         paddingTop: 20,
-        paddingBottom: 20,
+        paddingBottom: 30,
         paddingLeft: 15,
         paddingRight: 30,
     },
@@ -173,10 +229,12 @@ const styles = StyleSheet.create({
         marginTop: 8
     },
     badge : {
-        width : 10,
-        height : 20,
-        right: -5,
-        top: -5,
+        paddingHorizontal: 3,
+        paddingVertical: 3,
+        right: -10,
+        top: -10,
+        width: 25,
+        height : 'auto',
         backgroundColor: '#3e9d99'
     },
     badgeText : {

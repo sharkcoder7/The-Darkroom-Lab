@@ -5,12 +5,11 @@ import {
     Text,
     ScrollView,
     TouchableOpacity,
-    TextInput,
     Dimensions,
     Platform,
-    Alert, PermissionsAndroid, ActivityIndicator,
+    Alert, ActivityIndicator,
 } from 'react-native';
-import {useRequest} from '../helper';
+import {useRequest, useUpdater} from '../helper';
 import {useTheme} from '../theme-manager';
 import HeaderButton from '../components/HeaderButton';
 import BackButton, {customBackButtonHeaderProps} from '../components/BackButton';
@@ -20,7 +19,10 @@ import DownloadFilm from '../components/icons/DownloadFilm';
 import IconBadge from 'react-native-icon-badge';
 import {hasAndroidPermissionForCameraRoll, SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setImagesLikes, setRolls, setSelectedAlbum, setSelectedImage, setSelectedRoll} from '../ducks/main';
+import {
+    setImagesLikes,
+    setSelectedImage, setUncheckedNotificationsCount,
+} from '../ducks/main';
 import LikeOff from '../components/icons/LikeOff';
 import analytics from '@react-native-firebase/analytics';
 import {RollDownload} from '../components/RollDownload';
@@ -31,47 +33,54 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import Clipboard from "@react-native-community/clipboard";
 import {ImageDownloadModal} from '../components/ImageDownloadModal';
 import {hitSlop} from '../theme';
-import ImgToBase64 from 'react-native-image-base64';
 import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
 
 export default function RollImages ({navigation})
 {
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
-    const rolls = useSelector(state => state.main.rolls, shallowEqual);
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
+    const uncheckedNotificationsCount = useSelector(state => state.main.uncheckedNotificationsCount, shallowEqual);
+    const orientation = useSelector(state => state.main.orientation, shallowEqual);
 
     const [imageDownloadModalVisible, setImageDownloadModalVisible] = useState(false);
     const [favouritesFilter, setFavouritesFilter] = useState(false);
     const [selectionMode, setSelectionMode] = useState(false);
+    const [downloadCheckEnabled, setDownloadCheckEnabled] = useState(false);
     const [images1, setImages1] = useState([]);
     const [images2, setImages2] = useState([]);
     const [selectedImagesCount, setSelectedImagesCount] = useState(0);
-    const {request} = useRequest();
-
     const [saving, setSaving] = useState(false);
-
+    const [dateMark, setDateMark] = useState(Date.now());
     const bottomSheetEl = useRef();
+
+    const [rollDownloadProcessing, setRollDownloadProcessing] = useState(false);
+
+    const {request} = useRequest();
+    const {updateRoll} = useUpdater();
 
     const { theme } = useTheme();
 
     useEffect(() =>
     {
         const images = favouritesFilter ? roll.images.filter(image => imagesLikes[image.id] !== undefined ? imagesLikes[image.id] : image.liked) : roll.images;
-        const allImages1 = images.filter((roll, index) => index % 2 === 0);
-        const allImages2 = images.filter((roll, index) => index % 2 === 1);
-       /* const firstPart1 = allImages1.slice(0, 4);
-        const firstPart2 = allImages2.slice(0, 4);*/
-        setImages1(allImages1);
-        setImages2(allImages2);
-
-        /*setTimeout(() => {
-            setImages1([...firstPart1, ...allImages1.slice(4)]);
-            setImages2([...firstPart2, ...allImages2.slice(4)]);
-        }, 300);*/
-
+        setImages1(images.filter((roll, index) => index % 2 === 0));
+        setImages2(images.filter((roll, index) => index % 2 === 1));
     }, [roll, favouritesFilter]);
+
+    useEffect(() =>
+    {
+        setTimeout(() => setDateMark(Date.now()), 300);
+    }, [orientation]);
+
+    useEffect(() =>
+    {
+        if (roll && roll.download && roll.download.status === 'processing')
+        {
+            setDownloadCheckEnabled(true);
+        }
+    }, [roll]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -106,6 +115,35 @@ export default function RollImages ({navigation})
         navigation.setOptions(options);
 
     }, [navigation, selectionMode, images1, images2]);
+
+    useEffect(() => {
+
+        if (downloadCheckEnabled)
+        {
+            const downloadCheckInterval = setInterval(() => checkRollDownload(), 3000);
+            return () => clearInterval(downloadCheckInterval);
+        }
+
+    }, [downloadCheckEnabled]);
+
+    const checkRollDownload = useCallback(async () =>
+    {
+        try
+        {
+            let downloads = await request(`/downloads`);
+            let rollDownload = downloads.find(downloadItem => +downloadItem.rollId === roll.id && downloadItem.downloadURL !== null && downloadItem.failed === false);
+            if (rollDownload !== undefined)
+            {
+                updateRoll(roll.id, {download : rollDownload});
+                setUncheckedNotificationsCount(uncheckedNotificationsCount + 1);
+                setDownloadCheckEnabled(false);
+            }
+        }
+        catch (e)
+        {
+            console.warn('Error during check roll download');
+        }
+    }, []);
 
     const toggleSelectAll = (flag) =>
     {
@@ -210,14 +248,11 @@ export default function RollImages ({navigation})
     {
         try
         {
-            let imageIds = [...images1, ...images2].filter(image => image.selected).map(item => item.id),
-                updatedImages = roll.images.filter(image => imageIds.indexOf(image.id) === -1),
-                updatedRoll = {...roll, images : updatedImages},
-                updatedRolls = rolls.map(roll => roll.id === updatedRoll.id ? updatedRoll : roll);
+            const imageIds = [...images1, ...images2].filter(image => image.selected).map(item => item.id),
+                updatedImages = roll.images.filter(image => imageIds.indexOf(image.id) === -1);
 
             setSelectedImagesCount(0);
-            setRolls(updatedRolls);
-            setSelectedRoll({...roll, images : updatedImages});
+            updateRoll(roll.id, {images : updatedImages});
 
             request(`/albums/${album.id}/rolls/${roll.id}/images`, {method : "DELETE", body: JSON.stringify({imageIds}) });
         }
@@ -310,10 +345,64 @@ export default function RollImages ({navigation})
 
     }, [selectedImagesCount]);
 
-    const downloadEntireRoll = useCallback(() =>
+    async function downloadEntireRoll ()
     {
+        setRollDownloadProcessing(true);
         analytics().logEvent('downloadEntireRoll', {idRoll : roll.id});
-    }, [roll]);
+
+        try
+        {
+           let response = await request(`/albums/${album.id}/rolls/${roll.id}/download`, {method : "PUT" });
+            if (response !== 'successful update')
+            {
+                throw new Error();
+            }
+
+            updateRoll(roll.id, {download : {status : 'processing'}});
+            setDownloadCheckEnabled(true);
+            toggleSelectAll(false);
+            setSelectionMode(false);
+
+            Alert.alert(
+                'The Darkroom Lab',
+                'Your download is being prepared. After a few moments you will get notification.',
+                [{text: 'OK', onPress: () => false}],
+                {cancelable: false},
+            );
+
+            /*await request(`https://fcm.googleapis.com/fcm/send`, {method : "POST", body : JSON.stringify(
+                {
+                    "to" : "dniSYiF3TwCejyjItoxLqm:APA91bG3zNhzo2jSWocWrvgRmUpqbkkrUSoGk6Yg1j5KfklWVD9hEcPe93C_1wkmZTpT55luZPGIY1z2l1Sit0H-Mesgs8SboYZtnYDJYmsaVf2_vluVd-7oQRKWiilC4r0ijyuCO7Au",
+                    "priority" : "high",
+                    "notification" :
+                        {
+                            "title" : "test",
+                            "body" : "test"
+                        },
+                    "data" : {
+                        "field" : "anytext",
+                        "type" : "Order"
+                    }
+                }) }, {'Authorization' : 'key=AAAAltOGyh0:APA91bFVEcXINFITjwxvQO7XuwXJ-RcXR7JJ-65AbjltPtBa8FD9lwQS_XaNoarevl86t9Sk88R6RLTTC90oT4UwN_l8GpXgkOiOv1YwXhNfH1AjQSwzhPgZAnzHqqYsI0CSnnmu-PAB'});
+*/
+
+        }
+        catch (e)
+        {
+            Alert.alert(
+                'The Darkroom Lab', 'Error: ' + e.toString(),
+                [{text: 'OK', onPress: () => false}],
+                {cancelable: false},
+            );
+
+            console.warn('Error during roll download ' + JSON.stringify(e));
+        }
+        finally
+        {
+            setRollDownloadProcessing(false);
+        }
+
+    }
 
     function openSheet ()
     {
@@ -329,7 +418,7 @@ export default function RollImages ({navigation})
     {
         const downloadUrl = roll.download && roll.download.downloadURL || '';
         return (
-            <SheetBody style={{height: 180}}>
+            <SheetBody style={{height: 220}}>
 
                 <View style={styles.inputWrapper}>
                     <View pointerEvents='none'>
@@ -362,7 +451,7 @@ export default function RollImages ({navigation})
 
                 {
                     roll.download !== null &&
-                    <RollDownload date={roll.download.date} error={roll.download.failed} openSheet={openSheet}/>
+                    <RollDownload download={roll.download} openSheet={openSheet}/>
                 }
 
                 {
@@ -385,11 +474,6 @@ export default function RollImages ({navigation})
                                    colNumber={1}
                     />
                 </View>
-
-                {/*<MasonryList
-                    images={roll.images.map(image => ({uri : image.image_urls.sm}))}
-                    spacing={5}
-                />*/}
 
             </ScrollView>
             {
@@ -417,16 +501,22 @@ export default function RollImages ({navigation})
                         }
                     </View>
                     <View style={styles.buttonWrapper}>
-                        <IconBadge
-                            MainElement={
-                                <TouchableOpacity hitSlop={hitSlop} onPress={downloadEntireRoll}>
-                                    <DownloadFilm style={styles.footerIcon}/>
-                                </TouchableOpacity>
-                            }
-                            BadgeElement={<Text onPress={downloadEntireRoll} style={styles.badgeText}>{roll.images.length}</Text>}
-                            IconBadgeStyle={styles.badge}
-                            Hidden={false}
-                        />
+                        {
+                            rollDownloadProcessing && <ActivityIndicator style={{width: 24, height: 37, marginLeft: 10}} size="large" color={theme.primaryText}/>
+                        }
+                        {
+                            !rollDownloadProcessing &&
+                            <IconBadge
+                                MainElement={
+                                    <TouchableOpacity hitSlop={hitSlop} onPress={downloadEntireRoll}>
+                                        <DownloadFilm style={styles.footerIcon}/>
+                                    </TouchableOpacity>
+                                }
+                                BadgeElement={<Text onPress={downloadEntireRoll} style={styles.badgeText}>{roll.images.length}</Text>}
+                                IconBadgeStyle={styles.badge}
+                                Hidden={false}
+                            />
+                        }
                     </View>
                     <TouchableOpacity hitSlop={hitSlop} onPress={onDeleteRequest} style={styles.buttonWrapper}>
                         <Delete style={styles.footerIcon}/>
@@ -439,7 +529,7 @@ export default function RollImages ({navigation})
             <BottomSheet
                 ref={bottomSheetEl}
                 initialSnap={0}
-                snapPoints={[0, 250]}
+                snapPoints={[0, 300]}
                 renderContent={renderContent}
                 renderHeader={renderHeader}
             />
@@ -491,7 +581,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         position: 'absolute',
         bottom: 0,
-        paddingVertical: 10
+        paddingTop: 15,
+        paddingBottom: 25,
     },
     buttonWrapper : {
         width: '25%',
@@ -503,10 +594,12 @@ const styles = StyleSheet.create({
         transform: [{scale: 0.8}]
     },
     badge : {
-        width : 10,
-        height : 20,
-        right: -5,
-        top: -5,
+        paddingHorizontal: 3,
+        paddingVertical: 3,
+        right: -10,
+        top: -10,
+        width: 25,
+        height : 'auto',
         backgroundColor: '#3e9d99'
     },
     badgeText : {

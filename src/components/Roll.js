@@ -22,7 +22,7 @@ export function Roll ({roll, onPress})
             <View style={styles.images}>
                 {
                     roll.images.slice(0, 4).map(image =>
-                        <View style={styles.imageWrapper}>
+                        <View key={image.id.toString()} style={styles.imageWrapper}>
                             {/*<Text>
                                 local: {imagesRotation[image.id] && imagesRotation[image.id].date}
                                 remote: {image.updated_at}

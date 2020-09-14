@@ -9,8 +9,9 @@ import messaging from '@react-native-firebase/messaging';
 import PushNotificationIOS from "@react-native-community/push-notification-ios"
 import * as PushNotification from 'react-native-push-notification';
 import {StatusBar} from 'react-native';
+import {setForceAlbumId, setForceRollId} from './src/ducks/main';
 
-console.disableYellowBox = true;
+//console.disableYellowBox = true;
 
 StatusBar.setBackgroundColor("rgba(0,0,0,0)");
 StatusBar.setBarStyle("light-content");
@@ -30,6 +31,8 @@ PushNotification.configure({
 
         // (required) Called when a remote is received or opened, or local notification is opened
         notification.finish(PushNotificationIOS.FetchResult.NoData);
+        setForceAlbumId(+notification.data.data.albumId);
+        setForceRollId(+notification.data.data.rollId);
     },
 
     // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
@@ -80,42 +83,6 @@ async function requestUserPermission() {
 export default function App ({})
 {
     const storage = configureStore();
-
-    useEffect(() => {
-
-        const unsubscribe = messaging().onMessage(async notification => {
-            console.log('==================================== ON MESSAGE ==================================== ', JSON.stringify(notification));
-            PushNotification.localNotification({
-                title: notification.notification.title,
-                message: notification.notification.body
-            });
-        });
-
-        return unsubscribe;
-    }, []);
-
-    useEffect(() => {
-
-        const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
-            console.log(
-                'Notification caused app to open from background state:',
-                remoteMessage.notification,
-            );
-            console.log('==================================== DATA FROM NOTIFICATION ==================================== ' + JSON.stringify(remoteMessage));
-            //navigation.navigate(remoteMessage.data.type);
-        });
-
-        return unsubscribe;
-    }, []);
-
-    useEffect(() => {
-
-        const unsubscribe = messaging().setBackgroundMessageHandler(async remoteMessage => {
-            console.log('==================================== BACKGROUND NOTIFICATION ==================================== ', remoteMessage);
-        });
-
-        return unsubscribe;
-    }, []);
 
     function onBeforeLift ()
     {

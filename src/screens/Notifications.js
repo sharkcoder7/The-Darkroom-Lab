@@ -5,7 +5,7 @@ import {
     FlatList,
     View,
     TouchableOpacity,
-    Platform, KeyboardAvoidingView, ActivityIndicator,
+    Platform, KeyboardAvoidingView, ActivityIndicator, Dimensions,
 } from 'react-native';
 import {useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
@@ -14,6 +14,7 @@ import {useTheme} from '../theme-manager';
 import DownloadFilm from '../components/icons/DownloadFilm';
 import {openUrl, SharedUtils} from '../shared';
 import {render} from 'redux-logger/src/diff';
+import {setUncheckedNotificationsCount} from '../ducks/main';
 
 export default function Notifications ({navigation})
 {
@@ -66,6 +67,7 @@ export default function Notifications ({navigation})
         {
             const response = await request('/notifications');
             setNotifications(response);
+            setTimeout(() => setNotificationsAsChecked(), 100);
         }
         catch (e)
         {
@@ -77,16 +79,30 @@ export default function Notifications ({navigation})
         }
     }
 
-    function filterByDate (items)
+    async function setNotificationsAsChecked ()
+    {
+        setUncheckedNotificationsCount(0);
+        try
+        {
+            const uncheckedNotificationsIds = notifications.filter(notification => notification.seenAt === null).map(notification => notification.id);
+            if (uncheckedNotificationsIds.length === 0)
+            {
+                return;
+            }
+
+            const response = await request('/notifications', {method : "PUT", body : JSON.stringify({notificationIds : uncheckedNotificationsIds})});
+        }
+        catch (e)
+        {
+            console.warn('error:' + e);
+        }
+    }
+
+    function orderByDate (items)
     {
         return items.sort((a, b) =>
         {
-            let aDateComponents = a.date.split('/'),
-                aDate = [aDateComponents[2], aDateComponents[0].padStart('0', 2), aDateComponents[1].padStart('0', 2)].join(' '),
-                bDateComponents = b.date.split('/'),
-                bDate = [bDateComponents[2], bDateComponents[0].padStart('0', 2), bDateComponents[1].padStart('0', 2)].join(' ');
-
-            return aDate > bDate ? -1 : 1;
+            return a.date > b.date ? -1 : 1;
         });
     }
 
@@ -109,7 +125,7 @@ export default function Notifications ({navigation})
                 <TouchableOpacity onPress={() => openUrl(item.downloadURL)} style={styles.item}>
                     <View>
                         <View style={styles.mainText}>
-                            <Text style={[styles.date, styles.text, {color: theme.primaryText}]}>{item.date || ''}</Text>
+                            <Text style={[styles.date, styles.text, {color: theme.primaryText}]}>{formatDate(item.date)}</Text>
                             <Text style={[styles.text, {color: theme.primaryText}]}>Download is ready</Text>
                         </View>
                         <View>
@@ -130,11 +146,9 @@ export default function Notifications ({navigation})
         return (
             <React.Fragment>
                 <View style={styles.item}>
-                    <View>
-                        <View style={styles.mainText}>
-                            <Text style={[styles.date, styles.text, {color: theme.primaryText}]}>{item.date}</Text>
-                            <Text style={[styles.text, {color: theme.primaryText}]}>{item.text}</Text>
-                        </View>
+                    <View style={styles.mainText}>
+                        <Text style={[styles.date, styles.text, {color: theme.primaryText}]}>{formatDate(item.date)}</Text>
+                        <Text style={[styles.text, {color: theme.primaryText, width: Dimensions.get('window').width - 120}]}>{item.text}</Text>
                     </View>
                 </View>
                 <Separator/>
@@ -146,15 +160,23 @@ export default function Notifications ({navigation})
     {
         if (filter === 'ALERTS')
         {
-            return filterByDate(notifications);
+            return orderByDate(notifications);
         }
 
         if (filter === 'DOWNLOADS')
         {
-            return filterByDate(downloads);
+            return orderByDate(downloads);
         }
 
-        return filterByDate([...notifications, ...downloads]);
+        return orderByDate([...notifications, ...downloads]);
+    }
+
+    function formatDate (fullDate)
+    {
+        let date = fullDate.split('T')[0],
+            dateComponents = date.split('-');
+
+        return dateComponents[1] + '/' + dateComponents[2] + '/' + dateComponents[0];
     }
 
     return (
@@ -190,7 +212,7 @@ export default function Notifications ({navigation})
                             <Text style={[styles.emptyMessage, {color: theme.primaryText}]}>No items.</Text>
                         }
 
-                        <FlatList data={filteredData()} keyExtractor={item => item.downloadId || item.id} renderItem={renderItem}/>
+                        <FlatList data={filteredData()} keyExtractor={(item, index) => index || item.downloadId || item.id} renderItem={renderItem}/>
 
                     </React.Fragment>
                 }
@@ -231,7 +253,7 @@ const styles = StyleSheet.create({
     },
     text : {
         color: '#fff',
-        fontSize: 16
+        fontSize: 16,
     },
     additionalText : {
         color: '#3e9d99',
@@ -243,7 +265,6 @@ const styles = StyleSheet.create({
     },
     mainText : {
         flexDirection : 'row',
-        justifyContent: 'space-between',
     },
     emptyMessage : {
         fontSize: 14,

@@ -1,5 +1,6 @@
 import {useCallback, useState} from "react";
 import {shallowEqual, useSelector} from 'react-redux';
+import {setAlbums, setRolls, setSelectedAlbum, setSelectedRoll} from './ducks/main';
 
 export const API_ENDPOINT = 'https://thedarkroom.com/api/api';
 
@@ -20,13 +21,13 @@ export function useRequest ()
 
         const headers = new Headers({'Content-Type' : 'application/json', ...additionalHeaders});
         options = {...options, mode: 'cors', timeout : options.timeout || 5000, headers};
-        let response = await timeoutPromise(options.timeout, fetch(API_ENDPOINT + endpoint, options));
+        let response = await timeoutPromise(options.timeout, fetch((!endpoint.match('http') ? API_ENDPOINT : '') + endpoint, options));
 
         try
         {
             if (!response.ok)
             {
-                throw new Error('Errors on server');
+                throw new Error('Something went wrong. Please contact us.');
             }
 
             let result;
@@ -157,4 +158,54 @@ export function checkChanges (currentProps, currentState, nextProps, nextState)
     return changes;
 }
 
+export function useUpdater ()
+{
+    const albums = useSelector(state => state.main.albums, shallowEqual);
+    const selectedAlbum = useSelector(state => state.main.selectedAlbum, shallowEqual);
+    const rolls = useSelector(state => state.main.rolls, shallowEqual);
+    const selectedRoll = useSelector(state => state.main.selectedRoll, shallowEqual);
+
+    function updateRoll (idRoll, updates)
+    {
+        const originalRoll = rolls.find(existingRoll => existingRoll.id === idRoll);
+        if (originalRoll === undefined)
+        {
+            return;
+        }
+
+        const updatedRoll = Object.assign(originalRoll, updates),
+              updatedRolls = rolls.map(existingRoll => existingRoll.id === idRoll ? updatedRoll : existingRoll),
+              updatedAlbum = {...selectedRoll, rolls : updatedRolls};
+
+        setRolls(updatedRolls);
+        if (selectedRoll !== null && selectedRoll.id === idRoll)
+        {
+            setSelectedRoll(updatedRoll);
+        }
+
+        setSelectedAlbum(updatedAlbum);
+
+    }
+
+    function updateAlbum (idAlbum, updates)
+    {
+        const originalAlbum = albums.find(existingAlbum => existingAlbum.id === idAlbum);
+        if (originalAlbum === undefined)
+        {
+            return;
+        }
+
+        const updatedAlbum = {...originalAlbum, ...updates},
+              updatedAlbums = albums.map(existingAlbum => existingAlbum.id === idAlbum ? updatedAlbum : existingAlbum);
+
+        setAlbums(updatedAlbums);
+        if (selectedAlbum !== null && selectedAlbum.id === idAlbum)
+        {
+            setSelectedAlbum(updatedAlbum);
+        }
+    }
+
+
+    return { updateAlbum, updateRoll }
+}
 

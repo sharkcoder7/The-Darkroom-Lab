@@ -4,7 +4,7 @@ import {
     Text,
     StyleSheet,
     View,
-    TouchableOpacity, TextInput,
+    TouchableOpacity, TextInput, Platform,
 } from 'react-native';
 import SplashScreen from "react-native-splash-screen";
 import LinearGradient from 'react-native-linear-gradient';
@@ -17,6 +17,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
 import analytics from '@react-native-firebase/analytics';
+import * as DeviceInfo from 'react-native-device-info';
 
 export default function Welcome ({navigation})
 {
@@ -45,7 +46,8 @@ export default function Welcome ({navigation})
 
         try
         {
-            const token = await request(`/auth/signIn`, {withAuth : false, method : "POST", body : JSON.stringify({email, password, device_name : 'test'})});
+            const deviceId = Platform.OS + ' ' + DeviceInfo.getUniqueId();
+            const token = await request(`/auth/signIn`, {withAuth : false, method : "POST", body : JSON.stringify({email, password, device_name : deviceId})});
             setToken(token);
             navigation.replace('Albums');
             analytics().logEvent('signIn', {email});

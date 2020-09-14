@@ -2,7 +2,7 @@
 
 /*const osTheme = Appearance.getColorScheme();*/
 
-export const hitSlop = {top: 10, bottom: 10, left: 10, right: 10};
+export const hitSlop = {top: 20, bottom: 20, left: 20, right: 20};
 
 export const ThemeColors = {
     primaryText: {

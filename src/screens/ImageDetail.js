@@ -4,7 +4,7 @@ import {
     Dimensions,
     View,
     TouchableOpacity,
-    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform,
+    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform, Text,
 } from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -30,7 +30,6 @@ import {hitSlop} from '../theme';
 export default function ImageDetail ({navigation})
 {
     let rotationBlock = false;
-    let windowWidth = Dimensions.get('window').width;
 
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const rolls = useSelector(state => state.main.rolls, shallowEqual);
@@ -39,6 +38,7 @@ export default function ImageDetail ({navigation})
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
     const imagesTooltipProcessed = useSelector(state => state.main.imagesTooltipProcessed, shallowEqual);
+    const orientation = useSelector(state => state.main.orientation, shallowEqual);
 
     let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
     //let rotation = 0;
@@ -266,9 +266,25 @@ export default function ImageDetail ({navigation})
         return image.liked;
     }, [imagesLikes]);
 
+    const window = Dimensions.get('window');
+
+    let width, height;
+
+    if (window.height > window.width)
+    {
+        width = '100%';
+        height = [0, 0.5].indexOf(rotation) !== -1 ? window.height * (795 / 1200) + 20 : window.height - 50;
+    }
+    else
+    {
+        height = window.height - 120;
+        width = [0, 0.5].indexOf(rotation) !== -1 ? height / (795 / 1200) : height;
+    }
+
+
     return (
         <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
-                <View style={[styles.imageWrapper, {height : [0, 0.5].indexOf(rotation) !== -1 ? windowWidth * (795 / 1200) + 20 : windowWidth - 50}]}>
+                <View style={[styles.imageWrapper, {width, height}]}>
                     <ReactNativeZoomableView
                         maxZoom={1.5}
                         minZoom={0.5}
@@ -283,7 +299,7 @@ export default function ImageDetail ({navigation})
                         source={{uri : image.image_urls.social}} />
                     </ReactNativeZoomableView>
                 </View>
-            <View style={[styles.actions, {backgroundColor : theme.backgroundColor}]}>
+            <View style={[styles.actions, {backgroundColor : theme.backgroundColor, width: window.width}]}>
                 {
                     !saving &&
                     <TouchableOpacity hitSlop={hitSlop} style={{width: 24}} onPress={rotate}>
@@ -331,10 +347,10 @@ const styles = StyleSheet.create({
     wrapper : {
         flex: 1,
         width: '100%',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        alignItems : 'center'
     },
     imageWrapper : {
-        width: '100%',
         position: 'relative',
         marginTop: -30
     },

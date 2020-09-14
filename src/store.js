@@ -1,14 +1,20 @@
 import {persistReducer, persistStore} from "redux-persist";
 import {applyMiddleware, combineReducers, compose, createStore} from "redux";
 import main, {
-    setAlbums, setImagesLikes,
+    setAlbums,
+    setImagesLikes,
     setRolls,
     setSelectedAlbum,
     setSelectedImage,
     setSelectedRoll,
     setTheme,
     setToken,
-    setImagesRotation, setImagesTooltipProcessed, setFcmToken,
+    setImagesRotation,
+    setImagesTooltipProcessed,
+    setFcmToken,
+    setUncheckedNotificationsCount,
+    setOrientation,
+    setForceAlbumId, setForceRollId,
 } from './ducks/main';
 import FastStorage from "react-native-fast-storage";
 
@@ -21,13 +27,14 @@ export function configureStore ()
     if (development)
     {
         const {logger} = require(`redux-logger`);
-        middlewares.push(logger);
+        //middlewares.push(logger);
     }
 
     const withStorage = true;
 
     const rootReducer = combineReducers({
-        main : withStorage ? persistReducer({key: "main", storage : FastStorage, blacklist: ['selectedImage', 'selectedRoll', 'rolls', 'selectedAlbum']}, main) : main
+        main : withStorage ? persistReducer({key: "main", storage : FastStorage,
+            blacklist: ['selectedImage', 'selectedRoll', 'rolls', 'selectedAlbum', 'orientation'/*, 'forceAlbumId', 'forceRollId'*/]}, main) : main
     });
     const enhancer = compose(applyMiddleware(...middlewares));
     const store = createStore(rootReducer, enhancer);
@@ -51,4 +58,8 @@ function assignActionsCreators (store) {
     setImagesRotation.assignTo(store);
     setImagesTooltipProcessed.assignTo(store);
     setFcmToken.assignTo(store);
+    setUncheckedNotificationsCount.assignTo(store);
+    setOrientation.assignTo(store);
+    setForceAlbumId.assignTo(store);
+    setForceRollId.assignTo(store);
 }

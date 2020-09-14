@@ -1,21 +1,21 @@
 import React, {useLayoutEffect, useState} from 'react';
 import {StyleSheet, View, Image, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator} from 'react-native';
-import {useRequest} from '../helper';
+import {useRequest, useUpdater} from '../helper';
 import {useTheme} from '../theme-manager';
 import {AlbumInfo} from '../components/AlbumInfo';
 import HeaderButton from '../components/HeaderButton';
 import {customBackButtonHeaderProps} from '../components/BackButton';
 import {LineInput} from '../components/LineInput';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setAlbums, setRolls, setSelectedAlbum} from '../ducks/main';
+import {setRolls} from '../ducks/main';
 
 export default function EditAlbum ({navigation})
 {
-    const albums = useSelector(state => state.main.albums, shallowEqual);
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const rolls = useSelector(state => state.main.rolls, shallowEqual);
 
     const {request, loading} = useRequest();
+    const {updateAlbum} = useUpdater();
 
     const { theme } = useTheme();
     const [updatedAlbum, setUpdatedAlbum] = useState(JSON.parse(JSON.stringify(album)));
@@ -37,6 +37,7 @@ export default function EditAlbum ({navigation})
             return;
         }
 
+
         if (updatedAlbum.updated)
         {
             try
@@ -46,25 +47,14 @@ export default function EditAlbum ({navigation})
                 {
                     throw new Error();
                 }
+
+                updateAlbum(updatedAlbum.id, {name : updatedAlbum.name});
             }
             catch (e)
             {
                 console.warn('Error during album update');
                 return;
             }
-
-
-            let updatedAlbums = albums.map(originalAlbum =>
-            {
-                if (originalAlbum.id === updatedAlbum.id)
-                {
-                    return {...originalAlbum, name : updatedAlbum.name};
-                }
-
-                return originalAlbum;
-            });
-            setAlbums(updatedAlbums);
-            setSelectedAlbum(updatedAlbum);
         }
 
         for (const roll of updatedRolls.filter(roll => roll.updated))
@@ -76,6 +66,7 @@ export default function EditAlbum ({navigation})
                 {
                     throw new Error();
                 }
+
             }
             catch (e)
             {
@@ -87,7 +78,7 @@ export default function EditAlbum ({navigation})
         navigation.goBack();
     };
 
-    function updateAlbum (text)
+    function updateAlbumLocally (text)
     {
         setUpdatedAlbum({...updatedAlbum, name : text, updated : true});
     }
@@ -119,7 +110,7 @@ export default function EditAlbum ({navigation})
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
             <ScrollView showsVerticalScrollIndicator={false} style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]} contentContainerStyle={styles.containerStyle}>
                 <AlbumInfo album={album} isInsideAlbumBlock={false} showName={false}/>
-                <LineInput style={styles.albumInput} title="Album name" value={updatedAlbum.name} onChange={updateAlbum}/>
+                <LineInput style={styles.albumInput} title="Album name" value={updatedAlbum.name} onChange={updateAlbumLocally}/>
 
                     {
                         updatedRolls.map((roll) =>

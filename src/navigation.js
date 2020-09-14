@@ -1,21 +1,26 @@
-import React from "react";
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 /*import { register } from 'react-native-bundle-splitter';*/
 import analytics from '@react-native-firebase/analytics';
 
-import Albums from './screens/Albums';
-import Welcome from './screens/Welcome';
 import {ImageHeader} from './components/ImageHeader';
 import {TdrLogo} from './components/TdrLogo';
+import {FosLogo} from './components/FosLogo'
 import {shallowEqual, useSelector} from 'react-redux';
+
+import Albums from './screens/Albums';
+import Welcome from './screens/Welcome';
 import Notifications from './screens/Notifications';
-import AlbumRolls from './screens/AlbumRolls';
-import {FosLogo} from './components/FosLogo';
+import AlbumRolls from './screens/AlbumRolls';;
 import EditAlbum from './screens/EditAlbum';
 import RollImages from './screens/RollImages';
 import ImageDetail from './screens/ImageDetail';
 import Profile from './screens/Profile';
+import Orientation from 'react-native-orientation';
+import {setForceAlbumId, setForceRollId, setOrientation, setSelectedAlbum, setSelectedRoll} from './ducks/main';
+import messaging from '@react-native-firebase/messaging';
+import * as PushNotification from 'react-native-push-notification';
 
 const headerStyle = {
     headerStyle : {
@@ -33,9 +38,10 @@ const headerStyle = {
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
 
-const MainStackScreen = () => {
+const MainStackScreen = ({navigation}) => {
 
     const token = useSelector(state => state.main.token, shallowEqual);
+    //const forceAlbumId = useSelector(state => state.main.forceAlbumId, shallowEqual);
 
     return (
         <MainStack.Navigator initialRouteName={token ? 'Albums' : 'Welcome'} headerMode="screen" >
@@ -54,6 +60,10 @@ export default ({}) => {
     const routeNameRef = React.useRef();
     const navigationRef = React.useRef();
 
+    /*const albums = useSelector(state => state.main.albums, shallowEqual);
+    const selectedAlbum = useSelector(state => state.main.selectedAlbum, shallowEqual);
+    const selectedRoll = useSelector(state => state.main.selectedRoll, shallowEqual);*/
+
     function onStateChange (state)
     {
         const previousRouteName = routeNameRef.current;
@@ -67,6 +77,71 @@ export default ({}) => {
         // Save the current route name for later comparision
         routeNameRef.current = currentRouteName;
     }
+
+    useEffect(() => {
+
+        Orientation.addOrientationListener(_orientationDidChange);
+
+        return () =>
+        {
+            Orientation.removeOrientationListener(_orientationDidChange);
+        };
+    }, []);
+
+    function _orientationDidChange (orientation)
+    {
+        setOrientation(orientation);
+    }
+
+    useEffect(() => {
+
+        const unsubscribe = messaging().onMessage(async notification => {
+            console.log('==================================== ON MESSAGE ==================================== ', JSON.stringify(notification));
+            PushNotification.localNotification({
+                title: notification.notification.title,
+                message: notification.notification.body,
+                data : notification
+            });
+        });
+
+        return unsubscribe;
+    }, []);
+
+    useEffect(() => {
+
+        const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
+            console.log(
+                'Notification caused app to open from background state:',
+                remoteMessage.notification,
+            );
+
+            const albumId = remoteMessage.data.albumId,
+                  rollId = remoteMessage.data.rollId;
+
+            if (albumId === undefined || rollId === undefined)
+            {
+                return;
+            }
+
+            alert(albumId.toString() + ' ' + rollId.toString());
+            setForceAlbumId(+albumId);
+            setForceRollId(+rollId);
+
+            console.log('==================================== DATA FROM NOTIFICATION ==================================== ' + JSON.stringify(remoteMessage));
+            //navigation.navigate(remoteMessage.data.type);
+        });
+
+        return unsubscribe;
+    }, []);
+
+    useEffect(() => {
+
+        const unsubscribe = messaging().setBackgroundMessageHandler(async remoteMessage => {
+            console.log('==================================== BACKGROUND NOTIFICATION ==================================== ', remoteMessage);
+        });
+
+        return unsubscribe;
+    }, []);
 
     return (
         <React.Fragment>

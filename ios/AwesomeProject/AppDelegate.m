@@ -1,5 +1,6 @@
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
+#import "Orientation.h"
 
 #import <Firebase.h>
 #import "AppDelegate.h"
@@ -31,6 +32,10 @@ static void InitializeFlipper(UIApplication *application) {
 
 @implementation AppDelegate
 
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    return [Orientation getOrientation];
+}
+  
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   

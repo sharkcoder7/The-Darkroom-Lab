@@ -328,6 +328,10 @@ PODS:
   - react-native-fast-storage (0.1.4):
     - MMKV (= 1.0.23)
     - React
+  - react-native-image-base64 (0.1.4):
+    - React
+  - react-native-orientation (3.1.3):
+    - React
   - react-native-safe-area-context (3.1.1):
     - React
   - react-native-splash-screen (3.2.0):
@@ -400,6 +404,8 @@ PODS:
     - React
   - RNCPushNotificationIOS (1.4.1):
     - React
+  - RNDeviceInfo (6.0.2):
+    - React
   - RNFBAnalytics (7.4.2):
     - Firebase/Analytics (~> 6.28.1)
     - React
@@ -468,6 +474,8 @@ DEPENDENCIES:
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - "react-native-cameraroll (from `../node_modules/@react-native-community/cameraroll`)"
   - react-native-fast-storage (from `../node_modules/react-native-fast-storage`)
+  - react-native-image-base64 (from `../node_modules/react-native-image-base64`)
+  - react-native-orientation (from `../node_modules/react-native-orientation`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -484,6 +492,7 @@ DEPENDENCIES:
   - "RNCClipboard (from `../node_modules/@react-native-community/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
@@ -564,6 +573,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/cameraroll"
   react-native-fast-storage:
     :path: "../node_modules/react-native-fast-storage"
+  react-native-image-base64:
+    :path: "../node_modules/react-native-image-base64"
+  react-native-orientation:
+    :path: "../node_modules/react-native-orientation"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
@@ -596,6 +609,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/masked-view"
   RNCPushNotificationIOS:
     :path: "../node_modules/@react-native-community/push-notification-ios"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNFBAnalytics:
     :path: "../node_modules/@react-native-firebase/analytics"
   RNFBApp:
@@ -661,6 +676,8 @@ SPEC CHECKSUMS:
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
   react-native-cameraroll: 7c2e22b5a8e8f30fc6d5566c942b225ca7129752
   react-native-fast-storage: d3965abd49b62c4c82d21b0596717b1ef54e3d84
+  react-native-image-base64: acfe962aa79535d826a2668e66474e85a9ee468d
+  react-native-orientation: d4a97266b06ec8d45d74e626656a730ebbebbb6f
   react-native-safe-area-context: 4c3249e4840225c61fcd215b136af0a737bccb79
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   React-RCTActionSheet: 910163b6b09685a35c4ebbc52b66d1bfbbe39fc5
@@ -677,6 +694,7 @@ SPEC CHECKSUMS:
   RNCClipboard: 5f3218dcdc28405aa2ae72b78e388f150b826dd3
   RNCMaskedView: f5c7d14d6847b7b44853f7acb6284c1da30a3459
   RNCPushNotificationIOS: c625dde093c3c8351d4babd34285d772f551dc36
+  RNDeviceInfo: 273208fc409c58acecd7f5bd726eb5c7edd8265d
   RNFBAnalytics: 715279002cf21b600aec33bc2e315c4cdf5d05e6
   RNFBApp: d55b3a69d199cff25ecf4f3bf41a86c47aa37d57
   RNFBMessaging: 3bb7dcf398789ce359a9f6b97b83472a3090f65a
