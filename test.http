@@ -126,19 +126,22 @@ POST https://fcm.googleapis.com/fcm/send
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-Authorization: key=AAAAltOGyh0:APA91bFVEcXINFITjwxvQO7XuwXJ-RcXR7JJ-65AbjltPtBa8FD9lwQS_XaNoarevl86t9Sk88R6RLTTC90oT4UwN_l8GpXgkOiOv1YwXhNfH1AjQSwzhPgZAnzHqqYsI0CSnnmu-PAB
+Authorization: key=AAAAltOGyh0:APA91bH1G6byP774ZO6_bM-sEVoxhGhNosvgGUM-aQhpNeOqPBK6Gm3kJ6fwWGd451diqeWB-Qd-YJdmJt9owqnund86WmUyBOtUo0cJYHXRkID21UhmRaQtQkihcCawldBookcFj1Us
 
 {
- "to" : "fHhYc8cZQ5yRoByWRQvuly:APA91bH2V1nDDStWsxo4efuqj6zI3EDZc8qeZMoeerItGlIaVzPZtc_MTp5kPd2h2abDrLhd0OJgRslbmh00KhMx3V0_bhM1xHHmQ0AKCpJo06a9IqxZxt5ZUngM7qxqFK1tqGMj6P9T",
+ "to" : "f_jB9Lr4SF69nTPm1gUir6:APA91bEOuv5ITiJQop9md_a9E7FAsJjqV0MXseOF86Z6hfWuuVnl3MSQ7eOtlQ8XXD5j6SWz-bN1lvb8voqGiUrq5DHLKsk1emv5epWzouAoeBhKNaz5FDga7q1IAjPJ3KIqH7TMRg_o",
   "priority" : "high",
   "notification" :
   {
     "title" : "test",
-    "body" : "test"
+    "body" : "test",
+    "badge" : "10"
   },
   "data" : {
-    "field" : "anytext",
-    "type" : "Order"
+    "orderId" : "...",
+    "albumId" : "...",
+    "downloadId" : "...",
+    "badge" : "10"
   }
 }
 

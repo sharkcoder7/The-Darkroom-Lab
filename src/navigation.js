@@ -21,6 +21,7 @@ import Orientation from 'react-native-orientation';
 import {setForceAlbumId, setForceRollId, setOrientation, setSelectedAlbum, setSelectedRoll} from './ducks/main';
 import messaging from '@react-native-firebase/messaging';
 import * as PushNotification from 'react-native-push-notification';
+var BadgeAndroid = require('react-native-android-badge');
 
 const headerStyle = {
     headerStyle : {
@@ -102,6 +103,9 @@ export default ({}) => {
                 message: notification.notification.body,
                 data : notification
             });
+
+            PushNotification.setApplicationIconBadgeNumber(3);
+            BadgeAndroid.setBadge(3);
         });
 
         return unsubscribe;
@@ -137,6 +141,8 @@ export default ({}) => {
     useEffect(() => {
 
         const unsubscribe = messaging().setBackgroundMessageHandler(async remoteMessage => {
+            PushNotification.setApplicationIconBadgeNumber(3);
+            BadgeAndroid.setBadge(3);
             console.log('==================================== BACKGROUND NOTIFICATION ==================================== ', remoteMessage);
         });
 

@@ -68,7 +68,7 @@ export default function Notifications ({navigation})
         {
             const response = await request('/notifications');
             setNotifications(response);
-            setTimeout(() => setNotificationsAsChecked(), 100);
+            setNotificationsAsChecked(response);
         }
         catch (e)
         {
@@ -80,9 +80,11 @@ export default function Notifications ({navigation})
         }
     }
 
-    async function setNotificationsAsChecked ()
+    async function setNotificationsAsChecked (notifications)
     {
         setUncheckedNotificationsCount(0);
+        setTimeout(() => setNotifications(notifications.map(notification => {return {...notification, seenAt : true};})), 1000);
+
         try
         {
             const uncheckedNotificationsIds = notifications.filter(notification => notification.seenAt === null).map(notification => notification.id);
@@ -91,7 +93,7 @@ export default function Notifications ({navigation})
                 return;
             }
 
-            const response = await request('/notifications', {method : "PUT", body : JSON.stringify({notificationIds : uncheckedNotificationsIds})});
+            await request('/notifications', {method : "PUT"});
         }
         catch (e)
         {

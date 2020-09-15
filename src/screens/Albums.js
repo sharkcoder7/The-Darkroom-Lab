@@ -42,7 +42,7 @@ export default function Albums ({navigation})
         {
             console.log('TOKEN====================', newFcmToken);
             setFcmToken(newFcmToken);
-            if (true || newFcmToken !== fcmToken)
+            if (newFcmToken !== fcmToken)
             {
                 updateProfile(newFcmToken);
             }
