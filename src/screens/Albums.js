@@ -72,11 +72,8 @@ export default function Albums ({navigation})
 
     useEffect(() =>
     {
-        if (appState === 'active')
-        {
-            getAlbums();
-        }
-    }, [appState]);
+        getAlbums();
+    }, []);
 
     useEffect(() =>
     {
@@ -108,8 +105,11 @@ export default function Albums ({navigation})
 
     useEffect(() =>
     {
-        getNewAlertsCount();
-    }, []);
+        if (appState === 'active')
+        {
+            getNewAlertsCount();
+        }
+    }, [appState]);
 
     async function getAlbums ()
     {

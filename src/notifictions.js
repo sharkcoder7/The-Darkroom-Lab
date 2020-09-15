@@ -96,6 +96,10 @@ export const showNotification = (title, body) => {
 export function setBadge (count)
 {
     PushNotification.setApplicationIconBadgeNumber(+count);
-    BadgeAndroid.setBadge(+count);
+    if (BadgeAndroid)
+    {
+        BadgeAndroid.setBadge(+count);
+    }
+
     setUncheckedNotificationsCount(+count);
 }
