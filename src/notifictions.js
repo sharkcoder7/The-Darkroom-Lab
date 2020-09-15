@@ -2,6 +2,8 @@ import React, {useState, createContext} from 'react';
 import {useEffect} from 'react';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification from 'react-native-push-notification'
+import {setUncheckedNotificationsCount} from './ducks/main';
+var BadgeAndroid = require('react-native-android-badge');
 
 PushNotification.configure({
     largeIcon: 'ic_launcher',
@@ -90,3 +92,10 @@ export const showNotification = (title, body) => {
         //actions: '["Yes", "No"]', // (Android only) See the doc for notification actions to know more
     });
 };
+
+export function setBadge (count)
+{
+    PushNotification.setApplicationIconBadgeNumber(+count);
+    BadgeAndroid.setBadge(+count);
+    setUncheckedNotificationsCount(+count);
+}

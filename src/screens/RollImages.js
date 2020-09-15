@@ -135,7 +135,6 @@ export default function RollImages ({navigation})
             if (rollDownload !== undefined)
             {
                 updateRoll(roll.id, {download : rollDownload});
-                setUncheckedNotificationsCount(uncheckedNotificationsCount + 1);
                 setDownloadCheckEnabled(false);
             }
         }

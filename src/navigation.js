@@ -12,16 +12,20 @@ import {shallowEqual, useSelector} from 'react-redux';
 import Albums from './screens/Albums';
 import Welcome from './screens/Welcome';
 import Notifications from './screens/Notifications';
-import AlbumRolls from './screens/AlbumRolls';;
+import AlbumRolls from './screens/AlbumRolls';
 import EditAlbum from './screens/EditAlbum';
 import RollImages from './screens/RollImages';
 import ImageDetail from './screens/ImageDetail';
 import Profile from './screens/Profile';
 import Orientation from 'react-native-orientation';
-import {setForceAlbumId, setForceRollId, setOrientation, setSelectedAlbum, setSelectedRoll} from './ducks/main';
+import {
+    setForceAlbumId,
+    setForceRollId,
+    setOrientation
+} from './ducks/main';
 import messaging from '@react-native-firebase/messaging';
 import * as PushNotification from 'react-native-push-notification';
-var BadgeAndroid = require('react-native-android-badge');
+import {setBadge} from './notifictions';
 
 const headerStyle = {
     headerStyle : {
@@ -97,15 +101,21 @@ export default ({}) => {
     useEffect(() => {
 
         const unsubscribe = messaging().onMessage(async notification => {
-            console.log('==================================== ON MESSAGE ==================================== ', JSON.stringify(notification));
+
+            let data = {...(notification.data || {}), ...notification, ...notification.notification};
+
+            console.log('==================================== LOCAL onMessage ==================================== ', JSON.stringify(notification));
+
             PushNotification.localNotification({
                 title: notification.notification.title,
                 message: notification.notification.body,
                 data : notification
             });
 
-            PushNotification.setApplicationIconBadgeNumber(3);
-            BadgeAndroid.setBadge(3);
+            if (data.badge)
+            {
+                setBadge(data.badge);
+            }
         });
 
         return unsubscribe;
@@ -131,8 +141,7 @@ export default ({}) => {
             setForceAlbumId(+albumId);
             setForceRollId(+rollId);
 
-            console.log('==================================== DATA FROM NOTIFICATION ==================================== ' + JSON.stringify(remoteMessage));
-            //navigation.navigate(remoteMessage.data.type);
+            console.log('==================================== REMOTE onNotificationOpenedApp ==================================== ' + JSON.stringify(remoteMessage));
         });
 
         return unsubscribe;
@@ -141,9 +150,15 @@ export default ({}) => {
     useEffect(() => {
 
         const unsubscribe = messaging().setBackgroundMessageHandler(async remoteMessage => {
-            PushNotification.setApplicationIconBadgeNumber(3);
-            BadgeAndroid.setBadge(3);
-            console.log('==================================== BACKGROUND NOTIFICATION ==================================== ', remoteMessage);
+
+            const data = {...(remoteMessage.data || {}), ...remoteMessage};
+
+            if (data.badge)
+            {
+                setBadge(data.badge);
+            }
+
+            console.log('==================================== REMOTE onMessage ==================================== ' + JSON.stringify(remoteMessage));
         });
 
         return unsubscribe;

@@ -37,6 +37,13 @@ Content-Type: application/json
 Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
 
 ###
+GET https://thedarkroom.com/api/api/notifications/unseen
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
+
+###
 GET https://thedarkroom.com/api/api/downloads
 Accept: */*
 Cache-Control: no-cache

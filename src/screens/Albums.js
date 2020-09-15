@@ -123,13 +123,12 @@ export default function Albums ({navigation})
     {
         try
         {
-            const notifications = await request('/notifications');
-            const uncheckedNotifications = notifications.filter(notification => notification.seenAt === null);
-            setUncheckedNotificationsCount(uncheckedNotifications.length);
+            const uncheckedNotificationCount = await request('/notifications/unseen');
+            setUncheckedNotificationsCount(uncheckedNotificationCount);
         }
         catch (e)
         {
-            console.warn('error:' + e);
+            console.warn('error:' + JSON.stringify(e));
         }
     }
 

@@ -15,6 +15,8 @@ import DownloadFilm from '../components/icons/DownloadFilm';
 import {openUrl, SharedUtils} from '../shared';
 import {render} from 'redux-logger/src/diff';
 import {setUncheckedNotificationsCount} from '../ducks/main';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import * as PushNotification from 'react-native-push-notification';
 
 export default function Notifications ({navigation})
 {
@@ -82,7 +84,15 @@ export default function Notifications ({navigation})
 
     async function setNotificationsAsChecked (notifications)
     {
+        if (Platform.OS === 'ios')
+        {
+            PushNotificationIOS.removeAllDeliveredNotifications();
+            PushNotificationIOS.setApplicationIconBadgeNumber(0);
+        }
+
         setUncheckedNotificationsCount(0);
+        PushNotification.cancelAllLocalNotifications();
+
         setTimeout(() => setNotifications(notifications.map(notification => {return {...notification, seenAt : true};})), 1000);
 
         try
