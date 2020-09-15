@@ -95,6 +95,7 @@ export default function App ({})
     function onBeforeLift ()
     {
         requestUserPermission();
+        Platform.OS === 'ios' && PushNotificationIOS.setApplicationIconBadgeNumber(0);
     }
 
     return (
