@@ -49,6 +49,7 @@ export default function Notifications ({navigation})
         {
             const response = await request('/downloads');
             setDownloads(response.filter(item => item.downloadURL));
+            console.log(response);
         }
         catch (e)
         {
@@ -125,11 +126,11 @@ export default function Notifications ({navigation})
                 <TouchableOpacity onPress={() => openUrl(item.downloadURL)} style={styles.item}>
                     <View>
                         <View style={styles.mainText}>
-                            <Text style={[styles.date, styles.text, {color: theme.primaryText}]}>{formatDate(item.date)}</Text>
-                            <Text style={[styles.text, {color: theme.primaryText}]}>Download is ready</Text>
+                            <Text allowFontScaling={false} style={[styles.date, styles.text, {color: theme.primaryText}]}>{formatDate(item.date)}</Text>
+                            <Text allowFontScaling={false} style={[styles.text, {color: theme.primaryText}]}>Download is ready</Text>
                         </View>
                         <View>
-                            <Text style={styles.additionalText}>Roll #{item.rollId} in ready to download</Text>
+                            <Text allowFontScaling={false} style={styles.additionalText}>Roll #{item.rollId} in ready to download</Text>
                         </View>
                     </View>
                     <View style={styles.downloadIconWrapper}>
@@ -147,8 +148,8 @@ export default function Notifications ({navigation})
             <React.Fragment>
                 <View style={styles.item}>
                     <View style={styles.mainText}>
-                        <Text style={[styles.date, styles.text, {color: theme.primaryText}]}>{formatDate(item.date)}</Text>
-                        <Text style={[styles.text, {color: theme.primaryText, width: Dimensions.get('window').width - 120}]}>{item.text}</Text>
+                        <Text allowFontScaling={false} style={[styles.date, styles.text, {color: theme.primaryText}, !item.seenAt ? {fontWeight : 'bold'} : {}]}>{formatDate(item.date)}</Text>
+                        <Text allowFontScaling={false} style={[styles.text, {color: theme.primaryText, width: Dimensions.get('window').width - 120}, !item.seenAt ? {fontWeight : 'bold'} : {}]}>{item.text}</Text>
                     </View>
                 </View>
                 <Separator/>

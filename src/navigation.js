@@ -115,15 +115,15 @@ export default ({}) => {
                 remoteMessage.notification,
             );
 
-            const albumId = remoteMessage.data.albumId,
-                  rollId = remoteMessage.data.rollId;
+            let data = {...(remoteMessage.data || {}), ...remoteMessage},
+                albumId = data.albumId,
+                rollId = data.rollId;
 
             if (albumId === undefined || rollId === undefined)
             {
                 return;
             }
 
-            alert(albumId.toString() + ' ' + rollId.toString());
             setForceAlbumId(+albumId);
             setForceRollId(+rollId);
 

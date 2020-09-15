@@ -31,8 +31,16 @@ PushNotification.configure({
 
         // (required) Called when a remote is received or opened, or local notification is opened
         notification.finish(PushNotificationIOS.FetchResult.NoData);
-        setForceAlbumId(+notification.data.data.albumId);
-        setForceRollId(+notification.data.data.rollId);
+
+        if (!notification.data || !notification.data.data)
+        {
+            return;
+        }
+
+        let data = {...notification.data.data, ...notification.data, ...notification};
+
+        setForceAlbumId(+data.albumId);
+        setForceRollId(+data.rollId);
     },
 
     // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
