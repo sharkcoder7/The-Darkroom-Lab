@@ -21,6 +21,7 @@ import Profile from '../components/icons/Profile';
 import {setAlbums, setFcmToken, setForceAlbumId, setSelectedAlbum, setUncheckedNotificationsCount} from '../ducks/main';
 import messaging from '@react-native-firebase/messaging';
 import {hitSlop} from '../theme';
+import useAppState from 'react-native-appstate-hook';
 
 export default function Albums ({navigation})
 {
@@ -32,6 +33,12 @@ export default function Albums ({navigation})
     const {request, loading} = useRequest();
 
     const { mode, theme } = useTheme();
+
+    const { appState } = useAppState({
+        onChange: (newAppState) => console.warn('App state changed to ', newAppState),
+        onForeground: () => console.warn('App went to Foreground'),
+        onBackground: () => console.warn('App went to background'),
+    });
 
     useEffect(() => {
 
@@ -65,8 +72,11 @@ export default function Albums ({navigation})
 
     useEffect(() =>
     {
-        getAlbums();
-    }, []);
+        if (appState === 'active')
+        {
+            getAlbums();
+        }
+    }, [appState]);
 
     useEffect(() =>
     {
