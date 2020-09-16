@@ -1,6 +1,7 @@
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
 #import "Orientation.h"
+#import <Bugsnag/Bugsnag.h>
 
 #import <Firebase.h>
 #import "AppDelegate.h"
@@ -63,7 +64,10 @@ static void InitializeFlipper(UIApplication *application) {
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
   center.delegate = self;
   
+  [Bugsnag start];
+  
   [RNSplashScreen show];
+  
   return YES;
 }
 

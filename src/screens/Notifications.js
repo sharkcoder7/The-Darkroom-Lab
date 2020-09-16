@@ -17,6 +17,7 @@ import {render} from 'redux-logger/src/diff';
 import {setUncheckedNotificationsCount} from '../ducks/main';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import * as PushNotification from 'react-native-push-notification';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function Notifications ({navigation})
 {
@@ -55,6 +56,7 @@ export default function Notifications ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e)
             console.warn('error:' + e);
         }
         finally
@@ -74,6 +76,7 @@ export default function Notifications ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('error:' + e);
         }
         finally
@@ -107,6 +110,7 @@ export default function Notifications ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('error:' + e);
         }
     }

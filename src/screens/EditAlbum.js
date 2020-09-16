@@ -8,6 +8,7 @@ import {customBackButtonHeaderProps} from '../components/BackButton';
 import {LineInput} from '../components/LineInput';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setRolls} from '../ducks/main';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function EditAlbum ({navigation})
 {
@@ -52,6 +53,7 @@ export default function EditAlbum ({navigation})
             }
             catch (e)
             {
+                Bugsnag.notify(e);
                 console.warn('Error during album update');
                 return;
             }
@@ -70,6 +72,7 @@ export default function EditAlbum ({navigation})
             }
             catch (e)
             {
+                Bugsnag.notify(e);
                 console.warn('Error during roll update');
             }
         }

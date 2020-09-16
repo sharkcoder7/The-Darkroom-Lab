@@ -18,6 +18,7 @@ import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
 import analytics from '@react-native-firebase/analytics';
 import * as DeviceInfo from 'react-native-device-info';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function Welcome ({navigation})
 {
@@ -54,6 +55,7 @@ export default function Welcome ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             SharedUtils.Alert.alert('The Darkroom Lab', 'Incorrect username or password',
                 [{text: 'OK', onPress: () => console.log('OK Pressed')}],
                 {cancelable: false},

@@ -21,6 +21,7 @@ import { TextInputMask } from 'react-native-masked-text'
 import {LineInput} from '../components/LineInput';
 import {openUrl, SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function Profile ({navigation})
 {
@@ -68,6 +69,7 @@ export default function Profile ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('error:' + e);
         }
     }
@@ -86,6 +88,7 @@ export default function Profile ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('error:' + e);
         }
     }

@@ -35,6 +35,7 @@ import {ImageDownloadModal} from '../components/ImageDownloadModal';
 import {hitSlop} from '../theme';
 import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function RollImages ({navigation})
 {
@@ -140,6 +141,7 @@ export default function RollImages ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('Error during check roll download');
         }
     }, []);
@@ -196,6 +198,7 @@ export default function RollImages ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('Error during image update');
         }
     }
@@ -257,6 +260,7 @@ export default function RollImages ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('Error during image delete');
         }
     }
@@ -287,6 +291,7 @@ export default function RollImages ({navigation})
         }
         catch (error)
         {
+            Bugsnag.notify(error);
             console.warn(error.toString());
         }
     }
@@ -388,6 +393,7 @@ export default function RollImages ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             Alert.alert(
                 'The Darkroom Lab', 'Error: ' + e.toString(),
                 [{text: 'OK', onPress: () => false}],

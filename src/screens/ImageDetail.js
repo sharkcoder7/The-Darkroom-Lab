@@ -27,6 +27,7 @@ import {ImageDownloadModal} from '../components/ImageDownloadModal';
 import ImgToBase64 from 'react-native-image-base64';
 import {hitSlop} from '../theme';
 import Modal from 'react-native-translucent-modal';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function ImageDetail ({navigation})
 {
@@ -194,6 +195,7 @@ export default function ImageDetail ({navigation})
         }
         catch (error)
         {
+            Bugsnag.notify(e);
             console.warn(error.toString());
         }
         finally
@@ -214,6 +216,7 @@ export default function ImageDetail ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('Error during image update');
         }
     }

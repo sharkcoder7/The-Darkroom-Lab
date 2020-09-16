@@ -8,6 +8,7 @@ import HeaderButton from '../components/HeaderButton';
 import {customBackButtonHeaderProps} from '../components/BackButton';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setForceAlbumId, setForceRollId, setRolls, setSelectedRoll} from '../ducks/main';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function AlbumRolls ({navigation})
 {
@@ -46,6 +47,7 @@ export default function AlbumRolls ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('error:' + e);
         }
     }

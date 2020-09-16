@@ -1,8 +1,9 @@
 import {useCallback, useState} from "react";
 import {shallowEqual, useSelector} from 'react-redux';
 import {setAlbums, setRolls, setSelectedAlbum, setSelectedRoll} from './ducks/main';
+import Bugsnag from '@bugsnag/react-native'
 
-export const API_ENDPOINT = 'https://thedarkroom.com/api/api';
+export const API_ENDPOINT = 'https://thedarkroom.com/api/api/v1';
 
 export function useRequest ()
 {
@@ -37,6 +38,7 @@ export function useRequest ()
             }
             catch (e)
             {
+                Bugsnag.notify(e);
                 throw new Error('Incorrect server response (json error)');
             }
 
@@ -49,6 +51,7 @@ export function useRequest ()
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             setError(e.message);
             throw e.message;
         }

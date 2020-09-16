@@ -8,8 +8,11 @@ import ThemeManager from './src/theme-manager';
 import messaging from '@react-native-firebase/messaging';
 import PushNotificationIOS from "@react-native-community/push-notification-ios"
 import * as PushNotification from 'react-native-push-notification';
-import {StatusBar} from 'react-native';
+import {StatusBar, Text} from 'react-native';
 import {setForceAlbumId, setForceRollId} from './src/ducks/main';
+import Bugsnag from '@bugsnag/react-native'
+
+Bugsnag.start();
 
 //console.disableYellowBox = true;
 
@@ -88,6 +91,8 @@ async function requestUserPermission() {
     }
 }
 
+const ErrorBoundary = Bugsnag.getPlugin('react').createErrorBoundary(React);
+
 export default function App ({})
 {
     const storage = configureStore();
@@ -98,17 +103,26 @@ export default function App ({})
     }
 
     return (
-        <Provider store={storage.store}>
-            <PersistGate loading={null} onBeforeLift={onBeforeLift} persistor={storage.persistor}>
-                <React.Fragment>
-                    <StatusBar translucent barStyle="light-content" backgroundColor={'transparent'} />
-                    <AppearanceProvider>
-                        <ThemeManager>
-                            <NavigationWrapper/>
-                        </ThemeManager>
-                    </AppearanceProvider>
-                </React.Fragment>
-            </PersistGate>
-        </Provider>
+        <ErrorBoundary FallbackComponent={ErrorView}>
+            <Provider store={storage.store}>
+                <PersistGate loading={null} onBeforeLift={onBeforeLift} persistor={storage.persistor}>
+                    <React.Fragment>
+                        <StatusBar translucent barStyle="light-content" backgroundColor={'transparent'} />
+                        <AppearanceProvider>
+                            <ThemeManager>
+                                <NavigationWrapper/>
+                            </ThemeManager>
+                        </AppearanceProvider>
+                    </React.Fragment>
+                </PersistGate>
+            </Provider>
+        </ErrorBoundary>
+    )
+}
+
+function ErrorView ({})
+{
+    return (
+        <Text>Error! Please contact support.</Text>
     )
 }

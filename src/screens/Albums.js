@@ -22,6 +22,7 @@ import {setAlbums, setFcmToken, setForceAlbumId, setSelectedAlbum, setUncheckedN
 import messaging from '@react-native-firebase/messaging';
 import {hitSlop} from '../theme';
 import useAppState from 'react-native-appstate-hook';
+import Bugsnag from '@bugsnag/react-native'
 
 export default function Albums ({navigation})
 {
@@ -66,6 +67,7 @@ export default function Albums ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('error:' + e);
         }
     }
@@ -138,6 +140,7 @@ export default function Albums ({navigation})
         }
         catch (e)
         {
+            Bugsnag.notify(e);
             console.warn('error:' + JSON.stringify(e));
         }
     }
