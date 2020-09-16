@@ -4,7 +4,7 @@ import {
     Dimensions,
     View,
     TouchableOpacity,
-    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform, Text,
+    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform, Text, StatusBar,
 } from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -26,6 +26,7 @@ import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/R
 import {ImageDownloadModal} from '../components/ImageDownloadModal';
 import ImgToBase64 from 'react-native-image-base64';
 import {hitSlop} from '../theme';
+import Modal from 'react-native-translucent-modal';
 
 export default function ImageDetail ({navigation})
 {
@@ -268,77 +269,94 @@ export default function ImageDetail ({navigation})
 
     const window = Dimensions.get('window');
 
-    let width, height;
+    let imageParams = {};
 
-    if (window.height > window.width)
+    if (orientation !== 'LANDSCAPE')
     {
-        width = '100%';
-        height = [0, 0.5].indexOf(rotation) !== -1 ? window.height * (795 / 1200) + 20 : window.height - 50;
+        imageParams.width = '100%';
+        imageParams.height = [0, 0.5].indexOf(rotation) !== -1 ? window.height * (795 / 1200) + 20 : window.height - 50;
     }
     else
     {
-        height = window.height - 120;
-        width = [0, 0.5].indexOf(rotation) !== -1 ? height / (795 / 1200) : height;
+        imageParams.height = window.height;
+        imageParams.width = [0, 0.5].indexOf(rotation) !== -1 ? imageParams.height / (795 / 1200) : imageParams.height;
+        imageParams.marginTop = 0;
+        imageParams.modalView = true;
     }
 
+    const imageView = (
+        <View style={[styles.imageWrapper, {...imageParams}]}>
+            <ReactNativeZoomableView
+                captureEvent={true}
+                maxZoom={1.5}
+                minZoom={0.5}
+                zoomStep={0.5}
+                initialZoom={1}
+                bindToBorders={true}
+                style={{}}
+            >
+                <Animated.Image
+                    resizeMode="cover"
+                    style={[styles.image, {transform: [{rotate: spin}]}]}
+                    source={{uri : image.image_urls.social}} />
+            </ReactNativeZoomableView>
+        </View>
+    );
 
     return (
-        <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
-                <View style={[styles.imageWrapper, {width, height}]}>
-                    <ReactNativeZoomableView
-                        maxZoom={1.5}
-                        minZoom={0.5}
-                        zoomStep={0.5}
-                        initialZoom={1}
-                        bindToBorders={true}
-                        onZoomAfter={() => false}
-                        style={{}}
-                    >
-                    <Animated.Image
-                        style={[styles.image, {transform: [{rotate: spin}]}]}
-                        source={{uri : image.image_urls.social}} />
-                    </ReactNativeZoomableView>
+        <React.Fragment>
+
+            <Modal mode="pop" visible={imageParams.modalView === true} deviceWidth={window.width} animationIn={'fadeIn'} animationOut={'fadeOut'} hasBackdrop={true} backdropOpacity={1}>
+                <View style={styles.modalViewWrapper}>
+                    {imageView}
                 </View>
-            <View style={[styles.actions, {backgroundColor : theme.backgroundColor, width: window.width}]}>
-                {
-                    !saving &&
-                    <TouchableOpacity hitSlop={hitSlop} style={{width: 24}} onPress={rotate}>
-                        <Rotate fill={theme.primaryText}/>
-                    </TouchableOpacity>
-                }
-                {
-                    saving && <ActivityIndicator style={{width: 24}} size="large" color={theme.primaryText}/>
-                }
-                {
-                    !sharing &&
-                    <TouchableOpacity hitSlop={hitSlop} onPress={share}>
-                        <Share fill={theme.primaryText}/>
-                    </TouchableOpacity>
-                }
-                {
-                    sharing && <ActivityIndicator style={{width: 33}} size="large" color={theme.primaryText}/>
-                }
-                <TouchableOpacity hitSlop={hitSlop} onPress={() => like(!imageIsLiked())}>
+            </Modal>
+
+            <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
+
+                {imageView}
+
+                <View style={[styles.actions, {backgroundColor : theme.backgroundColor, width: window.width}]}>
                     {
-                        imageIsLiked() &&
-                        <LikeOn fill={theme.primaryText} style={styles.likeIcon}/>
+                        !saving &&
+                        <TouchableOpacity hitSlop={hitSlop} style={{width: 24}} onPress={rotate}>
+                            <Rotate fill={theme.primaryText}/>
+                        </TouchableOpacity>
                     }
                     {
-                        !imageIsLiked() &&
-                        <LikeOff fill={theme.primaryText} style={styles.likeIcon}/>
+                        saving && <ActivityIndicator style={{width: 24}} size="large" color={theme.primaryText}/>
                     }
-                </TouchableOpacity>
-                <TouchableOpacity hitSlop={hitSlop} onPress={download}>
-                    <Download fill={theme.primaryText} style={{marginTop: 3}}/>
-                </TouchableOpacity>
-                <TouchableOpacity hitSlop={hitSlop} onPress={onDeleteRequest}>
-                    <Delete fill={theme.primaryText} style={{marginTop: 3}}/>
-                </TouchableOpacity>
-            </View>
+                    {
+                        !sharing &&
+                        <TouchableOpacity hitSlop={hitSlop} onPress={share}>
+                            <Share fill={theme.primaryText}/>
+                        </TouchableOpacity>
+                    }
+                    {
+                        sharing && <ActivityIndicator style={{width: 33}} size="large" color={theme.primaryText}/>
+                    }
+                    <TouchableOpacity hitSlop={hitSlop} onPress={() => like(!imageIsLiked())}>
+                        {
+                            imageIsLiked() &&
+                            <LikeOn fill={theme.primaryText} style={styles.likeIcon}/>
+                        }
+                        {
+                            !imageIsLiked() &&
+                            <LikeOff fill={theme.primaryText} style={styles.likeIcon}/>
+                        }
+                    </TouchableOpacity>
+                    <TouchableOpacity hitSlop={hitSlop} onPress={download}>
+                        <Download fill={theme.primaryText} style={{marginTop: 3}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity hitSlop={hitSlop} onPress={onDeleteRequest}>
+                        <Delete fill={theme.primaryText} style={{marginTop: 3}}/>
+                    </TouchableOpacity>
+                </View>
 
-            <ImageDownloadModal isVisible={imageDownloadModalVisible} close={() => setImageDownloadModalVisible(false)}/>
+                <ImageDownloadModal isVisible={imageDownloadModalVisible} close={() => setImageDownloadModalVisible(false)}/>
 
-        </SafeAreaView>
+            </SafeAreaView>
+        </React.Fragment>
     )
 }
 
@@ -356,7 +374,7 @@ const styles = StyleSheet.create({
     },
     image : {
         width: '100%',
-        aspectRatio: 1200 / 795
+        aspectRatio: 1200 / 795,
     },
     actions : {
         position : 'absolute',
@@ -375,5 +393,11 @@ const styles = StyleSheet.create({
     },
     disabled : {
         opacity: 0.5
+    },
+    modalViewWrapper : {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent : 'center',
+        backgroundColor: '#000'
     }
 });
