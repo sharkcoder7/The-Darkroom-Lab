@@ -1,6 +1,6 @@
 import React, {useLayoutEffect, useState} from 'react';
 import {StyleSheet, View, Image, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator} from 'react-native';
-import {useRequest, useUpdater} from '../helper';
+import {processError, useRequest, useUpdater} from '../helper';
 import {useTheme} from '../theme-manager';
 import {AlbumInfo} from '../components/AlbumInfo';
 import HeaderButton from '../components/HeaderButton';
@@ -8,7 +8,6 @@ import {customBackButtonHeaderProps} from '../components/BackButton';
 import {LineInput} from '../components/LineInput';
 import {shallowEqual, useSelector} from 'react-redux';
 import {setRolls} from '../ducks/main';
-import Bugsnag from '@bugsnag/react-native'
 
 export default function EditAlbum ({navigation})
 {
@@ -22,6 +21,9 @@ export default function EditAlbum ({navigation})
     const [updatedAlbum, setUpdatedAlbum] = useState(JSON.parse(JSON.stringify(album)));
     const [updatedRolls, setUpdatedRolls] = useState(JSON.parse(JSON.stringify(rolls)));
 
+    /**
+     * Set header actions
+     */
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -31,13 +33,16 @@ export default function EditAlbum ({navigation})
         });
     }, [navigation, updatedAlbum, updatedRolls]);
 
+
+    /**
+     * Save changes
+     */
     const submit = async () =>
     {
         if (loading)
         {
             return;
         }
-
 
         if (updatedAlbum.updated)
         {
@@ -53,8 +58,7 @@ export default function EditAlbum ({navigation})
             }
             catch (e)
             {
-                Bugsnag.notify(e);
-                console.warn('Error during album update');
+                processError(e, `Error during album ${album.id} update`);
                 return;
             }
         }
@@ -72,8 +76,7 @@ export default function EditAlbum ({navigation})
             }
             catch (e)
             {
-                Bugsnag.notify(e);
-                console.warn('Error during roll update');
+                processError(e, `Error during roll ${roll.id} update`);
             }
         }
 
@@ -81,11 +84,17 @@ export default function EditAlbum ({navigation})
         navigation.goBack();
     };
 
+    /**
+     * Update local version of album (save will be fired only on Save action)
+     */
     function updateAlbumLocally (text)
     {
         setUpdatedAlbum({...updatedAlbum, name : text, updated : true});
     }
 
+    /**
+     * Update local version of roll (save will be fired only on Save action)
+     */
     function updateRolls (editableRoll, name)
     {
         let newUpdatedRolls = updatedRolls.map(roll => {
@@ -117,7 +126,7 @@ export default function EditAlbum ({navigation})
 
                     {
                         updatedRolls.map((roll) =>
-                            <View style={styles.rollWrapper}>
+                            <View key={roll.id} style={styles.rollWrapper}>
                                 <View style={styles.imagesWrapper}>
                                     <View style={styles.images}>
                                         {

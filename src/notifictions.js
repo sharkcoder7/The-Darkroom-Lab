@@ -3,6 +3,8 @@ import {useEffect} from 'react';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification from 'react-native-push-notification'
 import {setUncheckedNotificationsCount} from './ducks/main';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import {Platform} from 'react-native';
 var BadgeAndroid = require('react-native-android-badge');
 
 PushNotification.configure({
@@ -92,4 +94,14 @@ export function setBadge (count)
     }
 
     setUncheckedNotificationsCount(+count);
+
+    if (count === 0)
+    {
+        PushNotification.cancelAllLocalNotifications();
+        if (Platform.OS === 'ios')
+        {
+            PushNotificationIOS.removeAllDeliveredNotifications();
+            PushNotificationIOS.setApplicationIconBadgeNumber(0);
+        }
+    }
 }

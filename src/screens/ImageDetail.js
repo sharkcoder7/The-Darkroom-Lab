@@ -3,9 +3,9 @@ import {
     StyleSheet,
     Dimensions,
     View,
-    TouchableOpacity, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform,
+    TouchableOpacity, Animated, Easing, ActivityIndicator, Platform, SafeAreaView,
 } from 'react-native';
-import {useRequest} from '../helper';
+import {processError, useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import {customBackButtonHeaderProps} from '../components/BackButton';
 import {hasAndroidPermissionForCameraRoll, SharedUtils} from '../shared';
@@ -25,11 +25,9 @@ import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/R
 import {ImageDownloadModal} from '../components/ImageDownloadModal';
 import ImgToBase64 from 'react-native-image-base64';
 import {hitSlop} from '../theme';
-import Modal from 'react-native-translucent-modal';
-import Bugsnag from '@bugsnag/react-native'
 
 // for iOS it is higher because of iPhone X safe zone.
-const bottomBarHeightInPixes = Platform.OS === 'ios' ? 180 : 160;
+const bottomBarHeightInPixes = Platform.OS === 'ios' ? 170 : 160;
 
 export default function ImageDetail ({navigation})
 {
@@ -65,7 +63,24 @@ export default function ImageDetail ({navigation})
     const [imageParams, setImageParams] = useState({});
     const [fullSizeImageParams, setFullSizeImageParams] = useState({});
 
-    function getWindowSizes (orientation)
+    /**
+     * Set header actions
+     */
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerShown: !fullSizeMode,
+            headerRight: () => (
+                <View></View>
+            ),
+            ...customBackButtonHeaderProps('Roll', navigation)
+        });
+
+    }, [navigation, orientation]);
+
+    /**
+     * Calc window width & height. There is delay between orientation change and window sizes update, so we need this function
+     */
+    function getWindowSizes ()
     {
         const { height, width } = Dimensions.get('window');
         const min = Math.min(height, width);
@@ -76,11 +91,12 @@ export default function ImageDetail ({navigation})
         };
     }
 
+    /**
+     * Calc image sizes for different orientation & rotation
+     */
     useEffect(() =>
     {
         const window = getWindowSizes(orientation);
-
-        console.log(orientation, Math.round(window.width) + 'x' + Math.round(window.height) );
 
         let imageParams = {},
             fullSizeImageParams = {};
@@ -117,18 +133,9 @@ export default function ImageDetail ({navigation})
         setImageParams(imageParams);
     }, [orientation, rotation]);
 
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerShown: !fullSizeMode,
-            headerRight: () => (
-                <View></View>
-            ),
-            ...customBackButtonHeaderProps('Roll', navigation)
-        });
-
-    }, [navigation, orientation]);
-
-
+    /**
+     * Downoad image
+     */
     async function download ()
     {
         analytics().logEvent('downloadImage', {idImage : image.id});
@@ -141,7 +148,8 @@ export default function ImageDetail ({navigation})
 
         const onError = err =>
         {
-            Alert.alert(
+            processError(err, `Error during image ${image.id} download`);
+            SharedUtils.Alert.alert(
                 'Save Image',
                 'Failed to save Image: ' + err.message,
                 [{text: 'OK', onPress: () => console.log('OK Pressed')}],
@@ -159,6 +167,9 @@ export default function ImageDetail ({navigation})
             .catch(onError);
     }
 
+    /**
+     * Rotate image (only locally)
+     */
     async function rotate ()
     {
         if (rotationBlock || saving)
@@ -234,6 +245,9 @@ export default function ImageDetail ({navigation})
         }*/
     }
 
+    /**
+     * Share image (for iOS image transformed to base64 to deliver better share options)
+     */
     async function share ()
     {
         setSharing(true);
@@ -253,10 +267,9 @@ export default function ImageDetail ({navigation})
                 urls: [url]
             });
         }
-        catch (error)
+        catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn(error.toString());
+            processError(e, `Error during image ${image.id} share`);
         }
         finally
         {
@@ -264,6 +277,9 @@ export default function ImageDetail ({navigation})
         }
     }
 
+    /**
+     * Like/dislike image using API
+     */
     async function like (liked)
     {
         let updatedImagesLikes = {...imagesLikes, [image.id] : liked};
@@ -271,16 +287,18 @@ export default function ImageDetail ({navigation})
 
         try
         {
-            const response = await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
+            await request(`/albums/${album.id}/rolls/${roll.id}/images/${image.id}`,
                 {method : "PUT", body : JSON.stringify({id : image.id, liked : liked})}, {});
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('Error during image update');
+            processError(e, `Error during image ${image.id} like`);
         }
     }
 
+    /**
+     * Ask user for delete confirmation
+     */
     function onDeleteRequest ()
     {
         SharedUtils.Alert.alert('The Darkroom Lab', 'Do you really want to delete selected photo?',
@@ -297,6 +315,9 @@ export default function ImageDetail ({navigation})
 
     }
 
+    /**
+     * Delete image using API
+     */
     async function deleteImage ()
     {
         try
@@ -316,10 +337,13 @@ export default function ImageDetail ({navigation})
         }
         catch (e)
         {
-            console.warn('Error during image delete');
+            processError(e, `Error during image ${image.id} delete`);
         }
     }
 
+    /**
+     * Check if image is liked
+     */
     const imageIsLiked = useCallback(() =>
     {
         if (imagesLikes[image.id] !== undefined)
@@ -360,7 +384,7 @@ export default function ImageDetail ({navigation})
                 fullSizeMode && fullSizeImage
             }
 
-            <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
+            <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
 
                 <View style={styles.imageZone}>
                     {renderImageView(imageParams)}
@@ -383,7 +407,7 @@ export default function ImageDetail ({navigation})
                         </TouchableOpacity>
                     }
                     {
-                        sharing && <ActivityIndicator style={{width: 33}} size="large" color={theme.primaryText}/>
+                        sharing && <ActivityIndicator style={{width: 33, marginTop: -80}} size="large" color={theme.primaryText}/>
                     }
                     <TouchableOpacity hitSlop={hitSlop} onPress={() => like(!imageIsLiked())}>
                         {
@@ -405,7 +429,7 @@ export default function ImageDetail ({navigation})
 
                 <ImageDownloadModal isVisible={imageDownloadModalVisible} close={() => setImageDownloadModalVisible(false)}/>
 
-            </View>
+            </SafeAreaView>
         </React.Fragment>
     )
 }
@@ -425,7 +449,8 @@ const styles = StyleSheet.create({
     },
     actions : {
         minHeight : bottomBarHeightInPixes,
-        paddingVertical : 20,
+        paddingTop : 20,
+        paddingBottom : Platform.OS === 'ios' ? 30 : 20,
         width: '100%',
         flexDirection: 'row',
         justifyContent : 'space-around',

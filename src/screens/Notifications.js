@@ -7,17 +7,13 @@ import {
     TouchableOpacity,
     Platform, KeyboardAvoidingView, ActivityIndicator, Dimensions,
 } from 'react-native';
-import {useRequest} from '../helper';
+import {processError, useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
 import Separator from '../components/Separator';
 import {useTheme} from '../theme-manager';
 import DownloadFilm from '../components/icons/DownloadFilm';
-import {openUrl, SharedUtils} from '../shared';
-import {render} from 'redux-logger/src/diff';
-import {setUncheckedNotificationsCount} from '../ducks/main';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import * as PushNotification from 'react-native-push-notification';
-import Bugsnag from '@bugsnag/react-native'
+import {openUrl} from '../shared';
+import {setBadge} from '../notifictions';
 
 export default function Notifications ({navigation})
 {
@@ -30,12 +26,9 @@ export default function Notifications ({navigation})
     const [downloadsLoading, setDownloadsLoading] = useState(false);
     const [notificationsLoading, setNotificationsLoading] = useState(false);
 
-    useEffect(() =>
-    {
-        getNotifications();
-        getDownloads();
-    }, []);
-
+    /**
+     * Set header actions
+     */
     useLayoutEffect(() => {
         navigation.setOptions({
             headerLeft : () => <View></View>,
@@ -45,6 +38,18 @@ export default function Notifications ({navigation})
         });
     }, [navigation]);
 
+    /**
+     * Fetch downloads and notifications on screen open
+     */
+    useEffect(() =>
+    {
+        getNotifications();
+        getDownloads();
+    }, []);
+
+    /**
+     * Fetch downloads from the API
+     */
     async function getDownloads ()
     {
         setDownloadsLoading(true);
@@ -52,12 +57,10 @@ export default function Notifications ({navigation})
         {
             const response = await request('/downloads');
             setDownloads(response.filter(item => item.downloadURL));
-            console.log(response);
         }
         catch (e)
         {
-            Bugsnag.notify(e)
-            console.warn('error:' + e);
+            processError(e, 'Error fetching downloads');
         }
         finally
         {
@@ -65,6 +68,9 @@ export default function Notifications ({navigation})
         }
     }
 
+    /**
+     * Fetch notifications from the API
+     */
     async function getNotifications ()
     {
         setNotificationsLoading(true);
@@ -76,8 +82,7 @@ export default function Notifications ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('error:' + e);
+            processError(e, 'Error fetching notifications');
         }
         finally
         {
@@ -85,18 +90,16 @@ export default function Notifications ({navigation})
         }
     }
 
+    /**
+     * Mark notifications as seen
+     */
     async function setNotificationsAsChecked (notifications)
     {
-        if (Platform.OS === 'ios')
-        {
-            PushNotificationIOS.removeAllDeliveredNotifications();
-            PushNotificationIOS.setApplicationIconBadgeNumber(0);
-        }
+        // clear badge
+        setBadge(0);
 
-        setUncheckedNotificationsCount(0);
-        PushNotification.cancelAllLocalNotifications();
-
-        setTimeout(() => setNotifications(notifications.map(notification => {return {...notification, seenAt : true};})), 1000);
+        // remove bold effect for new notifications
+        setTimeout(() => setNotifications(notifications.map(notification => {return {...notification, seenAt : true};})), 2000);
 
         try
         {
@@ -110,11 +113,13 @@ export default function Notifications ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('error:' + e);
+            processError(e, 'Error marking notification as seen');
         }
     }
 
+    /**
+     * Order downloads / notifications by date
+     */
     function orderByDate (items)
     {
         return items.sort((a, b) =>
@@ -219,10 +224,6 @@ export default function Notifications ({navigation})
                                 <Text style={[styles.filterButton, {textDecorationLine: filter === 'ALERTS' ? 'underline' : 'none'}]}>Alerts</Text>
                             </TouchableOpacity>
                         </View>
-                        {/*<TouchableOpacity onPress={openSettingsSheet} style={styles.link}>
-                        <Text style={styles.linkText}>Settings</Text>
-                    </TouchableOpacity>
-                    <Separator/>*/}
 
                         {
                             filteredData().length === 0 &&

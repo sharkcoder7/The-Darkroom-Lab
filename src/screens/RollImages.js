@@ -6,10 +6,9 @@ import {
     ScrollView,
     TouchableOpacity,
     Dimensions,
-    Platform,
-    Alert, ActivityIndicator,
+    Platform, ActivityIndicator,
 } from 'react-native';
-import {useRequest, useUpdater} from '../helper';
+import {processError, useRequest, useUpdater} from '../helper';
 import {useTheme} from '../theme-manager';
 import HeaderButton from '../components/HeaderButton';
 import BackButton, {customBackButtonHeaderProps} from '../components/BackButton';
@@ -21,7 +20,7 @@ import {hasAndroidPermissionForCameraRoll, SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
 import {
     setImagesLikes,
-    setSelectedImage, setUncheckedNotificationsCount,
+    setSelectedImage
 } from '../ducks/main';
 import LikeOff from '../components/icons/LikeOff';
 import analytics from '@react-native-firebase/analytics';
@@ -35,14 +34,12 @@ import {ImageDownloadModal} from '../components/ImageDownloadModal';
 import {hitSlop} from '../theme';
 import RNFetchBlob from 'rn-fetch-blob';
 import CameraRoll from '@react-native-community/cameraroll';
-import Bugsnag from '@bugsnag/react-native'
 
 export default function RollImages ({navigation})
 {
     const album = useSelector(state => state.main.selectedAlbum, shallowEqual);
     const roll = useSelector(state => state.main.selectedRoll, shallowEqual);
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
-    const uncheckedNotificationsCount = useSelector(state => state.main.uncheckedNotificationsCount, shallowEqual);
     const orientation = useSelector(state => state.main.orientation, shallowEqual);
 
     const [imageDownloadModalVisible, setImageDownloadModalVisible] = useState(false);
@@ -63,26 +60,9 @@ export default function RollImages ({navigation})
 
     const { theme } = useTheme();
 
-    useEffect(() =>
-    {
-        const images = favouritesFilter ? roll.images.filter(image => imagesLikes[image.id] !== undefined ? imagesLikes[image.id] : image.liked) : roll.images;
-        setImages1(images.filter((roll, index) => index % 2 === 0));
-        setImages2(images.filter((roll, index) => index % 2 === 1));
-    }, [roll, favouritesFilter]);
-
-    useEffect(() =>
-    {
-        setTimeout(() => setDateMark(Date.now()), 300);
-    }, [orientation]);
-
-    useEffect(() =>
-    {
-        if (roll && roll.download && roll.download.status === 'processing')
-        {
-            setDownloadCheckEnabled(true);
-        }
-    }, [roll]);
-
+    /**
+     * Set header actions
+     */
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -92,6 +72,9 @@ export default function RollImages ({navigation})
         });
     }, [navigation]);
 
+    /**
+     * Update header actions on selection mode toggle
+     */
     useEffect(() => {
 
         let options = {
@@ -117,6 +100,38 @@ export default function RollImages ({navigation})
 
     }, [navigation, selectionMode, images1, images2]);
 
+    /**
+     * Set images for render (apply favourites filter && split images to 2 columns)
+     */
+    useEffect(() =>
+    {
+        const images = favouritesFilter ? roll.images.filter(image => imagesLikes[image.id] !== undefined ? imagesLikes[image.id] : image.liked) : roll.images;
+        setImages1(images.filter((roll, index) => index % 2 === 0));
+        setImages2(images.filter((roll, index) => index % 2 === 1));
+    }, [roll, favouritesFilter]);
+
+    /**
+     * Force rerender on orientation change
+     */
+    useEffect(() =>
+    {
+        setTimeout(() => setDateMark(Date.now()), 300);
+    }, [orientation]);
+
+    /**
+     * Enable status updater for roll
+     */
+    useEffect(() =>
+    {
+        if (roll && roll.download && roll.download.status === 'processing')
+        {
+            setDownloadCheckEnabled(true);
+        }
+    }, [roll]);
+
+    /**
+     * Run status checker interval for roll download result
+     */
     useEffect(() => {
 
         if (downloadCheckEnabled)
@@ -127,6 +142,9 @@ export default function RollImages ({navigation})
 
     }, [downloadCheckEnabled]);
 
+    /**
+     * Update roll download info using API
+     */
     const checkRollDownload = useCallback(async () =>
     {
         try
@@ -141,11 +159,13 @@ export default function RollImages ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('Error during check roll download');
+            processError(e, 'Error during check roll download');
         }
     }, []);
 
+    /**
+     * Select/deselect all images
+     */
     const toggleSelectAll = (flag) =>
     {
         setSelectedImagesCount(flag ? roll.images.length : 0);
@@ -159,6 +179,9 @@ export default function RollImages ({navigation})
 
     };
 
+    /**
+     * Like/dislike image
+     */
     const onImageLikeToggle = (col, image) =>
     {
         if (col === 1)
@@ -186,6 +209,9 @@ export default function RollImages ({navigation})
         updateImageLikeState({...image, liked : !image.liked});
     };
 
+    /**
+     * Save like/dislike image state to API
+     */
     async function updateImageLikeState (image)
     {
         let updatedImagesLikes = {...imagesLikes, [image.id] : image.liked};
@@ -198,11 +224,13 @@ export default function RollImages ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('Error during image update');
+            processError(e, 'Error during image update');
         }
     }
 
+    /**
+     * Select/deselect image
+     */
     const onImageSelectToggle = (col, image) =>
     {
         image.selected = image.selected !== undefined ? image.selected : false;
@@ -230,6 +258,9 @@ export default function RollImages ({navigation})
         }
     };
 
+    /**
+     * Delete image using API
+     */
     function onDeleteRequest ()
     {
         SharedUtils.Alert.alert('The Darkroom Lab', 'Do you really want to delete selected photo?',
@@ -246,6 +277,9 @@ export default function RollImages ({navigation})
 
     }
 
+    /**
+     * Delete selected images using API
+     */
     function deleteImages ()
     {
         try
@@ -253,18 +287,22 @@ export default function RollImages ({navigation})
             const imageIds = [...images1, ...images2].filter(image => image.selected).map(item => item.id),
                 updatedImages = roll.images.filter(image => imageIds.indexOf(image.id) === -1);
 
-            setSelectedImagesCount(0);
             updateRoll(roll.id, {images : updatedImages});
 
-            request(`/albums/${album.id}/rolls/${roll.id}/images`, {method : "DELETE", body: JSON.stringify({imageIds}) });
+            setSelectedImagesCount(0);
+            setSelectionMode(false);
+
+            //request(`/albums/${album.id}/rolls/${roll.id}/images`, {method : "DELETE", body: JSON.stringify({imageIds}) });
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('Error during image delete');
+            processError(e, 'Error during selected images delete');
         }
     }
 
+    /**
+     * Share selected images urls
+     */
     async function share ()
     {
         let urls = [...images1, ...images2].filter(image => image.selected).map(image => image.image_urls.sm.replace('\\/', '/'));
@@ -287,26 +325,34 @@ export default function RollImages ({navigation})
 
         try
         {
-            const ShareResponse = await SharedUtils.Share.open(shareOptions);
+            await SharedUtils.Share.open(shareOptions);
         }
-        catch (error)
+        catch (e)
         {
-            Bugsnag.notify(error);
-            console.warn(error.toString());
+            processError(e, 'Error during selected images share');
         }
     }
 
+    /**
+     * Open image when user taps on it
+     */
     function onImageOpen (image)
     {
         setSelectedImage(image);
         navigation.navigate('ImageDetail');
     }
 
+    /**
+     * Toggle favourites filter
+     */
     function toggleFavouritesFilter ()
     {
         setFavouritesFilter(!favouritesFilter);
     }
 
+    /**
+     * Download selected images to phone storage
+     */
     const downloadSelectedImages = useCallback(async () =>
     {
         setSaving(true);
@@ -315,16 +361,21 @@ export default function RollImages ({navigation})
 
         if (Platform.OS === 'android' && !(await hasAndroidPermissionForCameraRoll()))
         {
-            alert('No permission');
+            SharedUtils.Alert.alert(
+                'The Darkroom Lab',
+                'No permission to save images',
+                [{text: 'OK', onPress: () => false}],
+                {cancelable: false},
+            );
             return;
         }
 
         const onError = err =>
         {
-            Alert.alert(
-                'Save Images',
+            SharedUtils.Alert.alert(
+                'The Darkroom Lab',
                 'Failed to save Images: ' + err.message,
-                [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+                [{text: 'OK', onPress: () => false}],
                 {cancelable: false},
             );
         };
@@ -340,7 +391,7 @@ export default function RollImages ({navigation})
         Promise.all(urls).then(images => {
 
             let fetches = images.map(imageData => CameraRoll.save(imageData.data, {type : 'photo'}));
-            Promise.all(fetches).then(result =>
+            Promise.all(fetches).then(() =>
             {
                 setImageDownloadModalVisible(true);
             })
@@ -349,6 +400,9 @@ export default function RollImages ({navigation})
 
     }, [selectedImagesCount]);
 
+    /**
+     * Request for entire roll download using API
+     */
     async function downloadEntireRoll ()
     {
         setRollDownloadProcessing(true);
@@ -367,7 +421,7 @@ export default function RollImages ({navigation})
             toggleSelectAll(false);
             setSelectionMode(false);
 
-            Alert.alert(
+            SharedUtils.Alert.alert(
                 'The Darkroom Lab',
                 'Your download is being prepared. After a few moments you will get notification.',
                 [{text: 'OK', onPress: () => false}],
@@ -393,14 +447,12 @@ export default function RollImages ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            Alert.alert(
+            processError(e, `Error during roll ${roll.id} download request`);
+            SharedUtils.Alert.alert(
                 'The Darkroom Lab', 'Error: ' + e.toString(),
                 [{text: 'OK', onPress: () => false}],
                 {cancelable: false},
             );
-
-            console.warn('Error during roll download ' + JSON.stringify(e));
         }
         finally
         {
@@ -414,14 +466,18 @@ export default function RollImages ({navigation})
         bottomSheetEl.current.snapTo(1);
     }
 
-    function renderHeader()
+    function renderBottomSheetHeader ()
     {
-        return <SheetHeader rollDownloadIcon={true} title={'Roll Download'} additionalText={'Copy link to share or download'} onPress={() => bottomSheetEl.current.snapTo(0)}/>;
+        return <SheetHeader rollDownloadIcon={true}
+                            title={'Roll Download'}
+                            additionalText={'Copy link to share or download'}
+                            onPress={() => bottomSheetEl.current.snapTo(0)}/>;
     }
 
-    function renderContent ()
+    function renderBottomSheetContent ()
     {
         const downloadUrl = roll.download && roll.download.downloadURL || '';
+
         return (
             <SheetBody style={{height: 220}}>
 
@@ -535,8 +591,8 @@ export default function RollImages ({navigation})
                 ref={bottomSheetEl}
                 initialSnap={0}
                 snapPoints={[0, 300]}
-                renderContent={renderContent}
-                renderHeader={renderHeader}
+                renderContent={renderBottomSheetContent}
+                renderHeader={renderBottomSheetHeader}
             />
         </React.Fragment>
     )

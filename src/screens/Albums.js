@@ -36,12 +36,16 @@ export default function Albums ({navigation})
     /**
      * Hide SplashScreen in case when Albums screen is the first screen user see (when he already signed in)
      */
-    useEffect(() => setTimeout(() => SplashScreen.hide(), 50), []);
+    useEffect(() => {
+        setTimeout(() => SplashScreen.hide(), 50);
+    }, []);
 
     /**
      * Initial albums fetch request
      */
-    useEffect(() => getAlbums(), []);
+    useEffect(() => {
+        getAlbums();
+    }, []);
 
     /**
      * Fetch ans save Firebase Cloud Messaging Token
@@ -51,7 +55,7 @@ export default function Albums ({navigation})
         messaging().getToken().then(newFcmToken =>
         {
             setFcmToken(newFcmToken);
-            if (newFcmToken !== fcmToken)
+            if (true || newFcmToken !== fcmToken)
             {
                 saveFcmTokenToProfile(newFcmToken);
             }

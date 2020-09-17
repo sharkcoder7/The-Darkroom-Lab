@@ -1,14 +1,13 @@
-import React, {useCallback, useEffect, useLayoutEffect} from 'react';
+import React, {useEffect, useLayoutEffect} from 'react';
 import {StyleSheet, View, FlatList, ActivityIndicator} from 'react-native';
-import {useRequest} from '../helper';
+import {processError, useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import {AlbumInfo} from '../components/AlbumInfo';
 import {Roll} from '../components/Roll';
 import HeaderButton from '../components/HeaderButton';
 import {customBackButtonHeaderProps} from '../components/BackButton';
 import {shallowEqual, useSelector} from 'react-redux';
-import {setForceAlbumId, setForceRollId, setRolls, setSelectedRoll} from '../ducks/main';
-import Bugsnag from '@bugsnag/react-native'
+import {setForceRollId, setRolls, setSelectedRoll} from '../ducks/main';
 
 export default function AlbumRolls ({navigation})
 {
@@ -20,20 +19,29 @@ export default function AlbumRolls ({navigation})
 
     const { theme } = useTheme();
 
+    /**
+     * Add header actions
+     */
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <HeaderButton text="Edit Album" onPress={toEditAlbum}/>
+                <HeaderButton text="Edit Album" onPress={() => navigation.navigate('EditAlbum')}/>
             ),
             ...customBackButtonHeaderProps('Orders', navigation)
         });
     }, [navigation, rolls]);
 
-    useEffect(() =>
-    {
+
+    /**
+     * Initial rolls request
+     */
+    useEffect(() => {
         getRolls();
     }, []);
 
+    /**
+     * Fetch rolls from the API
+     */
     async function getRolls ()
     {
         try
@@ -47,22 +55,22 @@ export default function AlbumRolls ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('error:' + e);
+            processError(e, `Error fetching album ${album.id} rolls`);
         }
     }
 
-    const toEditAlbum = useCallback(() =>
-    {
-        navigation.navigate('EditAlbum');
-    }, [album, rolls]);
-
+    /**
+     * Select roll when user tap on it
+     */
     function selectRoll (roll)
     {
         setSelectedRoll(roll);
         navigation.navigate('RollImages');
     }
 
+    /**
+     * Open forced roll (when user tapped on notification)
+     */
     useEffect(() =>
     {
         if (!forceRollId)
@@ -81,6 +89,9 @@ export default function AlbumRolls ({navigation})
 
     }, [forceRollId]);
 
+    /**
+     * Find forced roll and open it
+     */
     function findAndSelectForceRoll ()
     {
         const existingRoll = rolls.find(roll => roll.id === forceRollId);
@@ -99,7 +110,11 @@ export default function AlbumRolls ({navigation})
             }
             {
                 !loading &&
-                <FlatList showsVerticalScrollIndicator={false} style={styles.listWrapper} data={rolls} keyExtractor={item => item.id.toString()} renderItem={({item}) => <Roll roll={item} onPress={() => selectRoll(item)}/>}/>
+                <FlatList showsVerticalScrollIndicator={false}
+                          style={styles.listWrapper}
+                          data={rolls}
+                          keyExtractor={item => item.id.toString()}
+                          renderItem={({item}) => <Roll roll={item} onPress={() => selectRoll(item)}/>}/>
             }
         </View>
     )

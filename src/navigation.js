@@ -46,7 +46,6 @@ const RootStack = createStackNavigator();
 const MainStackScreen = ({navigation}) => {
 
     const token = useSelector(state => state.main.token, shallowEqual);
-    //const forceAlbumId = useSelector(state => state.main.forceAlbumId, shallowEqual);
 
     return (
         <MainStack.Navigator initialRouteName={token ? 'Albums' : 'SignIn'} headerMode="screen" >
@@ -152,13 +151,9 @@ export default ({}) => {
      */
     useEffect(() => {
 
-        const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
-            console.log(
-                'Notification caused app to open from background state:',
-                remoteMessage.notification,
-            );
+        const unsubscribe = messaging().onNotificationOpenedApp(backgroundNotification => {
 
-            let data = {...(remoteMessage.data || {}), ...remoteMessage},
+            let data = {...(backgroundNotification.data || {}), ...backgroundNotification},
                 albumId = data.albumId,
                 rollId = data.rollId;
 
@@ -170,7 +165,7 @@ export default ({}) => {
             setForceAlbumId(+albumId);
             setForceRollId(+rollId);
 
-            console.log('==================================== REMOTE onNotificationOpenedApp ==================================== ' + JSON.stringify(remoteMessage));
+            console.log('==================================== BACKGROUND onMessageOpen ==================================== ' + JSON.stringify(backgroundNotification));
         });
 
         return unsubscribe;

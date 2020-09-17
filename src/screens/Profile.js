@@ -8,7 +8,7 @@ import {
     Switch,
     Platform, KeyboardAvoidingView, Keyboard,
 } from 'react-native';
-import {useRequest} from '../helper';
+import {processError, useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
 import Separator from '../components/Separator';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -16,12 +16,11 @@ import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
 import {useTheme} from '../theme-manager';
 import Back from '../components/icons/Back';
-import {setAlbums, setFcmToken, setToken} from '../ducks/main';
+import {setFcmToken, setToken} from '../ducks/main';
 import { TextInputMask } from 'react-native-masked-text'
 import {LineInput} from '../components/LineInput';
 import {openUrl, SharedUtils} from '../shared';
 import {shallowEqual, useSelector} from 'react-redux';
-import Bugsnag from '@bugsnag/react-native'
 
 export default function Profile ({navigation})
 {
@@ -43,6 +42,9 @@ export default function Profile ({navigation})
 
     const { theme } = useTheme();
 
+    /**
+     * Set header actions
+     */
     useLayoutEffect(() => {
         navigation.setOptions({
             headerLeft : () => <View></View>,
@@ -52,10 +54,16 @@ export default function Profile ({navigation})
         });
     }, [navigation]);
 
+    /**
+     * Fetch profile data on screen open
+     */
     useEffect(() => {
         getProfile();
     }, []);
 
+    /**
+     * Fetch profile data from the API
+     */
     async function getProfile ()
     {
         try
@@ -69,11 +77,13 @@ export default function Profile ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('error:' + e);
+            processError(e, 'Error fetching profile data');
         }
     }
 
+    /**
+     * Update profile on Save button press (save smsEnabled & phoneNumber & Firebase cloud messaging token)
+     */
     async function updateProfile ()
     {
         try
@@ -88,8 +98,7 @@ export default function Profile ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('error:' + e);
+            processError(e, 'Error saving profile data');
         }
     }
 
@@ -205,10 +214,21 @@ export default function Profile ({navigation})
     {
         return (
             <SheetBody style={{paddingHorizontal: 0}}>
-                <LineInput labelWidth={120} disabled={true} forceMode="light" textMode={true} style={styles.accountInput} title="Email address" numberOfLines={2} value={email} onChange={newValue => false}/>
-                {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Name" value={'Jhon Doe'} onChange={newValue => false}/>*/}
-                {/*<LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Address" value={'72 Avenue, New York'} onChange={newValue => false}/>*/}
-                <LineInput labelWidth={120} disabled={true} forceMode="light" style={styles.accountInput} title="Phone number" value={phoneNumber} onChange={newValue => false}/>
+                <LineInput labelWidth={120}
+                           disabled={true}
+                           forceMode="light"
+                           textMode={true}
+                           style={styles.accountInput}
+                           title="Email address"
+                           value={email}
+                           onChange={() => false}/>
+                <LineInput labelWidth={120}
+                           disabled={true}
+                           forceMode="light"
+                           style={styles.accountInput}
+                           title="Phone number"
+                           value={phoneNumber}
+                           onChange={() => false}/>
             </SheetBody>
         );
     }

@@ -6,7 +6,7 @@ import {LikeOn, SelectOn} from './icons';
 import SelectOff from './icons/SelectOff';
 import {shallowEqual, useSelector} from 'react-redux';
 
-export function RollImagesColImage ({image, index, onImageLikeToggle, onImageSelectToggle, selectionMode, onImageOpen, colNumber})
+export function RollImagesColImage ({image, onImageLikeToggle, onImageSelectToggle, selectionMode, onImageOpen, colNumber})
 {
     const window = Dimensions.get('window');
     const imagesLikes = useSelector(state => state.main.imagesLikes, shallowEqual);
@@ -103,8 +103,6 @@ export function RollImagesColImage ({image, index, onImageLikeToggle, onImageSel
                     }
                 </React.Fragment>
 
-                {/*<FullWidthImage source={{uri : image.image_urls.sm}}/>*/}
-                {/*<FullWidthImage onInit={() => setTimeout(() => setInit(true), 0)} source={{uri : image.image_urls[['sq', 'lg'][Math.floor(Math.random() * ['sq', 'lg'].length)]]}}/>*/}
                 <Image resizeMode={imageDimensions.resizeMode} onLoad={() => setLoaded(true)} style={{
                     transform : [{rotate : imageRotationAngle(image)}],
                     ...imageDimensions

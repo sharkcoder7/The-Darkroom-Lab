@@ -1,25 +1,17 @@
-import React, {useState} from 'react';
-import {Image, View, StyleSheet, Text, findNodeHandle, TouchableOpacity} from 'react-native';
+import React from 'react';
+import {Image, View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {AlbumInfo} from './AlbumInfo';
 import {useTheme} from '../theme-manager';
 
 export function Album ({album, onPress})
 {
-    let backgroundImage = null;
-    const [viewRef, setViewRef] = useState(null);
-
-    function imageLoaded ()
-    {
-        setViewRef(findNodeHandle(backgroundImage));
-    }
-
     const { theme } = useTheme();
 
     return (
         <TouchableOpacity onPress={onPress} style={styles.wrapper}>
             {
                 album.imageUrl !== "" &&
-                <Image ref={(img) => { backgroundImage = img; }} onLoadEnd={imageLoaded} resizeMode="cover" style={styles.image} source={{uri : album.imageUrl}}></Image>
+                <Image resizeMode="cover" style={styles.image} source={{uri : album.imageUrl}}></Image>
             }
             {
                 !album.imageUrl &&
@@ -28,12 +20,6 @@ export function Album ({album, onPress})
                 </View>
             }
             <AlbumInfo album={album}/>
-            {/*<BlurView
-                style={styles.blur}
-                viewRef={viewRef}
-                blurType="light"
-                blurAmount={10}
-            />*/}
         </TouchableOpacity>
     )
 }
@@ -46,14 +32,6 @@ const styles = StyleSheet.create({
     image : {
         width: '100%',
         height: 300
-    },
-    blur : {
-        backgroundColor: 'transparent',
-        overflow: 'hidden',
-        bottom : 0,
-        left: 0,
-        width : 50,
-        height: 50
     },
     noImages : {
         marginBottom: 3,
