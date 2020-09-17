@@ -7,11 +7,6 @@ import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {Platform} from 'react-native';
 var BadgeAndroid = require('react-native-android-badge');
 
-PushNotification.configure({
-    largeIcon: 'ic_launcher',
-    smallIcon: 'ic_notification',
-});
-
 export const registerForegroundNotifications = onNotification => {
     return messaging().onMessage(async remoteMessage => {
       console.log('Foreground notification: ', remoteMessage.data);
