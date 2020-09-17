@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import SplashScreen from "react-native-splash-screen";
 import LinearGradient from 'react-native-linear-gradient';
-import {Button} from '../components/Button';
-import {useRequest} from '../helper';
+
+import {processError, useRequest} from '../helper';
 import {setToken} from '../ducks/main';
 import {BestLabSeal, OrderPromo, YearsOfQuality} from '../components/icons';
 import {openUrl, SharedUtils} from '../shared';
@@ -18,9 +18,8 @@ import {SheetHeader} from '../components/SheetHeader';
 import {SheetBody} from '../components/SheetBody';
 import analytics from '@react-native-firebase/analytics';
 import * as DeviceInfo from 'react-native-device-info';
-import Bugsnag from '@bugsnag/react-native'
 
-export default function Welcome ({navigation})
+export default function SignIn ({navigation})
 {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,16 +27,17 @@ export default function Welcome ({navigation})
     const bottomSheetEl = useRef();
     const {request, loading} = useRequest();
 
-    useEffect(() =>
-    {
-
-    }, []);
-
+    /**
+     * Hide SplashScreen in case when SignIn screen is the first screen user see
+     */
     useEffect(() =>
     {
         setTimeout(() => SplashScreen.hide(), 50);
     }, []);
 
+    /**
+     * Sign in user
+     */
     async function submit ()
     {
         if (email === '' || password === '')
@@ -55,19 +55,15 @@ export default function Welcome ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
+            processError(e, 'Auth error');
             SharedUtils.Alert.alert('The Darkroom Lab', 'Incorrect username or password',
                 [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-                {cancelable: false},
-            );
-        }
-        finally
-        {
-
+                {cancelable: false});
         }
     }
 
-    function openForgotPasswordPage () {
+    function openForgotPasswordPage ()
+    {
         openUrl('https://thedarkroom.com/shop/my-account/lost-password/');
     }
 
@@ -76,12 +72,12 @@ export default function Welcome ({navigation})
         bottomSheetEl.current.snapTo(1);
     }
 
-    function renderHeader()
+    function renderBottomSheetHeader()
     {
         return <SheetHeader title="Register" onPress={() => bottomSheetEl.current.snapTo(0)}/>;
     }
 
-    function renderContent ()
+    function renderBottomSheetContent ()
     {
         return (
             <SheetBody>
@@ -90,15 +86,28 @@ export default function Welcome ({navigation})
                     If you don't have an account, you can register at <Text onPress={() => openUrl('https://thedarkmoon.com')} style={styles.linkInText}>thedarkmoon.com</Text>
                 </Text>
                 <View style={styles.registerIconWrapper}>
-                    <OrderPromo style={styles.registerIcon}/>
+                    <OrderPromo/>
                 </View>
             </SheetBody>
         );
     }
 
+    function renderBullet (text1, text2)
+    {
+        return (
+            <View style={styles.bullet}>
+                {
+                    text1 === '40+ Years of Quality' ? <YearsOfQuality style={styles.bulletIcon}/> : <BestLabSeal style={styles.bulletIcon}/>
+                }
+                <Text style={styles.bulletText}>{text1}</Text>
+                <Text style={styles.bulletText}>{text2}</Text>
+            </View>
+        );
+    }
+
     return (
         <React.Fragment>
-                <LinearGradient colors={['#474042', '#000']} style={styles.gradient}>
+            <LinearGradient colors={['#474042', '#000']} style={styles.gradient}>
                 <ImageBackground source={require('../assets/textured_background.png')} style={styles.image}>
 
                     <View style={styles.wrapper}>
@@ -132,7 +141,11 @@ export default function Welcome ({navigation})
                                        placeholder={"Password"}/>
 
 
-                               <Button disabled={loading} text={loading ? 'Wait...' : 'Submit'} onPress={submit} style={[styles.button, {opacity : loading ? 0.7 : 1}]}/>
+                                <LinearGradient colors={['#fa8e01', '#fcc801']} style={[styles.buttonWrapper, {opacity : loading ? 0.7 : 1}]}>
+                                    <TouchableOpacity onPress={submit} style={styles.button}>
+                                        <Text style={styles.buttonText}>{loading ? 'Wait...' : 'Submit'}</Text>
+                                    </TouchableOpacity>
+                                </LinearGradient>
 
                                <TouchableOpacity onPress={openForgotPasswordPage} style={styles.link}>
                                    <Text style={styles.linkText}>Forgot Password</Text>
@@ -144,26 +157,20 @@ export default function Welcome ({navigation})
                         </View>
 
                         <View style={styles.bulletsWrapper}>
-                            <View style={styles.bullet}>
-                                <YearsOfQuality style={styles.bulletIcon}/>
-                                <Text style={styles.bulletText}>40+ Years of Quality</Text>
-                                <Text style={styles.bulletText}>Photo Developing</Text>
-                            </View>
-                            <View style={styles.bullet}>
-                                <BestLabSeal style={styles.bulletIcon}/>
-                                <Text style={styles.bulletText}>Voted Best Photo Lab</Text>
-                                <Text style={styles.bulletText}>In an Independent User Poll</Text>
-                            </View>
+                            {renderBullet('40+ Years of Quality', 'Photo Developing')}
+                            {renderBullet('Voted Best Photo Lab', 'In an Independent User Poll')}
                         </View>
+
                     </View>
+
                 </ImageBackground>
             </LinearGradient>
             <BottomSheet
                 ref={bottomSheetEl}
                 initialSnap={0}
                 snapPoints={[0, 400]}
-                renderContent={renderContent}
-                renderHeader={renderHeader}
+                renderContent={renderBottomSheetContent}
+                renderHeader={renderBottomSheetHeader}
             />
         </React.Fragment>
     )
@@ -221,9 +228,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         color: '#fff'
     },
-    button : {
-        marginTop: 15
-    },
     link : {
         marginTop: 25
     },
@@ -245,6 +249,24 @@ const styles = StyleSheet.create({
         alignItems : 'center',
         marginTop: 30
     },
-    registerIcon : {
+    buttonWrapper : {
+        marginTop: 15
+    },
+    button : {
+        flexDirection : 'row',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        paddingHorizontal : 35,
+    },
+    buttonText : {
+        color: '#000',
+        fontSize: 24,
+        fontWeight : "600"
+    },
+    arrowIcon : {
+        transform: [{ rotate: '180deg'}],
+        width : 12,
+        aspectRatio : 0.764,
+        marginTop: 5
     }
 });

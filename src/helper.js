@@ -2,6 +2,7 @@ import {useCallback, useState} from "react";
 import {shallowEqual, useSelector} from 'react-redux';
 import {setAlbums, setRolls, setSelectedAlbum, setSelectedRoll} from './ducks/main';
 import Bugsnag from '@bugsnag/react-native'
+import {SharedUtils} from './shared';
 
 export const API_ENDPOINT = 'https://thedarkroom.com/api/api/v1';
 
@@ -212,3 +213,8 @@ export function useUpdater ()
     return { updateAlbum, updateRoll }
 }
 
+export function processError (e, text = '')
+{
+    console.warn((text ? text + ': ' : '') + e);
+    Bugsnag.notify((text ? text + ': ' : '') + e);
+}

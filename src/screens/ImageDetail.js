@@ -1,10 +1,9 @@
-import React, {useCallback, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import {
     StyleSheet,
     Dimensions,
     View,
-    TouchableOpacity,
-    PermissionsAndroid, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform, Text, StatusBar,
+    TouchableOpacity, Alert, Animated, Easing, ActivityIndicator, SafeAreaView, Platform,
 } from 'react-native';
 import {useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
@@ -29,6 +28,9 @@ import {hitSlop} from '../theme';
 import Modal from 'react-native-translucent-modal';
 import Bugsnag from '@bugsnag/react-native'
 
+// for iOS it is higher because of iPhone X safe zone.
+const bottomBarHeightInPixes = Platform.OS === 'ios' ? 180 : 160;
+
 export default function ImageDetail ({navigation})
 {
     let rotationBlock = false;
@@ -41,6 +43,8 @@ export default function ImageDetail ({navigation})
     const imagesRotation = useSelector(state => state.main.imagesRotation, shallowEqual);
     const imagesTooltipProcessed = useSelector(state => state.main.imagesTooltipProcessed, shallowEqual);
     const orientation = useSelector(state => state.main.orientation, shallowEqual);
+
+    const fullSizeMode = orientation === 'LANDSCAPE' || orientation === 'PORTRAITUPSIDEDOWN';
 
     let rotation = (imagesRotation[image.id] !== undefined && imagesRotation[image.id].date > image.updated_at) ? (imagesRotation[image.id].angle / 360) : 0;
     //let rotation = 0;
@@ -58,15 +62,71 @@ export default function ImageDetail ({navigation})
     const [sharing, setSharing] = useState(false);
     const { theme } = useTheme();
 
+    const [imageParams, setImageParams] = useState({});
+    const [fullSizeImageParams, setFullSizeImageParams] = useState({});
+
+    function getWindowSizes (orientation)
+    {
+        const { height, width } = Dimensions.get('window');
+        const min = Math.min(height, width);
+        const max = Math.max(height, width);
+        return {
+            height: fullSizeMode ? min : max,
+            width: fullSizeMode ? max : min,
+        };
+    }
+
+    useEffect(() =>
+    {
+        const window = getWindowSizes(orientation);
+
+        console.log(orientation, Math.round(window.width) + 'x' + Math.round(window.height) );
+
+        let imageParams = {},
+            fullSizeImageParams = {};
+
+        if ([0, 0.5].indexOf(rotation) !== -1)
+        {
+            imageParams = {
+                width:  window.width,
+                height: window.width * 795 / 1200,
+                resizeMode : 'cover',
+                marginTop : 0,
+                marginBottom : 0,
+            };
+        }
+        else
+        {
+            let width = Math.min(window.width * 1200 / 795, window.height - bottomBarHeightInPixes),
+                height = window.height - 40,
+                diff = Math.round((width - height) / 2);
+
+            imageParams = {
+                width,
+                height,
+                resizeMode : 'cover',
+            };
+        }
+
+        fullSizeImageParams.height = window.height;
+        fullSizeImageParams.width = [0, 0.5].indexOf(rotation) !== -1 ? fullSizeImageParams.height / (795 / 1200) : fullSizeImageParams.height;
+        fullSizeImageParams.marginTop = 0;
+        fullSizeImageParams.modalView = true;
+
+        setFullSizeImageParams(fullSizeImageParams);
+        setImageParams(imageParams);
+    }, [orientation, rotation]);
+
     useLayoutEffect(() => {
         navigation.setOptions({
+            headerShown: !fullSizeMode,
             headerRight: () => (
                 <View></View>
             ),
             ...customBackButtonHeaderProps('Roll', navigation)
         });
 
-    }, [navigation]);
+    }, [navigation, orientation]);
 
 
     async function download ()
@@ -270,64 +330,10 @@ export default function ImageDetail ({navigation})
         return image.liked;
     }, [imagesLikes]);
 
-    const window = Dimensions.get('window');
-
-    let imageParams = {},
-        wrapperParams = {};
-
-
-    if (orientation !== 'LANDSCAPE')
+    function renderImageView (params)
     {
-        if ([0, 0.5].indexOf(rotation) !== -1)
-        {
-            imageParams = {
-                width:  window.width,
-                height: window.width * 795 / 1200,
-                resizeMode : 'cover',
-                marginTop : 0,
-                marginBottom : 0,
-            };
-
-            wrapperParams = {
-                justifyContent: 'center',
-                alignItems : 'center'
-            };
-        }
-        else
-        {
-            let width = window.width * 1200 / 795 - 90,
-                height = window.width,
-                diff = Math.round((width - height) / 2);
-
-            imageParams = {
-                width,
-                height,
-                resizeMode : 'cover',
-                marginTop: diff,
-            };
-
-            wrapperParams = {
-                alignItems: 'center'
-            };
-        }
-
-        /*imageParams.width = '100%';
-        imageParams.height = [0, 0.5].indexOf(rotation) !== -1 ? window.height * (795 / 1200) + 20 : window.height - 50;*/
-    }
-    else
-    {
-        imageParams.height = window.height;
-        imageParams.width = [0, 0.5].indexOf(rotation) !== -1 ? imageParams.height / (795 / 1200) : imageParams.height;
-        imageParams.marginTop = 0;
-        imageParams.modalView = true;
-
-        wrapperParams = {
-            justifyContent: 'center'
-        };
-    }
-
-    const imageView = (
-        <View style={[styles.imageWrapper, {...imageParams}]}>
+        return (
+        <View style={{...params}}>
             <ReactNativeZoomableView
                 captureEvent={true}
                 maxZoom={1.5}
@@ -342,23 +348,25 @@ export default function ImageDetail ({navigation})
                     style={[styles.image, {transform: [{rotate: spin}]}]}
                     source={{uri : image.image_urls.social}} />
             </ReactNativeZoomableView>
-        </View>
-    );
+        </View>);
+    }
+
+    const fullSizeImage = <View style={styles.modalViewWrapper}>{renderImageView(fullSizeImageParams)}</View>;
 
     return (
         <React.Fragment>
 
-            <Modal mode="pop" visible={imageParams.modalView === true} deviceWidth={window.width} animationIn={'fadeIn'} animationOut={'fadeOut'} hasBackdrop={true} backdropOpacity={1}>
-                <View style={styles.modalViewWrapper}>
-                    {imageView}
+            {
+                fullSizeMode && fullSizeImage
+            }
+
+            <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
+
+                <View style={styles.imageZone}>
+                    {renderImageView(imageParams)}
                 </View>
-            </Modal>
 
-            <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}, {...wrapperParams}]}>
-
-                {imageView}
-
-                <View style={[styles.actions, {backgroundColor : theme.backgroundColor, width: window.width}]}>
+                <View style={[styles.actions, {backgroundColor : theme.backgroundColor}]}>
                     {
                         !saving &&
                         <TouchableOpacity hitSlop={hitSlop} style={{width: 24}} onPress={rotate}>
@@ -397,30 +405,27 @@ export default function ImageDetail ({navigation})
 
                 <ImageDownloadModal isVisible={imageDownloadModalVisible} close={() => setImageDownloadModalVisible(false)}/>
 
-            </SafeAreaView>
+            </View>
         </React.Fragment>
     )
 }
 
-
 const styles = StyleSheet.create({
     wrapper : {
         flex: 1,
-        width: '100%'
     },
-    imageWrapper : {
-        position: 'relative'
+    imageZone : {
+        height: Dimensions.get('window').height - bottomBarHeightInPixes,
+        justifyContent: 'center',
+        alignItems : 'center'
     },
     image : {
         width: '100%',
         aspectRatio: 1200 / 795,
     },
     actions : {
-        position : 'absolute',
-        paddingBottom: Platform.OS === 'ios' ? 30 : 10,
-        bottom: 0,
-        paddingTop: 20,
-        left: 0,
+        minHeight : bottomBarHeightInPixes,
+        paddingVertical : 20,
         width: '100%',
         flexDirection: 'row',
         justifyContent : 'space-around',
@@ -437,6 +442,12 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent : 'center',
-        backgroundColor: '#000'
+        backgroundColor: '#000',
+        position: 'absolute',
+        zIndex: 10,
+        height: '100%',
+        width: '100%',
+        left: 0,
+        top: 0,
     }
 });

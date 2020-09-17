@@ -6,7 +6,7 @@ import {
     View,
     TouchableOpacity,
     Switch,
-    Platform, KeyboardAvoidingView, Keyboard, Alert,
+    Platform, KeyboardAvoidingView, Keyboard,
 } from 'react-native';
 import {useRequest} from '../helper';
 import HeaderButton from '../components/HeaderButton';
@@ -122,7 +122,7 @@ export default function Profile ({navigation})
     function logout ()
     {
         navigation.navigate('Main');
-        navigation.replace('Welcome');
+        navigation.replace('SignIn');
         setToken(null);
         setFcmToken(null);
     }
@@ -215,7 +215,7 @@ export default function Profile ({navigation})
 
     function askBeforeOpenTerms ()
     {
-        Alert.alert(
+        SharedUtils.Alert.alert(
             'The Darkroom Lab',
             'You will be redirected to TheDarkroom.com website.',
             [{

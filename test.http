@@ -1,4 +1,4 @@
-POST https://thedarkroom.com/api/api/auth/signIn
+POST https://thedarkroom.com/api/api/v1/auth/signIn
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -11,7 +11,7 @@ Content-Type: application/json
 
 ###
 
-POST https://thedarkroom.com/api/api/auth/signIn
+POST https://thedarkroom.com/api/api/v1/auth/signIn
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -23,43 +23,35 @@ Content-Type: application/json
 }
 
 ###
-GET https://thedarkroom.com/api/api/profile
+GET https://thedarkroom.com/api/api/v1/profile
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/jsonk
 Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
 
 ###
-GET https://thedarkroom.com/api/api/notifications
+GET https://thedarkroom.com/api/api/v1/notifications
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
 
 ###
-GET https://thedarkroom.com/api/api/notifications/unseen
+GET https://thedarkroom.com/api/api/v1/notifications/unseen
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
 
 ###
-GET https://thedarkroom.com/api/api/downloads
+GET https://thedarkroom.com/api/api/v1/downloads
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
 ###
 
-GET https://thedarkroom.com/api/api/albums
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
-Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
-
-###
-
-GET https://thedarkroom.com/api/api/albums/201729/rolls
+GET https://thedarkroom.com/api/api/v1/albums
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -67,7 +59,15 @@ Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDF
 
 ###
 
-PUT https://thedarkroom.com/api/api/albums/338200/rolls/18819
+GET https://thedarkroom.com/api/api/v1/albums/201729/rolls
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer 16|CvEn5XrBxc4zLkcu8S8O1T9gN4V8T40xOHIQsQdchDeu7RmmAO1jHDFVuIGvyHLViXgq4wSYW42ih6G5
+
+###
+
+PUT https://thedarkroom.com/api/api/v1/albums/338200/rolls/18819
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -79,7 +79,7 @@ Authorization: Bearer 6|PmoIdEKQpN9MFVRNb4LTDq2i4UY42EgJ4VmplyI5RXnOkUjVUviJCBzw
 }
 ###
 
-PUT https://thedarkroom.com/api/api/albums/36374
+PUT https://thedarkroom.com/api/api/v1/albums/36374
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -91,7 +91,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 }
 ###
 
-PUT https://thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532
+PUT https://thedarkroom.com/api/api/v1/albums/36374/rolls/25159/images/2057532
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -104,7 +104,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 
 ###
 
-PUT https://thedarkroom.com/api/api/albums/36374/rolls/25159/images/2057532/rotate
+PUT https://thedarkroom.com/api/api/v1/albums/36374/rolls/25159/images/2057532/rotate
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -117,7 +117,7 @@ Authorization: Bearer 47|lejE6yXaVkvdXX9ewJDIVxnSiGtRYscrLUWJfSV1H1sTM6hSXABGVAm
 
 ###
 
-DELETE https://thedarkroom.com/api/api/albums/36374/rolls/25159/images
+DELETE https://thedarkroom.com/api/api/v1/albums/36374/rolls/25159/images
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

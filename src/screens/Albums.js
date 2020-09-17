@@ -1,5 +1,4 @@
-
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {shallowEqual, useSelector} from "react-redux";
 import {
     Text,
@@ -11,7 +10,7 @@ import {
 } from 'react-native';
 import SplashScreen from "react-native-splash-screen";
 import {Album} from '../components/Album';
-import {useRequest} from '../helper';
+import {processError, useRequest} from '../helper';
 import {useTheme} from '../theme-manager';
 import Fos from '../components/icons/Fos';
 import {Notifications} from '../components/icons';
@@ -22,7 +21,6 @@ import {setAlbums, setFcmToken, setForceAlbumId, setSelectedAlbum, setUncheckedN
 import messaging from '@react-native-firebase/messaging';
 import {hitSlop} from '../theme';
 import useAppState from 'react-native-appstate-hook';
-import Bugsnag from '@bugsnag/react-native'
 
 export default function Albums ({navigation})
 {
@@ -32,51 +30,56 @@ export default function Albums ({navigation})
     const forceAlbumId = useSelector(state => state.main.forceAlbumId, shallowEqual);
 
     const {request, loading} = useRequest();
-
     const { mode, theme } = useTheme();
+    const { appState } = useAppState({});
 
-    const { appState } = useAppState({
-        onChange: (newAppState) => console.warn('App state changed to ', newAppState),
-        onForeground: () => console.warn('App went to Foreground'),
-        onBackground: () => console.warn('App went to background'),
-    });
+    /**
+     * Hide SplashScreen in case when Albums screen is the first screen user see (when he already signed in)
+     */
+    useEffect(() => setTimeout(() => SplashScreen.hide(), 50), []);
 
+    /**
+     * Initial albums fetch request
+     */
+    useEffect(() => getAlbums(), []);
+
+    /**
+     * Fetch ans save Firebase Cloud Messaging Token
+     */
     useEffect(() => {
 
-        //setTimeout(() => setForceAlbumId(338200), 1000);
-
-        setTimeout(() => SplashScreen.hide(), 50);
         messaging().getToken().then(newFcmToken =>
         {
-            console.log('TOKEN====================', newFcmToken);
             setFcmToken(newFcmToken);
             if (newFcmToken !== fcmToken)
             {
-                updateProfile(newFcmToken);
+                saveFcmTokenToProfile(newFcmToken);
             }
-        }).catch((error) => {
+        }).catch(e =>
+        {
+            processError(e, 'Error fetching fcm token');
         });
 
     }, []);
 
-    async function updateProfile (newFcmToken)
+    /**
+     * Save firebase Cloud Messaging Token to FOS profile (to send push notifications)
+     */
+    async function saveFcmTokenToProfile (newFcmToken)
     {
         try
         {
-            let response = await request('/profile', {method : "PUT", body : JSON.stringify({notificationsToken : newFcmToken})});
+            await request('/profile', {method : "PUT", body : JSON.stringify({notificationsToken : newFcmToken})});
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('error:' + e);
+            processError(e, 'Error saving fcm token to profile');
         }
     }
 
-    useEffect(() =>
-    {
-        getAlbums();
-    }, []);
-
+    /**
+     * Open forced album (when user tapped on notification)
+     */
     useEffect(() =>
     {
         if (!forceAlbumId)
@@ -95,6 +98,9 @@ export default function Albums ({navigation})
 
     }, [forceAlbumId]);
 
+    /**
+     * Find forced album and open it
+     */
     function findAndSelectForceAlbum ()
     {
         const existingAlbum = albums.find(album => album.id === forceAlbumId);
@@ -105,6 +111,9 @@ export default function Albums ({navigation})
         }
     }
 
+    /**
+     * Fetch unseen alerts count on app reopen
+     */
     useEffect(() =>
     {
         if (appState === 'active')
@@ -113,12 +122,16 @@ export default function Albums ({navigation})
         }
     }, [appState]);
 
+    /**
+     * Fetch albums from the API
+     */
     async function getAlbums ()
     {
         try
         {
             const albums = await request('/albums');
-            setAlbums(albums.filter(album => album.filmsCount + album.imagesCount > 0));
+            const notEmptyAlbums = albums.filter(album => album.filmsCount + album.imagesCount > 0);
+            setAlbums(notEmptyAlbums);
             if (forceAlbumId)
             {
                 findAndSelectForceAlbum();
@@ -127,10 +140,13 @@ export default function Albums ({navigation})
         }
         catch (e)
         {
-            console.warn('error:' + e);
+            processError(e, 'Error fetching albums');
         }
     }
 
+    /**
+     * Fetch unseen alerts count (to show it on Notifications badge)
+     */
     async function getNewAlertsCount ()
     {
         try
@@ -140,9 +156,17 @@ export default function Albums ({navigation})
         }
         catch (e)
         {
-            Bugsnag.notify(e);
-            console.warn('error:' + JSON.stringify(e));
+            processError(e, 'Error fetching unseen alerts count');
         }
+    }
+
+    /**
+     * Open albums (when user taps on it)
+     */
+    function selectAlbum (album)
+    {
+        setSelectedAlbum(album);
+        navigation.navigate('AlbumRolls');
     }
 
     function toNotifications ()
@@ -155,12 +179,6 @@ export default function Albums ({navigation})
         navigation.navigate('Profile');
     }
 
-    function selectAlbum (album)
-    {
-        setSelectedAlbum(album);
-        navigation.navigate('AlbumRolls');
-    }
-
     return (
         <View style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
             <View style={styles.header}>
@@ -168,7 +186,6 @@ export default function Albums ({navigation})
                 <Fos style={styles.icon} fill={theme.primaryText}/>
             </View>
 
-            {/*<TextInput multiline={true} numberOfLines={3} style={{backgroundColor : '#fff', color: '#000'}} value={token}/>*/}
             {
                 loading && <ActivityIndicator style={styles.loader} size="large" color={theme.primaryText}/>
             }

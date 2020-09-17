@@ -10,7 +10,7 @@ import {FosLogo} from './components/FosLogo'
 import {shallowEqual, useSelector} from 'react-redux';
 
 import Albums from './screens/Albums';
-import Welcome from './screens/Welcome';
+import SignIn from './screens/SignIn';
 import Notifications from './screens/Notifications';
 import AlbumRolls from './screens/AlbumRolls';
 import EditAlbum from './screens/EditAlbum';
@@ -49,9 +49,9 @@ const MainStackScreen = ({navigation}) => {
     //const forceAlbumId = useSelector(state => state.main.forceAlbumId, shallowEqual);
 
     return (
-        <MainStack.Navigator initialRouteName={token ? 'Albums' : 'Welcome'} headerMode="screen" >
+        <MainStack.Navigator initialRouteName={token ? 'Albums' : 'SignIn'} headerMode="screen" >
             <MainStack.Screen name="Albums" component={Albums} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
-            <MainStack.Screen name="Welcome" component={Welcome} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
+            <MainStack.Screen name="SignIn" component={SignIn} options={{...headerStyle, headerTitle : <TdrLogo/>}}/>
             <MainStack.Screen name="AlbumRolls" component={AlbumRolls} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
             <MainStack.Screen name="EditAlbum" component={EditAlbum} options={{...headerStyle, headerTitle : 'Edit'}}/>
             <MainStack.Screen name="RollImages" component={RollImages} options={{...headerStyle, headerTitle : <FosLogo/>}}/>
@@ -65,10 +65,9 @@ export default ({}) => {
     const routeNameRef = React.useRef();
     const navigationRef = React.useRef();
 
-    /*const albums = useSelector(state => state.main.albums, shallowEqual);
-    const selectedAlbum = useSelector(state => state.main.selectedAlbum, shallowEqual);
-    const selectedRoll = useSelector(state => state.main.selectedRoll, shallowEqual);*/
-
+    /**
+     * Screen reporting for firebase analytics
+     */
     function onStateChange (state)
     {
         const previousRouteName = routeNameRef.current;
@@ -83,7 +82,11 @@ export default ({}) => {
         routeNameRef.current = currentRouteName;
     }
 
-    useEffect(() => {
+    /**
+     * Listener for orientation change
+     */
+    useEffect(() =>
+    {
 
         Orientation.addOrientationListener(_orientationDidChange);
 
@@ -98,18 +101,21 @@ export default ({}) => {
         setOrientation(orientation);
     }
 
+    /**
+     * Display foreground notification
+     */
     useEffect(() => {
 
-        const unsubscribe = messaging().onMessage(async notification => {
+        const unsubscribe = messaging().onMessage(async foregroundNotification => {
 
-            let data = {...(notification.data || {}), ...notification, ...notification.notification};
+            console.log('==================================== FOREGROUND onMessage ==================================== ', JSON.stringify(foregroundNotification));
 
-            console.log('==================================== LOCAL onMessage ==================================== ', JSON.stringify(notification));
+            let data = {...(foregroundNotification.data || {}), ...foregroundNotification, ...foregroundNotification.notification};
 
             PushNotification.localNotification({
-                title: notification.notification.title,
-                message: notification.notification.body,
-                data : notification
+                title: foregroundNotification.notification.title,
+                message: foregroundNotification.notification.body,
+                data : foregroundNotification
             });
 
             if (data.badge)
@@ -121,6 +127,29 @@ export default ({}) => {
         return unsubscribe;
     }, []);
 
+    /**
+     * Display background notification
+     */
+    useEffect(() => {
+
+        const unsubscribe = messaging().setBackgroundMessageHandler(async backgroundNotification => {
+
+            console.log('==================================== BACKGROUND onMessage ==================================== ' + JSON.stringify(backgroundNotification));
+
+            const data = {...(backgroundNotification.data || {}), ...backgroundNotification};
+
+            if (data.badge)
+            {
+                setBadge(data.badge);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
+
+    /**
+     * Called when user tap on FOREGROUND notification
+     */
     useEffect(() => {
 
         const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
@@ -142,23 +171,6 @@ export default ({}) => {
             setForceRollId(+rollId);
 
             console.log('==================================== REMOTE onNotificationOpenedApp ==================================== ' + JSON.stringify(remoteMessage));
-        });
-
-        return unsubscribe;
-    }, []);
-
-    useEffect(() => {
-
-        const unsubscribe = messaging().setBackgroundMessageHandler(async remoteMessage => {
-
-            const data = {...(remoteMessage.data || {}), ...remoteMessage};
-
-            if (data.badge)
-            {
-                setBadge(data.badge);
-            }
-
-            console.log('==================================== REMOTE onMessage ==================================== ' + JSON.stringify(remoteMessage));
         });
 
         return unsubscribe;

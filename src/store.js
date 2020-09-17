@@ -34,7 +34,7 @@ export function configureStore ()
 
     const rootReducer = combineReducers({
         main : withStorage ? persistReducer({key: "main", storage : FastStorage,
-            blacklist: ['selectedImage', 'selectedRoll', 'rolls', 'selectedAlbum', 'orientation'/*, 'forceAlbumId', 'forceRollId'*/]}, main) : main
+            blacklist: ['selectedImage', 'selectedRoll', 'rolls', 'selectedAlbum', 'orientation', 'forceAlbumId', 'forceRollId']}, main) : main
     });
     const enhancer = compose(applyMiddleware(...middlewares));
     const store = createStore(rootReducer, enhancer);

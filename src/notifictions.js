@@ -10,19 +10,6 @@ PushNotification.configure({
     smallIcon: 'ic_notification',
 });
 
-export const registerBackgroundNotifications = () => {
-    /*const promise = new Promise((resolve, reject) => {
-      messaging().setBackgroundMessageHandler(async remoteMessage => {
-        console.log('Background notification: ', remoteMessage);
-        await setNotificationData(remoteMessage.data);
-        const { body, title } = remoteMessage.data;
-        showNotification(body, title);
-        resolve();
-      });
-    });
-    return promise;*/
-};
-
 export const registerForegroundNotifications = onNotification => {
     return messaging().onMessage(async remoteMessage => {
       console.log('Foreground notification: ', remoteMessage.data);
@@ -93,6 +80,9 @@ export const showNotification = (title, body) => {
     });
 };
 
+/**
+ * Set notifications badge
+ */
 export function setBadge (count)
 {
     PushNotification.setApplicationIconBadgeNumber(+count);

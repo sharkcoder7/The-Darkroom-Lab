@@ -1,8 +1,4 @@
 import {PermissionsAndroid, Platform} from 'react-native';
-import {useCallback, useState} from 'react';
-import analytics from '@react-native-firebase/analytics';
-import RNFetchBlob from 'rn-fetch-blob';
-import CameraRoll from '@react-native-community/cameraroll';
 
 export function openUrl (url)
 {
@@ -68,50 +64,3 @@ export const SharedUtils =
         return this.lazyLoadedModules["Linking"];
     },
 };
-
-/*
-export async function onShare ()
-{
-    try
-    {
-        const result = await utils.Share.share({message: translate("shareText1") + translate("shareText2"),});
-
-        if (result.action === utils.Share.sharedAction)
-        {
-            firebase.analytics().logEvent('appShared');
-
-            if (result.activityType)
-            {
-            }
-            else
-            {
-            }
-        }
-        else if (result.action === utils.Share.dismissedAction)
-        {
-        }
-    }
-    catch (error)
-    {
-        console.log(error);
-    }
-}
-
-export async function onRate ()
-{
-    const options = {
-        AppleAppID:"1284518530",
-        GooglePackageName:"com.pairscrossplatform",
-        preferredAndroidMarket: utils.AndroidMarket.Google,
-        preferInApp: false,
-        openAppStoreIfInAppFails: true,
-        fallbackPlatformURL:"https://какая-пара.рф",
-    };
-
-    utils.Rate.rate(options, success => {
-        if (success)
-        {
-            firebase.analytics().logEvent('appRate');
-        }
-    })
-}*/
