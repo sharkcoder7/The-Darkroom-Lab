@@ -386,7 +386,7 @@ export default function ImageDetail ({navigation})
 
             <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
 
-                <View style={styles.imageZone}>
+                <View style={[styles.imageZone, {height: Dimensions.get('window').height - bottomBarHeightInPixes}]}>
                     {renderImageView(imageParams)}
                 </View>
 
@@ -439,7 +439,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     imageZone : {
-        height: Dimensions.get('window').height - bottomBarHeightInPixes,
         justifyContent: 'center',
         alignItems : 'center'
     },

@@ -82,11 +82,18 @@ export default ({}) => {
     }
 
     /**
+     * Set initial orientation
+     */
+    useEffect(() =>
+    {
+        setOrientation(Orientation.getInitialOrientation());
+    }, []);
+
+    /**
      * Listener for orientation change
      */
     useEffect(() =>
     {
-
         Orientation.addOrientationListener(_orientationDidChange);
 
         return () =>
