@@ -272,12 +272,47 @@ export default function ImageDetail ({navigation})
 
     const window = Dimensions.get('window');
 
-    let imageParams = {};
+    let imageParams = {},
+        wrapperParams = {};
+
 
     if (orientation !== 'LANDSCAPE')
     {
-        imageParams.width = '100%';
-        imageParams.height = [0, 0.5].indexOf(rotation) !== -1 ? window.height * (795 / 1200) + 20 : window.height - 50;
+        if ([0, 0.5].indexOf(rotation) !== -1)
+        {
+            imageParams = {
+                width:  window.width,
+                height: window.width * 795 / 1200,
+                resizeMode : 'cover',
+                marginTop : 0,
+                marginBottom : 0,
+            };
+
+            wrapperParams = {
+                justifyContent: 'center',
+                alignItems : 'center'
+            };
+        }
+        else
+        {
+            let width = window.width * 1200 / 795 - 90,
+                height = window.width,
+                diff = Math.round((width - height) / 2);
+
+            imageParams = {
+                width,
+                height,
+                resizeMode : 'cover',
+                marginTop: diff,
+            };
+
+            wrapperParams = {
+                alignItems: 'center'
+            };
+        }
+
+        /*imageParams.width = '100%';
+        imageParams.height = [0, 0.5].indexOf(rotation) !== -1 ? window.height * (795 / 1200) + 20 : window.height - 50;*/
     }
     else
     {
@@ -285,6 +320,10 @@ export default function ImageDetail ({navigation})
         imageParams.width = [0, 0.5].indexOf(rotation) !== -1 ? imageParams.height / (795 / 1200) : imageParams.height;
         imageParams.marginTop = 0;
         imageParams.modalView = true;
+
+        wrapperParams = {
+            justifyContent: 'center'
+        };
     }
 
     const imageView = (
@@ -315,7 +354,7 @@ export default function ImageDetail ({navigation})
                 </View>
             </Modal>
 
-            <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}]}>
+            <SafeAreaView style={[styles.wrapper, {backgroundColor : theme.backgroundColor}, {...wrapperParams}]}>
 
                 {imageView}
 
@@ -367,13 +406,10 @@ export default function ImageDetail ({navigation})
 const styles = StyleSheet.create({
     wrapper : {
         flex: 1,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems : 'center'
+        width: '100%'
     },
     imageWrapper : {
-        position: 'relative',
-        marginTop: -30
+        position: 'relative'
     },
     image : {
         width: '100%',
