@@ -158,7 +158,7 @@ export default function ImageDetail ({navigation})
         };
 
         RNFetchBlob.config({fileCache: true, appendExt: 'png'})
-            .fetch('GET', image.image_urls.sm)
+            .fetch('GET', image.image_urls.social)
             .then(res => {
                 CameraRoll.save(res.data, {type : 'photo'})
                     .then(() => setImageDownloadModalVisible(true))
@@ -251,7 +251,7 @@ export default function ImageDetail ({navigation})
     async function share ()
     {
         setSharing(true);
-        let url = image.image_urls.sm.replace('\\/', '/');
+        let url = image.image_urls.social.replace('\\/', '/');
 
         try
         {
